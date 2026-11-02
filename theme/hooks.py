@@ -54,6 +54,10 @@ def on_files(files, config):
 
 
 def on_page_markdown(markdown, page, config, files):
+    if page.meta.get("home"):
+        visual = (HERE / "overrides/partials/hero-visual.html").read_text(encoding="utf-8")
+        return markdown.replace("<!-- hero-visual -->", visual)
+
     if getattr(page.file, "norm_src_uri", page.file.src_uri) != "models/index.md":
         return markdown
 
@@ -73,7 +77,7 @@ def on_page_markdown(markdown, page, config, files):
         model["category_label"] = ui["categories"][model["category"]]
 
     env = Environment(
-        loader=FileSystemLoader(HERE / "overrides"),
+        loader=FileSystemLoader(config.theme.dirs),
         autoescape=select_autoescape(["html"]),
     )
     catalog = env.get_template("partials/model-catalog.html").render(

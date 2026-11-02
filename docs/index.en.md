@@ -8,6 +8,8 @@ hide:
 
 <div class="lx-hero" markdown>
 
+<div class="lx-hero-copy" markdown>
+
 # LightX2V Documentation
 
 <p class="lx-hero-lead">Lighter, faster image and video inference.</p>
@@ -20,6 +22,10 @@ Turn text and images into visual content. LightX2V brings model execution, infer
 [Choose a model](models/index.md){ .md-button }
 
 </div>
+
+</div>
+
+<!-- hero-visual -->
 
 </div>
 

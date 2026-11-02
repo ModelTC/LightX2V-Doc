@@ -8,6 +8,8 @@ hide:
 
 <div class="lx-hero" markdown>
 
+<div class="lx-hero-copy" markdown>
+
 # LightX2V 文档
 
 <p class="lx-hero-lead">让图像与视频推理，更轻、更快。</p>
@@ -20,6 +22,10 @@ hide:
 [选择模型](models/index.md){ .md-button }
 
 </div>
+
+</div>
+
+<!-- hero-visual -->
 
 </div>
 
