@@ -1,6 +1,6 @@
 # Generate your first video
 
-This walkthrough uses Wan2.1-T2V-1.3B. Complete the [environment setup](quickstart.md) first, then run the commands below from the LightX2V repository root.
+This walkthrough uses Wan2.1-T2V-1.3B. Complete the [environment setup](installation.md) first, then run the commands below from the LightX2V repository root.
 
 ## Download the model
 

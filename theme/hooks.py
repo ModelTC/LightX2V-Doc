@@ -3,6 +3,7 @@
 import posixpath
 import re
 from pathlib import Path
+from urllib.parse import urljoin
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -20,6 +21,16 @@ def read_models(locale="zh"):
     models = yaml.safe_load((HERE / "models.yml").read_text(encoding="utf-8"))
     names, pages = set(), set()
     for model in models:
+        # Keep discovery consistent when readers switch the interface language.
+        model["search_text"] = " ".join(
+            [
+                model["name"],
+                model["description"],
+                model["description_en"],
+                *model["tags"],
+                *model["tags_en"],
+            ]
+        )
         if locale == "en":
             for field in ("source", "description", "tags"):
                 model[field] = model[f"{field}_en"]
@@ -50,12 +61,42 @@ def on_files(files, config):
             if files.get_file_from_path(target):
                 raise PluginError(f"Document asset shadows a theme asset: {target}")
             files.append(File.generated(config, target, abs_src_path=str(asset)))
+
+    # Keep published URLs working without retaining duplicate Markdown pages.
+    locale = config.plugins["i18n"].current_language
+    env = Environment(
+        loader=FileSystemLoader(config.theme.dirs),
+        autoescape=select_autoescape(["html"]),
+    )
+    template = env.get_template("redirect.html")
+    for old_url, target in config.extra.get("redirects", {}).items():
+        source = locale_prefix(locale) + old_url
+        destination = files.get_file_from_path(target)
+        if not destination or not destination.is_documentation_page():
+            raise PluginError(f"Redirect target is not a document: {target}")
+        if any(file.dest_uri == source for file in files):
+            raise PluginError(f"Redirect would overwrite a page or asset: {source}")
+        files.append(
+            File.generated(
+                config,
+                source,
+                content=template.render(
+                    locale=locale,
+                    target_url=posixpath.relpath(
+                        destination.url, posixpath.dirname(source)
+                    ),
+                    canonical_url=urljoin(config.site_url, destination.url),
+                ),
+            )
+        )
     return files
 
 
 def on_page_markdown(markdown, page, config, files):
     if page.meta.get("home"):
-        visual = (HERE / "overrides/partials/hero-visual.html").read_text(encoding="utf-8")
+        visual = (HERE / "overrides/partials/hero-visual.html").read_text(
+            encoding="utf-8"
+        )
         return markdown.replace("<!-- hero-visual -->", visual)
 
     if getattr(page.file, "norm_src_uri", page.file.src_uri) != "models/index.md":

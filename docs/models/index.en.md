@@ -23,7 +23,7 @@ hide:
 
 <div class="lx-catalog-footer" markdown>
 
-Need to prepare your environment? Start with the [quickstart](../getting-started/quickstart.md). See the [full model ecosystem](https://github.com/ModelTC/LightX2V/blob/main/README.md) for more models and variants.
+Need to prepare your environment? Start with the [quickstart](../getting_started/index.md). See the [full model ecosystem](https://github.com/ModelTC/LightX2V/blob/main/README.md) for more models and variants.
 
 Wan2.1, Wan2.2 and Qwen-Image-2.1 have complete guides on this site. Other entries link to their repository instructions or scripts.
 

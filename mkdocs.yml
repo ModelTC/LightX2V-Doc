@@ -45,7 +45,6 @@ theme:
     - search.highlight
     - content.code.copy
     - content.tabs.link
-    - content.action.edit
 
 nav:
   - 概览:
@@ -59,9 +58,9 @@ nav:
           - LightX2V Studio: https://x2v.light-ai.top/
           - macOS 应用: https://github.com/ModelTC/LightX2V-Mac-App
   - 快速入门:
-      - 安装与首次生成: getting-started/quickstart.md
+      - 安装与首次生成: getting_started/index.md
       - 继续使用:
-          - 完整安装指南: getting_started/quickstart.md
+          - 完整安装指南: getting_started/installation.md
           - 生成第一个视频: getting_started/first_generation.md
           - Python API: getting_started/python_api.md
           - 模型结构与权重: getting_started/model_structure.md
@@ -76,6 +75,7 @@ nav:
           - MiniMax-H3: https://github.com/ModelTC/LightX2V/blob/main/scripts/minimax_h3/README_zh.md
           - LTX: https://github.com/ModelTC/LightX2V/blob/main/scripts/ltx2/README_zh.md
   - 加速优化:
+      - 选择加速方案: method_tutorials/index.md
       - 模型量化: method_tutorials/quantization.md
       - 特征缓存: method_tutorials/cache.md
       - 注意力机制: method_tutorials/attention.md
@@ -144,6 +144,7 @@ plugins:
             Wan2.1 与 VACE: Wan2.1 and VACE
             更多模型示例: More model examples
             加速优化: Acceleration
+            选择加速方案: Choose an acceleration approach
             模型量化: Model quantization
             特征缓存: Feature caching
             注意力机制: Attention
@@ -206,6 +207,9 @@ extra_javascript:
 
 extra:
   generator: false
+  redirects:
+    getting-started/quickstart.html: getting_started/index.md
+    getting_started/quickstart.html: getting_started/installation.md
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/ModelTC/LightX2V

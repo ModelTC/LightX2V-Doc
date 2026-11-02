@@ -12,7 +12,7 @@
 
 ## 环境与权重
 
-先完成[环境安装](../getting_started/quickstart.md)。首次运行 MoE T2V 时下载：
+先完成[环境安装](../getting_started/installation.md)。首次运行 MoE T2V 时下载：
 
 ```bash
 hf download Wan-AI/Wan2.2-T2V-A14B --local-dir Wan-AI/Wan2.2-T2V-A14B

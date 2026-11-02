@@ -18,13 +18,13 @@ This document provides detailed instructions for deploying LightX2V locally on W
 
 ### Method 1: Using Batch File Inference
 
-Refer to [Quick Start Guide](../getting_started/quickstart.md) to install environment, and use [batch files](https://github.com/ModelTC/LightX2V/tree/main/scripts/win) to run.
+Refer to [Quick Start Guide](../getting_started/installation.md) to install environment, and use [batch files](https://github.com/ModelTC/LightX2V/tree/main/scripts/win) to run.
 
 ### Method 2: Using Gradio Web Interface Inference
 
 #### Manual Gradio Configuration
 
-Refer to [Quick Start Guide](../getting_started/quickstart.md) to install environment, refer to [Gradio Deployment Guide](deploy_gradio.md)
+Refer to [Quick Start Guide](../getting_started/installation.md) to install environment, refer to [Gradio Deployment Guide](deploy_gradio.md)
 
 #### Legacy Bundle: One-Click Gradio Startup
 

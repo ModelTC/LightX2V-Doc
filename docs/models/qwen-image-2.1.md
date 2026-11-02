@@ -39,7 +39,7 @@ hf download Qwen/Qwen-Image-2.1-Turbo --local-dir Qwen/Qwen-Image-2.1-Turbo
 
 ## 2. 环境安装
 
-已有运行环境时，按[完整安装指南](../getting_started/quickstart.md)检查依赖。通用配置使用 `flash_attn3`；算子选择见[注意力机制](../method_tutorials/attention.md)，RTX 5090 使用下文对应的镜像与专用配置。
+已有运行环境时，按[完整安装指南](../getting_started/installation.md)检查依赖。通用配置使用 `flash_attn3`；算子选择见[注意力机制](../method_tutorials/attention.md)，RTX 5090 使用下文对应的镜像与专用配置。
 
 根据 GPU 型号选择 [LightX2V Docker 镜像](https://hub.docker.com/r/lightx2v/lightx2v/tags)。在宿主机的工作目录中拉取对应镜像：
 

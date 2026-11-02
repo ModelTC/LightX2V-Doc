@@ -5,15 +5,18 @@ zh:
     restore: 修复与超分
     world: 交互与空间
   search_label: 查找模型
-  search_placeholder: 搜索名称或任务，如 Wan、文生图…
+  search_placeholder: 中英文名称或任务，如 Wan、图像编辑…
   filter_label: 按任务筛选模型
   all: 全部
   count: '显示 {visible} / {total} 个模型系列'
   tags_label: 任务与特性
   guide: 使用指南
   guide_label: '查看 {name} 的使用指南'
+  example: GitHub 示例
+  example_label: '在 GitHub 查看 {name} 的运行示例'
+  other_results: '查看其他分类的 {count} 个结果'
   empty_title: 没有找到匹配的模型
-  empty_description: 尝试其他模型名称，或清除任务筛选后重新查找。
+  empty_description: 试试更短的关键词，或调整任务分类。支持中文与英文搜索。
   reset: 清除筛选
 en:
   categories:
@@ -22,13 +25,16 @@ en:
     restore: Restoration and upscaling
     world: Interaction and spatial tasks
   search_label: Find a model
-  search_placeholder: Search a name or task, e.g. Wan, image editing…
+  search_placeholder: Name or task in English or Chinese, e.g. Wan, image editing…
   filter_label: Filter models by task
   all: All
   count: 'Showing {visible} / {total} model families'
   tags_label: Tasks and features
   guide: Usage guide
   guide_label: 'Read the {name} usage guide'
+  example: GitHub examples
+  example_label: 'View {name} examples on GitHub'
+  other_results: 'Show {count} results in other categories'
   empty_title: No matching models
-  empty_description: Try another model name or clear the task filter.
+  empty_description: Try a shorter keyword or a different task category. Search works in English and Chinese.
   reset: Clear filters

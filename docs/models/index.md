@@ -23,7 +23,7 @@ hide:
 
 <div class="lx-catalog-footer" markdown>
 
-还没有准备好运行环境？从[快速入门](../getting-started/quickstart.md)开始。更多模型与变体见[完整模型生态](https://github.com/ModelTC/LightX2V/blob/main/README_zh.md)。
+还没有准备好运行环境？从[快速入门](../getting_started/index.md)开始。更多模型与变体见[完整模型生态](https://github.com/ModelTC/LightX2V/blob/main/README_zh.md)。
 
 Wan2.1、Wan2.2 和 Qwen-Image-2.1 提供完整站内指南；其他模型链接到仓库中的使用说明或运行脚本。
 

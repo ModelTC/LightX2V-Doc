@@ -12,7 +12,7 @@ The example scripts are in `scripts/wan22/` in the [LightX2V inference repositor
 
 ## Environment and weights
 
-Complete the [environment setup](../getting_started/quickstart.md).
+Complete the [environment setup](../getting_started/installation.md).
 For your first MoE T2V run, download:
 
 ```bash

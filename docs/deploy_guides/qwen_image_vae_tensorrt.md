@@ -4,7 +4,7 @@ TensorRT 可加速 Qwen Image 的 VAE Encoder 和 Decoder。固定分辨率的 T
 
 ## 准备与启动
 
-1. 完成 [LightX2V 环境安装](../getting_started/quickstart.md)，准备对应的 Qwen Image 模型。
+1. 完成 [LightX2V 环境安装](../getting_started/installation.md)，准备对应的 Qwen Image 模型。
 2. 安装与当前 CUDA 环境及引擎构建版本匹配的 TensorRT，并准备预先构建的 `.trt` 文件。设置配置路径不会自动构建引擎。
 3. 选择下表中的完整配置，修改 `trt_vae_config.trt_engine_path`，并确认 `attn_type` 与 GPU 和已安装的后端匹配。引擎文件的目录结构见下文。
 

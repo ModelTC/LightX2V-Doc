@@ -1,8 +1,8 @@
-# LightX2V Quick Start Guide
+# Full installation guide { #lightx2v-quick-start-guide }
 
 After setup, follow [Generate your first video](first_generation.md), or use the [Python API](python_api.md).
 
-Welcome to LightX2V! This guide will help you quickly set up the environment and start using LightX2V for video generation.
+This page covers Linux and Windows setup, container images, and operator dependencies. For a walkthrough from setup to a generated video, start with [Installation and first generation](index.md).
 
 ## 📋 Table of Contents
 

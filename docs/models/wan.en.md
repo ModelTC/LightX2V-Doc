@@ -14,7 +14,7 @@ The example scripts are in `scripts/wan/` in the [LightX2V inference repository]
 
 ## Environment and weights
 
-Complete the [environment setup](../getting_started/quickstart.md).
+Complete the [environment setup](../getting_started/installation.md).
 For your first T2V 1.3B run, download:
 
 ```bash

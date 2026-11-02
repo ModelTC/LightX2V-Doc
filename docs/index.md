@@ -18,7 +18,7 @@ hide:
 
 <div class="lx-hero-actions" markdown>
 
-[快速开始 :material-arrow-right:](getting-started/quickstart.md){ .md-button .md-button--primary }
+[快速开始 :material-arrow-right:](getting_started/index.md){ .md-button .md-button--primary }
 [选择模型](models/index.md){ .md-button }
 
 </div>
@@ -39,7 +39,7 @@ hide:
 
 从文生图、图像编辑，到视频与音视频生成，按任务找到合适的模型。
 
-[浏览模型 ↗](models/index.md){ .lx-card-action }
+[浏览模型 →](models/index.md){ .lx-card-action }
 
 </div>
 
@@ -51,7 +51,7 @@ hide:
 
 结合量化、特征缓存、注意力优化与步数蒸馏，调整推理性能。
 
-[了解加速方法 ↗](method_tutorials/quantization.md){ .lx-card-action }
+[选择加速方案 →](method_tutorials/index.md){ .lx-card-action }
 
 </div>
 
@@ -63,7 +63,7 @@ hide:
 
 通过参数卸载、量化与并行配置，让模型适应你的硬件资源。
 
-[查看低资源部署 ↗](deploy_guides/for_low_resource.md){ .lx-card-action }
+[查看低资源部署 →](deploy_guides/for_low_resource.md){ .lx-card-action }
 
 </div>
 
@@ -75,7 +75,7 @@ hide:
 
 使用 Python API、推理服务、Gradio 或 ComfyUI 构建生成工作流。
 
-[选择部署方式 ↗](deploy_guides/deploy_service.md){ .lx-card-action }
+[查看服务部署 →](deploy_guides/deploy_service.md){ .lx-card-action }
 
 </div>
 
@@ -99,7 +99,7 @@ hide:
 <li><span>3</span>运行生成</li>
 </ol>
 
-[打开快速入门 :material-arrow-right:](getting-started/quickstart.md){ .lx-text-link }
+[打开快速入门 :material-arrow-right:](getting_started/index.md){ .lx-text-link }
 
 </div>
 
@@ -115,14 +115,16 @@ hide:
 
 </div>
 
-## 探索模型生态
+## 按任务探索模型 { #探索模型生态 }
 
-<div class="lx-model-shortcuts" markdown>
+从想要生成的内容出发，查看对应模型与运行示例。
 
-[**Wan2.2**<span>视频生成</span>](models/wan22.md)
-[**Qwen-Image-2.1**<span>图像生成与编辑</span>](models/qwen-image-2.1.md)
-[**MiniMax-H3**<span>音视频生成</span>](https://github.com/ModelTC/LightX2V/blob/main/scripts/minimax_h3/README_zh.md)
-[**SeedVR2**<span>修复与超分</span>](https://github.com/ModelTC/LightX2V/blob/main/scripts/seedvr2/README_zh.md)
+<div class="lx-task-shortcuts" markdown>
+
+[:material-video-outline: **视频与音视频**<span>Wan、MiniMax-H3、LTX 等</span>](models/index.md?task=video#model-catalog)
+[:material-image-outline: **图像生成与编辑**<span>Qwen-Image、Z-Image、FLUX.2 等</span>](models/index.md?task=image#model-catalog)
+[:material-auto-fix: **修复与超分**<span>SeedVR2、SwiftVR、RelayVSR</span>](models/index.md?task=restore#model-catalog)
+[:material-cube-outline: **交互与空间**<span>EdenLive、WorldMirror、WorldPlay</span>](models/index.md?task=world#model-catalog)
 
 </div>
 

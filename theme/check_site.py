@@ -25,6 +25,7 @@ class Page(HTMLParser):
         self.switches = []
         self.lang = None
         self.canonical = None
+        self.redirect = None
         self.fallback = False
         self.feed(path.read_text(encoding="utf-8"))
 
@@ -41,6 +42,8 @@ class Page(HTMLParser):
             self.switches.append(attrs)
         if tag == "link" and "canonical" in attrs.get("rel", "").split():
             self.canonical = attrs.get("href")
+        if tag == "meta" and attrs.get("http-equiv", "").lower() == "refresh":
+            self.redirect = attrs.get("content", "")
         if tag in {"a", "link", "img", "script", "video", "source"}:
             for field in ("href", "src", "poster"):
                 if attrs.get(field):
@@ -55,7 +58,14 @@ def check_site(site, site_url=None, repository_dir=None, edit_base=None):
         path.relative_to(site).as_posix(): Page(path)
         for path in sorted(site.rglob("*.html"))
     }
-    content = {name: page for name, page in pages.items() if name != "404.html"}
+    redirects = {
+        name: page for name, page in pages.items() if page.redirect is not None
+    }
+    content = {
+        name: page
+        for name, page in pages.items()
+        if name != "404.html" and name not in redirects
+    }
     repository_paths = set()
 
     def fail(message):
@@ -108,6 +118,21 @@ def check_site(site, site_url=None, repository_dir=None, edit_base=None):
     for name, page in pages.items():
         for href in page.links:
             check_link(name, href)
+    for name, page in redirects.items():
+        match = re.fullmatch(r"0;\s*url=(.+)", page.redirect)
+        if not match:
+            fail(f"{name}: invalid redirect: {page.redirect}")
+            continue
+        target_url = urljoin(base + name, match[1])
+        target = local_path(target_url)
+        if target not in content:
+            fail(f"{name}: redirect must reach a content page directly: {target_url}")
+        elif page.lang != content[target].lang:
+            fail(f"{name}: redirect changes language: {target_url}")
+        if site_url and page.canonical != target_url:
+            fail(
+                f"{name}: redirect canonical does not match its target: {page.canonical}"
+            )
     for path in site.rglob("*.css"):
         name = path.relative_to(site).as_posix()
         for match in re.finditer(
@@ -146,10 +171,13 @@ def check_site(site, site_url=None, repository_dir=None, edit_base=None):
             )
             expected_edit = edit_base.rstrip("/") + "/" + source
             edits = [href for href in page.links if href.startswith(edit_base)]
-            if edits != [expected_edit] or not (ROOT / "docs" / source).is_file():
+            # Material's edit action is optional; validate its target when shown.
+            if edits and edits != [expected_edit]:
                 fail(
                     f"{name}: edit link must point to this repository's docs/{source}: {edits}"
                 )
+            if not (ROOT / "docs" / source).is_file():
+                fail(f"{name}: missing Markdown source: docs/{source}")
 
     try:
         search = json.loads(
@@ -212,7 +240,7 @@ def check_site(site, site_url=None, repository_dir=None, edit_base=None):
         )
         return 1
     print(
-        f"Documentation validated: {len(content)} pages, {len(repository_paths)} repository paths; links, assets, language switches, search and sitemap passed."
+        f"Documentation validated: {len(content)} pages, {len(redirects)} redirects, {len(repository_paths)} repository paths; links, assets, language switches, search and sitemap passed."
     )
     if not repository_dir:
         print(
@@ -239,7 +267,7 @@ def main():
             "LIGHTX2V_DOCS_EDIT_URI",
             "https://github.com/ModelTC/LightX2V-Doc/edit/main/docs/",
         ),
-        help="Full edit URL of this documentation repository, ending in /docs/",
+        help="Full edit URL to validate when edit links are shown, ending in /docs/",
     )
     parser.add_argument(
         "--lightx2v-source",

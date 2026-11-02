@@ -1,14 +1,14 @@
 {% set category_icons = {"video": "video-outline", "image": "image-outline", "restore": "auto-fix", "world": "cube-outline"} %}
-<div class="lx-catalog" data-model-catalog data-count-template="{{ ui.count }}">
+<div class="lx-catalog" id="model-catalog" data-model-catalog data-count-template="{{ ui.count }}" data-other-template="{{ ui.other_results }}">
   <div class="lx-catalog-controls">
     <label class="lx-model-search" for="model-search">
       <span>{{ ui.search_label }}</span>
       <input id="model-search" type="search" placeholder="{{ ui.search_placeholder }}" autocomplete="off" aria-controls="model-list">
     </label>
     <div class="lx-filter-row" role="group" aria-label="{{ ui.filter_label }}">
-      <button type="button" data-filter="all" aria-pressed="true">{{ ui.all }} <span>{{ models | length }}</span></button>
+      <button type="button" data-filter="all" aria-pressed="true" aria-controls="model-list">{{ ui.all }} <span data-filter-count>{{ models | length }}</span></button>
       {% for category, label in categories.items() %}
-      <button type="button" data-filter="{{ category }}" aria-pressed="false">{{ label }}</button>
+      <button type="button" data-filter="{{ category }}" aria-pressed="false" aria-controls="model-list">{{ label }} <span data-filter-count>{{ models | selectattr('category', 'equalto', category) | list | length }}</span></button>
       {% endfor %}
     </div>
     <div class="lx-catalog-status">
@@ -18,7 +18,7 @@
   </div>
   <div class="lx-model-list" id="model-list">
     {% for model in models %}
-    <article class="lx-model" data-category="{{ model.category }}">
+    <article class="lx-model" data-category="{{ model.category }}" data-search="{{ model.search_text }}">
       <div class="lx-model-heading">
         <span class="lx-model-symbol" aria-hidden="true">{% include ".icons/material/" ~ category_icons[model.category] ~ ".svg" %}</span>
         <span class="lx-model-kind">{{ model.category_label }}</span>
@@ -28,13 +28,16 @@
       <ul class="lx-model-tags" aria-label="{{ ui.tags_label }}">
         {% for tag in model.tags %}<li>{{ tag }}</li>{% endfor %}
       </ul>
-      <a href="{{ model.url }}" class="lx-model-link" aria-label="{{ ui.guide_label.format(name=model.name) }}">{{ ui.guide }} <span aria-hidden="true">{{ '→' if model.page else '↗' }}</span></a>
+      <a href="{{ model.url }}" class="lx-model-link" aria-label="{{ (ui.guide_label if model.page else ui.example_label).format(name=model.name) }}">{{ ui.guide if model.page else ui.example }} <span aria-hidden="true">{{ '→' if model.page else '↗' }}</span></a>
     </article>
     {% endfor %}
   </div>
   <div class="lx-model-empty" hidden>
     <h2>{{ ui.empty_title }}</h2>
     <p>{{ ui.empty_description }}</p>
-    <button type="button" class="md-button" data-reset-filters>{{ ui.reset }}</button>
+    <div class="lx-model-empty-actions">
+      <button type="button" class="md-button md-button--primary" data-clear-category hidden></button>
+      <button type="button" class="md-button" data-reset-filters>{{ ui.reset }}</button>
+    </div>
   </div>
 </div>

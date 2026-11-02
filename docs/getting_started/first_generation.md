@@ -1,6 +1,6 @@
 # 生成第一个视频
 
-本教程使用 Wan2.1-T2V-1.3B。先完成[环境安装](quickstart.md)，再从 LightX2V 仓库根目录执行下面的命令。
+本教程使用 Wan2.1-T2V-1.3B。先完成[环境安装](installation.md)，再从 LightX2V 仓库根目录执行下面的命令。
 
 ## 下载模型
 

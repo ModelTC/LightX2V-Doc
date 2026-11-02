@@ -45,7 +45,7 @@ Sol-Attn is a forward-only, non-causal self-attention backend requiring contiguo
 docker build -f dockerfiles/Dockerfile_5090_cu130_sol_attn -t lightx2v-sol-attn:sm120 .
 ```
 
-Follow [Quick Start](../getting_started/quickstart.md) to run a container, replacing the image with `lightx2v-sol-attn:sm120`. For H100/H200 (SM90), install the backend using the [upstream Sol-Attn instructions](https://github.com/NVlabs/Sana/tree/sol-engine/techniques/sparse_backends).
+Follow [Quick Start](../getting_started/installation.md) to run a container, replacing the image with `lightx2v-sol-attn:sm120`. For H100/H200 (SM90), install the backend using the [upstream Sol-Attn instructions](https://github.com/NVlabs/Sana/tree/sol-engine/techniques/sparse_backends).
 
 Before running, set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in `scripts/wan/inference/run_wan_i2v_sol_attn.sh`. Then edit `configs/attentions/wan_i2v_sol_attn.json` to match your GPU:
 

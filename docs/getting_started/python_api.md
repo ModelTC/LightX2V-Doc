@@ -1,6 +1,6 @@
 # Python API
 
-先按[快速入门](quickstart.md)安装 LightX2V。下列示例从仓库根目录运行，请将模型、输入和输出路径替换为本地路径。
+先按[完整安装指南](installation.md)安装 LightX2V。下列示例从仓库根目录运行，请将模型、输入和输出路径替换为本地路径。
 
 ## 创建 Pipeline 并生成
 

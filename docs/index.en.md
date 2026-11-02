@@ -18,7 +18,7 @@ Turn text and images into visual content. LightX2V brings model execution, infer
 
 <div class="lx-hero-actions" markdown>
 
-[Get started :material-arrow-right:](getting-started/quickstart.md){ .md-button .md-button--primary }
+[Get started :material-arrow-right:](getting_started/index.md){ .md-button .md-button--primary }
 [Choose a model](models/index.md){ .md-button }
 
 </div>
@@ -51,7 +51,7 @@ Find a model for text-to-image, image editing, video or audiovisual generation.
 
 Tune inference with quantization, feature caching, attention optimization and step distillation.
 
-[Explore acceleration →](method_tutorials/quantization.md){ .lx-card-action }
+[Choose an acceleration approach →](method_tutorials/index.md){ .lx-card-action }
 
 </div>
 
@@ -75,7 +75,7 @@ Use parameter offload, quantization and parallel configurations to fit your hard
 
 Build generation workflows with the Python API, inference services, Gradio or ComfyUI.
 
-[Choose a deployment path →](deploy_guides/deploy_service.md){ .lx-card-action }
+[Set up an inference service →](deploy_guides/deploy_service.md){ .lx-card-action }
 
 </div>
 
@@ -99,7 +99,7 @@ Prepare the environment, download [Wan2.1-T2V-1.3B](models/wan.md#first-run), an
 <li><span>3</span>Generate</li>
 </ol>
 
-[Open the quickstart :material-arrow-right:](getting-started/quickstart.md){ .lx-text-link }
+[Open the quickstart :material-arrow-right:](getting_started/index.md){ .lx-text-link }
 
 </div>
 
@@ -115,14 +115,16 @@ Prepare the environment, download [Wan2.1-T2V-1.3B](models/wan.md#first-run), an
 
 </div>
 
-## Explore the model ecosystem
+## Explore models by task { #explore-the-model-ecosystem }
 
-<div class="lx-model-shortcuts" markdown>
+Start with what you want to create, then find the models and examples for that task.
 
-[**Wan2.2**<span>Video generation</span>](models/wan22.md)
-[**Qwen-Image-2.1**<span>Image generation and editing</span>](models/qwen-image-2.1.md)
-[**MiniMax-H3**<span>Audiovisual generation</span>](https://github.com/ModelTC/LightX2V/blob/main/scripts/minimax_h3/README.md)
-[**SeedVR2**<span>Restoration and upscaling</span>](https://github.com/ModelTC/LightX2V/blob/main/scripts/seedvr2/README.md)
+<div class="lx-task-shortcuts" markdown>
+
+[:material-video-outline: **Video and audio**<span>Wan, MiniMax-H3, LTX and more</span>](models/index.md?task=video#model-catalog)
+[:material-image-outline: **Image generation and editing**<span>Qwen-Image, Z-Image, FLUX.2 and more</span>](models/index.md?task=image#model-catalog)
+[:material-auto-fix: **Restoration and upscaling**<span>SeedVR2, SwiftVR, RelayVSR</span>](models/index.md?task=restore#model-catalog)
+[:material-cube-outline: **Interaction and spatial tasks**<span>EdenLive, WorldMirror, WorldPlay</span>](models/index.md?task=world#model-catalog)
 
 </div>
 

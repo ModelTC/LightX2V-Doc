@@ -39,7 +39,7 @@ hf download Qwen/Qwen-Image-2.1-Turbo --local-dir Qwen/Qwen-Image-2.1-Turbo
 
 ## 2. Environment Setup
 
-For an existing environment, check dependencies against the [full installation guide](../getting_started/quickstart.md). General configurations use `flash_attn3`; see the [attention guide](../method_tutorials/attention.md) for backend selection. RTX 5090 uses its corresponding image and dedicated configurations below.
+For an existing environment, check dependencies against the [full installation guide](../getting_started/installation.md). General configurations use `flash_attn3`; see the [attention guide](../method_tutorials/attention.md) for backend selection. RTX 5090 uses its corresponding image and dedicated configurations below.
 
 Choose the [LightX2V Docker image](https://hub.docker.com/r/lightx2v/lightx2v/tags) for your GPU. Pull the corresponding image in a working directory on the host:
 

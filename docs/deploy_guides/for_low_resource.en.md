@@ -1,6 +1,6 @@
 # Low-resource Wan deployment
 
-This guide covers quantization, CPU/disk offloading, and VAE options for Wan2.1. Complete [environment setup](../getting_started/quickstart.md), then select a config compatible with your model and GPU backends. VRAM and host RAM requirements depend on weights, dimensions, frame count, and kernels; 8GB VRAM and 16/32GB RAM do not guarantee that every config will run.
+This guide covers quantization, CPU/disk offloading, and VAE options for Wan2.1. Complete [environment setup](../getting_started/installation.md), then select a config compatible with your model and GPU backends. VRAM and host RAM requirements depend on weights, dimensions, frame count, and kernels; 8GB VRAM and 16/32GB RAM do not guarantee that every config will run.
 
 ## Choose a configuration
 

@@ -1,8 +1,8 @@
-# LightX2V 快速入门指南
+# 完整安装指南 { #lightx2v-快速入门指南 }
 
 环境安装完成后，继续[生成第一个视频](first_generation.md)，或使用 [Python API](python_api.md)。
 
-欢迎使用 LightX2V！本指南将帮助您快速搭建环境并开始使用 LightX2V 进行视频生成。
+本页介绍 Linux、Windows 下的环境安装、镜像选择和算子依赖。希望先走通一次生成流程，可阅读[安装与首次生成](index.md)。
 
 ## 📋 目录
 

@@ -49,7 +49,7 @@ cd LightX2V
     pip install -v -e .
     ```
 
-    Run the remaining commands inside the container. Other CUDA image versions and mirrors are listed in the [full installation guide](../getting_started/quickstart.md).
+    Run the remaining commands inside the container. Other CUDA image versions and mirrors are listed in the [full installation guide](installation.md).
 
 === "Conda"
 
@@ -61,7 +61,7 @@ cd LightX2V
     pip install -v -e .
     ```
 
-    Follow the [full installation guide](../getting_started/quickstart.md) to install attention kernels compatible with your GPU, CUDA and PyTorch. Quantized models also require the corresponding quantization kernels.
+    Follow the [full installation guide](installation.md) to install attention kernels compatible with your GPU, CUDA and PyTorch. Quantized models also require the corresponding quantization kernels.
 
     Check that the package imports:
 
@@ -137,6 +137,6 @@ Continue with [Wan2.1 and VACE](../models/wan.md) for other tasks, distillation 
 
     Create a pipeline and reuse the loaded model for generation.
 
-    [Read the Python API guide](../getting_started/python_api.md)
+    [Read the Python API guide](python_api.md)
 
 </div>

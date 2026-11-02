@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="{{ locale }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <title>{{ "页面已迁移" if locale == "zh" else "Page moved" }} · LightX2V</title>
+    <script>
+      window.location.replace({{ target_url | tojson }} + window.location.search + window.location.hash);
+    </script>
+    <noscript><meta http-equiv="refresh" content="0; url={{ target_url }}"></noscript>
+  </head>
+  <body>
+    <p><a href="{{ target_url }}">{{ "页面已迁移，点击继续阅读。" if locale == "zh" else "This page has moved. Continue reading." }}</a></p>
+  </body>
+</html>

@@ -45,7 +45,7 @@ Sol-Attn 是仅支持前向计算的非因果 self-attention 后端，要求连�
 docker build -f dockerfiles/Dockerfile_5090_cu130_sol_attn -t lightx2v-sol-attn:sm120 .
 ```
 
-按[快速入门](../getting_started/quickstart.md)启动容器，将镜像替换为 `lightx2v-sol-attn:sm120`。H100/H200（SM90）按 [Sol-Attn 上游说明](https://github.com/NVlabs/Sana/tree/sol-engine/techniques/sparse_backends)安装后端。
+按[快速入门](../getting_started/installation.md)启动容器，将镜像替换为 `lightx2v-sol-attn:sm120`。H100/H200（SM90）按 [Sol-Attn 上游说明](https://github.com/NVlabs/Sana/tree/sol-engine/techniques/sparse_backends)安装后端。
 
 运行前，修改 `scripts/wan/inference/run_wan_i2v_sol_attn.sh` 中的 `lightx2v_path`、`model_path` 和 `CUDA_VISIBLE_DEVICES`。再编辑 `configs/attentions/wan_i2v_sol_attn.json`，按 GPU 选择后端：
 

@@ -49,7 +49,7 @@ cd LightX2V
     pip install -v -e .
     ```
 
-    后续命令均在容器内执行。镜像的其他 CUDA 版本和国内镜像源见[完整安装指南](../getting_started/quickstart.md)。
+    后续命令均在容器内执行。镜像的其他 CUDA 版本和国内镜像源见[完整安装指南](installation.md)。
 
 === "Conda"
 
@@ -61,7 +61,7 @@ cd LightX2V
     pip install -v -e .
     ```
 
-    然后按照[完整安装指南](../getting_started/quickstart.md)安装与 GPU、CUDA、PyTorch 匹配的注意力算子。使用量化模型时，还需安装对应量化算子。
+    然后按照[完整安装指南](installation.md)安装与 GPU、CUDA、PyTorch 匹配的注意力算子。使用量化模型时，还需安装对应量化算子。
 
     安装完成后检查是否能导入：
 
@@ -137,6 +137,6 @@ save_results/output_lightx2v_wan_t2v.mp4
 
     创建 Pipeline，复用已加载的模型进行生成。
 
-    [阅读 Python API](../getting_started/python_api.md)
+    [阅读 Python API](python_api.md)
 
 </div>

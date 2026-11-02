@@ -10,10 +10,11 @@
   const count = catalog.querySelector(".lx-model-count");
   const empty = catalog.querySelector(".lx-model-empty");
   const clearActive = catalog.querySelector("[data-clear-active]");
+  const clearCategory = catalog.querySelector("[data-clear-category]");
   const languageSwitch = document.querySelector(".lx-language-switch");
   const categories = new Set(buttons.map(button => button.dataset.filter));
   const normalize = value => value.normalize("NFKC").toLocaleLowerCase().trim();
-  const searchable = new Map(models.map(model => [model, normalize(model.textContent)]));
+  const searchable = new Map(models.map(model => [model, normalize(model.dataset.search)]));
   let category = "all";
 
   function syncURL() {
@@ -35,19 +36,28 @@
 
   function filter() {
     const terms = normalize(input.value).split(/\s+/).filter(Boolean);
+    const counts = new Map([...categories].map(key => [key, 0]));
     let visible = 0;
     for (const model of models) {
+      const matchesQuery = terms.every(term => searchable.get(model).includes(term));
+      if (matchesQuery) {
+        counts.set("all", counts.get("all") + 1);
+        counts.set(model.dataset.category, counts.get(model.dataset.category) + 1);
+      }
       const matches = (category === "all" || model.dataset.category === category)
-        && terms.every(term => searchable.get(model).includes(term));
+        && matchesQuery;
       model.hidden = !matches;
       if (matches) visible += 1;
     }
     for (const button of buttons) {
       button.setAttribute("aria-pressed", String(button.dataset.filter === category));
+      button.querySelector("[data-filter-count]").textContent = counts.get(button.dataset.filter);
     }
     count.textContent = catalog.dataset.countTemplate
       .replace("{visible}", visible).replace("{total}", models.length);
     empty.hidden = visible > 0;
+    clearCategory.hidden = visible > 0 || counts.get("all") === 0;
+    clearCategory.textContent = catalog.dataset.otherTemplate.replace("{count}", counts.get("all"));
     clearActive.hidden = category === "all" && terms.length === 0;
     syncURL();
   }
@@ -65,6 +75,11 @@
     filter();
   }));
   input.addEventListener("input", filter);
+  clearCategory.addEventListener("click", () => {
+    category = "all";
+    filter();
+    input.focus({ preventScroll: true });
+  });
   catalog.querySelectorAll("[data-reset-filters]").forEach(button => button.addEventListener("click", () => {
     category = "all";
     input.value = "";

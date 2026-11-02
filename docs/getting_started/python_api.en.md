@@ -1,6 +1,6 @@
 # Python API
 
-Install LightX2V using the [quickstart](quickstart.md). The examples below run from the repository root; replace model, input and output paths with local paths.
+Install LightX2V using the [full installation guide](installation.md). The examples below run from the repository root; replace model, input and output paths with local paths.
 
 ## Create a pipeline and generate
 

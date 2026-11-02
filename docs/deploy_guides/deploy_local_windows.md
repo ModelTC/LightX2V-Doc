@@ -17,13 +17,13 @@
 
 ### 方式一：使用批处理文件推理
 
-参考[快速开始文档](../getting_started/quickstart.md)安装环境，并使用[批处理文件](https://github.com/ModelTC/LightX2V/tree/main/scripts/win)运行。
+参考[快速开始文档](../getting_started/installation.md)安装环境，并使用[批处理文件](https://github.com/ModelTC/LightX2V/tree/main/scripts/win)运行。
 
 ### 方式二：使用Gradio Web界面推理
 
 #### 手动配置Gradio
 
-参考[快速开始文档](../getting_started/quickstart.md)安装环境，参考[Gradio部署指南](deploy_gradio.md)
+参考[快速开始文档](../getting_started/installation.md)安装环境，参考[Gradio部署指南](deploy_gradio.md)
 
 #### 旧版整合包：一键启动 Gradio
 
