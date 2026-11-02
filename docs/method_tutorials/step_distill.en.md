@@ -1,0 +1,189 @@
+# Step Distillation
+
+Step distillation is an important optimization technique in LightX2V. By training distilled models, it significantly reduces inference steps from the original 40-50 steps to **4 steps**, dramatically improving inference speed while maintaining video quality. LightX2V implements step distillation along with CFG distillation to further enhance inference speed.
+
+## 🔍 Technical Principle
+
+### DMD Distillation
+
+The core technology of step distillation is [DMD Distillation](https://arxiv.org/abs/2311.18828). The DMD distillation framework is shown in the following diagram:
+
+<div align="center">
+<img alt="DMD Distillation Framework" src="../../assets/repository/figs/step_distill/fig_01.png" width="75%">
+</div>
+
+The core idea of DMD distillation is to minimize the KL divergence between the output distributions of the distilled model and the original model:
+
+$$
+\begin{aligned}
+D_{KL}\left(p_{\text{fake}} \; \| \; p_{\text{real}} \right) &= \mathbb{E}{x\sim p\text{fake}}\left(\log\left(\frac{p_\text{fake}(x)}{p_\text{real}(x)}\right)\right)\\
+&= \mathbb{E}{\substack{
+z \sim \mathcal{N}(0; \mathbf{I}) \\
+x = G_\theta(z)
+}}-\big(\log~p_\text{real}(x) - \log~p_\text{fake}(x)\big).
+\end{aligned}
+$$
+
+Since directly computing the probability density is nearly impossible, DMD distillation instead computes the gradient of this KL divergence:
+
+$$
+\begin{aligned}
+\nabla_\theta D_{KL}
+&= \mathbb{E}{\substack{
+z \sim \mathcal{N}(0; \mathbf{I}) \\
+x = G_\theta(z)
+} } \Big[-
+\big(
+s_\text{real}(x) - s_\text{fake}(x)\big)
+\hspace{.5mm} \frac{dG}{d\theta}
+\Big],
+\end{aligned}
+$$
+
+where $s_\text{real}(x) =\nabla_{x} \text{log}~p_\text{real}(x)$ and $s_\text{fake}(x) =\nabla_{x} \text{log}~p_\text{fake}(x)$ are score functions. Score functions can be computed by the model. Therefore, DMD distillation maintains three models in total:
+
+- `real_score`, computes the score of the real distribution; since the real distribution is fixed, DMD distillation uses the original model with fixed weights as its score function;
+- `fake_score`, computes the score of the fake distribution; since the fake distribution is constantly updated, DMD distillation initializes it with the original model and fine-tunes it to learn the output distribution of the generator;
+- `generator`, the student model, guided by computing the gradient of the KL divergence between `real_score` and `fake_score`.
+
+> References:
+>
+> 1. [DMD (One-step Diffusion with Distribution Matching Distillation)](https://arxiv.org/abs/2311.18828)
+> 2. [DMD2 (Improved Distribution Matching Distillation for Fast Image Synthesis)](https://arxiv.org/abs/2405.14867)
+
+### Self-Forcing
+
+DMD distillation technology is designed for image generation. The step distillation in LightX2V is implemented based on [Self-Forcing](https://github.com/guandeh17/Self-Forcing) technology. The overall implementation of Self-Forcing is similar to DMD, but following DMD2, it removes the regression loss and uses ODE initialization instead. Additionally, Self-Forcing adds an important optimization for video generation tasks:
+
+Current DMD distillation-based methods struggle to generate videos in one step. Self-Forcing selects one timestep for optimization each time, with the generator computing gradients only at this step. This approach significantly improves Self-Forcing's training speed and enhances the denoising quality at intermediate timesteps, also improving its effectiveness.
+
+> References:
+>
+> 1. [Self-Forcing (Self Forcing: Bridging the Train-Test Gap in Autoregressive Video Diffusion)](https://arxiv.org/abs/2506.08009)
+
+### LightX2V
+
+Self-Forcing performs step distillation and CFG distillation on 1.3B autoregressive models. LightX2V extends it with a series of enhancements:
+
+1. **Larger Models**: Supports step distillation training for 14B models;
+2. **More Model Types**: Supports standard bidirectional models and I2V model step distillation training;
+3. **Better Results**: LightX2V uses high-quality prompts from approximately 50,000 data entries for training;
+
+For detailed implementation, refer to [Self-Forcing-Plus](https://github.com/GoatWu/Self-Forcing-Plus).
+
+## 🎯 Technical Features
+
+- **Inference Acceleration**: Reduces inference steps from 40-50 to 4 steps without CFG, achieving approximately **20-24x** speedup
+- **Quality Preservation**: Maintains original video generation quality through distillation techniques
+- **Strong Compatibility**: Supports both T2V and I2V tasks
+- **Flexible Usage**: Supports loading complete step distillation models or loading step distillation LoRA on top of native models; compatible with int8/fp8 model quantization
+
+## 🛠️ Configuration Files
+
+### Basic Configuration Files
+
+Multiple configuration options are provided in the [configs/distill/](https://github.com/ModelTC/lightx2v/tree/main/configs/distill) directory:
+
+| Configuration File | Purpose | Model Address |
+|-------------------|---------|---------------|
+| [wan_t2v_distill_model_4step_cfg.json](https://github.com/ModelTC/lightx2v/blob/main/configs/distill/wan21/wan_t2v_distill_model_4step_cfg.json) | Load T2V 4-step distillation complete model | [hugging-face](https://huggingface.co/lightx2v/Wan2.1-T2V-14B-StepDistill-CfgDistill-Lightx2v/blob/main/distill_models/distill_model.safetensors) |
+| [wan_i2v_distill_model_4step_cfg.json](https://github.com/ModelTC/lightx2v/blob/main/configs/distill/wan21/wan_i2v_distill_model_4step_cfg.json) | Load I2V 4-step distillation complete model | [hugging-face](https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-CfgDistill-Lightx2v/blob/main/distill_models/distill_model.safetensors) |
+| [wan_t2v_distill_lora_4step_cfg.json](https://github.com/ModelTC/lightx2v/blob/main/configs/distill/wan21/wan_t2v_distill_lora_4step_cfg.json) | Load Wan-T2V model and step distillation LoRA | [hugging-face](https://huggingface.co/lightx2v/Wan2.1-T2V-14B-StepDistill-CfgDistill-Lightx2v/blob/main/loras/Wan21_T2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors) |
+| [wan_i2v_distill_lora_4step_cfg.json](https://github.com/ModelTC/lightx2v/blob/main/configs/distill/wan21/wan_i2v_distill_lora_4step_cfg.json) | Load Wan-I2V model and step distillation LoRA | [hugging-face](https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-CfgDistill-Lightx2v/blob/main/loras/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors) |
+
+### Key Configuration Parameters
+
+- Set `distill_method` to `"dmd2"` to use [WanStepDistillScheduler](https://github.com/ModelTC/LightX2V/blob/main/lightx2v/models/schedulers/wan/step_distill/scheduler.py).
+- `infer_steps`, `denoising_step_list` and `sample_shift` are set to parameters matching those during training, and are generally not recommended for user modification.
+- Keep `enable_cfg` consistent with the selected model configuration. The Wan2.1 examples here use `false`.
+- When using a distilled LoRA, set its path and strength in `lora_configs` while keeping `distill_method: "dmd2"`. Omit `lora_configs` when loading a complete distilled model without an additional LoRA.
+
+The following is a fragment to merge into the complete config for the selected weights. `infer_steps` is the inference step count, `denoising_step_list` lists the denoising timesteps, and `sample_shift` is the scheduler's timestep shift.
+
+```json
+{
+    "distill_method": "dmd2",
+    "infer_steps": 4,
+    "denoising_step_list": [
+        1000,
+        750,
+        500,
+        250
+    ],
+    "sample_shift": 5,
+    "enable_cfg": false,
+    "lora_configs": [
+        {
+            "path": "path/to/distill_lora.safetensors",
+            "strength": 1.0
+        }
+    ]
+}
+```
+
+## 📜 Usage
+
+### Model Preparation
+
+**Complete Model:**
+Set `--model_path` to the original Wan model directory containing `config.json` and encoder/VAE weights. Set `dit_original_ckpt` to the distilled safetensors file, or use `dit_quantized_ckpt` with `dit_quantized=true` and the matching `dit_quant_scheme` for quantized weights. If using `distill_model.pt`, remove `dit_original_ckpt` from the config and place the file directly under `--model_path`.
+
+**LoRA:**
+
+1. Place the downloaded LoRA in any location
+2. Modify the `lora_configs[].path` parameter in the configuration file to the LoRA storage path
+
+### Inference Scripts
+
+**T2V Complete Model:**
+
+```bash
+bash scripts/wan/inference/distill/run_wan_t2v_distill_model.sh
+```
+
+**I2V Complete Model:**
+
+```bash
+bash scripts/wan/inference/distill/run_wan_i2v_distill_model.sh
+```
+
+### Step Distillation LoRA Inference Scripts
+
+**T2V LoRA:**
+
+```bash
+bash scripts/wan/inference/distill/run_wan_t2v_distill_lora.sh
+```
+
+**I2V LoRA:**
+
+```bash
+bash scripts/wan/inference/distill/run_wan_i2v_distill_lora.sh
+```
+
+## 🔧 Service Deployment
+
+### Start Distillation Model Service
+
+Modify the startup command in [scripts/server/start_server.sh](https://github.com/ModelTC/lightx2v/blob/main/scripts/server/start_server.sh):
+
+```bash
+python -m lightx2v.server \
+  --model_cls wan2.1 \
+  --task t2v \
+  --model_path $model_path \
+  --config_json ${lightx2v_path}/configs/distill/wan21/wan_t2v_distill_model_4step_cfg.json \
+  --port 8000
+```
+
+Run the service startup script:
+
+```bash
+scripts/server/start_server.sh
+```
+
+For more details, see [Service Deployment](../deploy_guides/deploy_service.md).
+
+### Usage in Gradio Interface
+
+See the separate [Gradio-Lightx2v repository](https://github.com/ModelTC/Gradio-Lightx2v) for installation and usage instructions.

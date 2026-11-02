@@ -1,0 +1,20 @@
+{% if page and not page.meta.home %}
+{% set english = config.theme.language == "en" %}
+{% set section = page.ancestors | last %}
+{% set landing = section.children | first if section else none %}
+<nav class="lx-breadcrumbs" aria-label="{{ 'Breadcrumb' if english else '当前位置' }}">
+  <ol>
+    <li><a href="{{ ('en/index.html' if english else 'index.html') | url }}">{{ 'Home' if english else '首页' }}</a></li>
+    {% if section and section.title != page.title %}
+    <li>
+      {% if landing and landing.is_page and landing.url != page.url %}
+      <a href="{{ landing.url | url }}">{{ section.title }}</a>
+      {% else %}
+      <span>{{ section.title }}</span>
+      {% endif %}
+    </li>
+    {% endif %}
+    <li aria-current="page"><span>{{ page.title }}</span></li>
+  </ol>
+</nav>
+{% endif %}

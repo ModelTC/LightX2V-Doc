@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block site_meta %}
+{# Material 9.8 treats head alternates as separate site roots and fetches a
+   sitemap beside each one. Our switch links directly to paired .html pages;
+   language alternates are recorded in sitemap.xml instead of head links. #}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+{% if page.meta and page.meta.description %}
+<meta name="description" content="{{ page.meta.description }}">
+{% elif config.site_description %}
+<meta name="description" content="{{ config.site_description }}">
+{% endif %}
+{% if page.meta and page.meta.author %}
+<meta name="author" content="{{ page.meta.author }}">
+{% elif config.site_author %}
+<meta name="author" content="{{ config.site_author }}">
+{% endif %}
+{% if page.canonical_url %}
+<link rel="canonical" href="{{ page.canonical_url }}">
+{% endif %}
+{% if page.previous_page %}
+<link rel="prev" href="{{ page.previous_page.url | url }}">
+{% endif %}
+{% if page.next_page %}
+<link rel="next" href="{{ page.next_page.url | url }}">
+{% endif %}
+<link rel="icon" href="{{ config.theme.favicon | url }}">
+<meta name="generator" content="mkdocs-{{ mkdocs_version }}">
+{% endblock %}
+
+{% block content %}
+<div class="lx-page{% if page.meta.home %} lx-home{% endif %}">
+  {% include "partials/breadcrumbs.html" %}
+  {% if lx_translation_missing %}
+  <div class="admonition note lx-translation-notice" role="note">
+    {% if config.theme.language == "en" %}
+    <p>This page is not yet available in English. The Chinese source is shown below.</p>
+    <a href="{{ lx_language_switch.link | url }}">Read the Chinese original</a> · <a href="{{ 'en/index.html' | url }}">English home</a>
+    {% else %}
+    <p>本页尚无中文译文，以下展示英文原文。</p>
+    <a href="{{ lx_language_switch.link | url }}">阅读英文原文</a> · <a href="{{ 'index.html' | url }}">中文首页</a>
+    {% endif %}
+  </div>
+  {% endif %}
+  {{ super() }}
+</div>
+{% endblock %}

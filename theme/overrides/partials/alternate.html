@@ -1,0 +1,10 @@
+{% if lx_language_switch %}
+  {% set alternate = lx_language_switch %}
+{% elif config.theme.language == 'en' %}
+  {% set alternate = {"link": "index.html", "lang": "zh", "name": "中文", "title": "中文首页"} %}
+{% else %}
+  {% set alternate = {"link": "en/index.html", "lang": "en", "name": "English", "title": "English home"} %}
+{% endif %}
+<a href="{{ alternate.link | url }}" class="md-header__button lx-language-switch" lang="{{ alternate.lang }}" hreflang="{{ alternate.lang }}" title="{{ alternate.title }}" aria-label="{{ alternate.title }}">
+  {{ alternate.name }}
+</a>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{# A local preview without site_url has no canonical URLs to advertise. #}
+{% if config.site_url %}
+{% for locale, files in i18n_alternates.items() %}
+{% for file in files if file.page and file.locale == locale %}
+  <url>
+    <loc>{{ (config.site_url ~ file.url) | e }}</loc>
+    {% if file.page.update_date %}<lastmod>{{ file.page.update_date }}</lastmod>{% endif %}
+    {% for language, alternate in file.alternates.items() if alternate.locale == language %}
+    <xhtml:link rel="alternate" hreflang="{{ language }}" href="{{ (config.site_url ~ alternate.url) | e }}"/>
+    {% endfor %}
+  </url>
+{% endfor %}
+{% endfor %}
+{% endif %}
+</urlset>

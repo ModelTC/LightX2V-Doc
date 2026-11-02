@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.0
+    hooks:
+      - id: ruff
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+        exclude: ^mkdocs\.yml$
+      - id: check-yaml
+        name: check-yaml (MkDocs custom tags)
+        files: ^mkdocs\.yml$
+        args: [--unsafe]
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=3072]

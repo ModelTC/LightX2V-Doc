@@ -1,0 +1,38 @@
+<div class="lx-catalog" data-model-catalog data-count-template="{{ ui.count }}">
+  <div class="lx-catalog-controls">
+    <label class="lx-model-search" for="model-search">
+      <span>{{ ui.search_label }}</span>
+      <input id="model-search" type="search" placeholder="{{ ui.search_placeholder }}" autocomplete="off" aria-controls="model-list">
+    </label>
+    <div class="lx-filter-row" role="group" aria-label="{{ ui.filter_label }}">
+      <button type="button" data-filter="all" aria-pressed="true">{{ ui.all }} <span>{{ models | length }}</span></button>
+      {% for category, label in categories.items() %}
+      <button type="button" data-filter="{{ category }}" aria-pressed="false">{{ label }}</button>
+      {% endfor %}
+    </div>
+    <div class="lx-catalog-status">
+      <p class="lx-model-count" role="status" aria-live="polite" aria-atomic="true">{{ ui.count.format(visible=models | length, total=models | length) }}</p>
+      <button type="button" class="lx-clear-filters" data-reset-filters data-clear-active hidden>{{ ui.reset }}</button>
+    </div>
+  </div>
+  <div class="lx-model-list" id="model-list">
+    {% for model in models %}
+    <article class="lx-model" data-category="{{ model.category }}">
+      <div class="lx-model-heading">
+        <span class="lx-model-kind">{{ model.category_label }}</span>
+        <h2>{{ model.name }}</h2>
+      </div>
+      <p>{{ model.description }}</p>
+      <ul class="lx-model-tags" aria-label="{{ ui.tags_label }}">
+        {% for tag in model.tags %}<li>{{ tag }}</li>{% endfor %}
+      </ul>
+      <a href="{{ model.url }}" class="lx-model-link" aria-label="{{ ui.guide_label.format(name=model.name) }}">{{ ui.guide }} <span aria-hidden="true">{{ '→' if model.page else '↗' }}</span></a>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="lx-model-empty" hidden>
+    <h2>{{ ui.empty_title }}</h2>
+    <p>{{ ui.empty_description }}</p>
+    <button type="button" class="md-button" data-reset-filters>{{ ui.reset }}</button>
+  </div>
+</div>

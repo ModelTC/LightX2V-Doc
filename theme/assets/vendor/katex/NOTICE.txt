@@ -1,0 +1,5 @@
+KaTeX 0.19.1 (MIT)
+https://github.com/KaTeX/KaTeX
+Source: https://registry.npmjs.org/katex/-/katex-0.19.1.tgz
+Archive SHA-256: 24da5a599eb2fcede2e270b99a6ff48bca816beecc95feeb84e8cccbd1bb34fd
+Included unchanged: dist/katex.min.js, dist/katex.min.css, dist/fonts/* and LICENSE.

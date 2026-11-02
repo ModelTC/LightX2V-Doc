@@ -1,0 +1,219 @@
+site_name: LightX2V 文档
+site_url: !ENV [LIGHTX2V_DOCS_URL, "http://light-ai.top/LightX2V-Doc/"]
+site_description: 图像与视频生成的轻量级推理框架。从首次生成到加速与部署。
+repo_url: https://github.com/ModelTC/LightX2V
+repo_name: GitHub
+edit_uri: !ENV [LIGHTX2V_DOCS_EDIT_URI, "https://github.com/ModelTC/LightX2V-Doc/edit/main/docs/"]
+docs_dir: docs
+site_dir: site
+use_directory_urls: false
+copyright: Copyright © 2026 LightX2V Team
+
+theme:
+  name: material
+  language: zh
+  custom_dir: theme/overrides
+  logo: assets/lightx2v.png
+  favicon: assets/favicon.svg
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: 切换到深色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: 切换到浅色模式
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - content.action.edit
+
+nav:
+  - 概览:
+      - 欢迎使用: index.md
+      - 项目资源:
+          - GitHub 仓库: https://github.com/ModelTC/LightX2V
+          - 模型权重: https://huggingface.co/lightx2v
+          - 技术博客: https://light-ai.top/LightX2V-BLOG/
+          - 论文收藏集: https://lightx2v-papers-zhcn.readthedocs.io/zh-cn/latest/
+      - 相关应用:
+          - LightX2V Studio: https://x2v.light-ai.top/
+          - macOS 应用: https://github.com/ModelTC/LightX2V-Mac-App
+  - 快速入门:
+      - 安装与首次生成: getting-started/quickstart.md
+      - 继续使用:
+          - 完整安装指南: getting_started/quickstart.md
+          - 生成第一个视频: getting_started/first_generation.md
+          - Python API: getting_started/python_api.md
+          - 模型结构与权重: getting_started/model_structure.md
+          - 性能基准: getting_started/benchmark.md
+  - 模型与示例:
+      - 模型总览: models/index.md
+      - 模型使用指南:
+          - Wan2.1 与 VACE: models/wan.md
+          - Wan2.2: models/wan22.md
+          - Qwen-Image-2.1: models/qwen-image-2.1.md
+      - 更多模型示例:
+          - MiniMax-H3: https://github.com/ModelTC/LightX2V/blob/main/scripts/minimax_h3/README_zh.md
+          - LTX: https://github.com/ModelTC/LightX2V/blob/main/scripts/ltx2/README_zh.md
+  - 加速优化:
+      - 模型量化: method_tutorials/quantization.md
+      - 特征缓存: method_tutorials/cache.md
+      - 注意力机制: method_tutorials/attention.md
+      - 参数卸载: method_tutorials/offload.md
+      - 并行推理: method_tutorials/parallel.md
+      - 变分辨率推理: method_tutorials/changing_resolution.md
+      - 步数蒸馏: method_tutorials/step_distill.md
+  - 部署指南:
+      - 按资源与延迟选择:
+          - 低资源部署: deploy_guides/for_low_resource.md
+          - 低延迟部署: deploy_guides/for_low_latency.md
+      - 接入与运行:
+          - LoRA 部署: deploy_guides/lora_deploy.md
+          - 服务化部署: deploy_guides/deploy_service.md
+          - Gradio: deploy_guides/deploy_gradio.md
+          - ComfyUI: deploy_guides/deploy_comfyui.md
+          - Windows 本地部署: deploy_guides/deploy_local_windows.md
+      - 进阶部署:
+          - 分离式推理: deploy_guides/disagg.md
+          - Qwen Image 编码器: deploy_guides/qwen_image_encoder.md
+          - Qwen Image VAE TensorRT: deploy_guides/qwen_image_vae_tensorrt.md
+  - 开发指南:
+      - 新增请求参数: developer_guides/request_parameters.md
+      - 性能分析: method_tutorials/torch_profiling.md
+
+plugins:
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      languages:
+        - locale: zh
+          name: 简体中文
+          default: true
+          build: true
+        - locale: en
+          name: English
+          build: true
+          site_name: LightX2V Documentation
+          site_description: Lightweight image and video inference, from your first generation to acceleration and deployment.
+          theme:
+            palette:
+              - toggle:
+                  name: Switch to dark mode
+              - toggle:
+                  name: Switch to light mode
+          nav_translations:
+            概览: Overview
+            欢迎使用: Welcome
+            项目资源: Project resources
+            GitHub 仓库: GitHub repository
+            模型权重: Model weights
+            技术博客: Technical blog
+            论文收藏集: Paper collection (Chinese)
+            相关应用: Related applications
+            macOS 应用: macOS app
+            快速入门: Getting started
+            安装与首次生成: Installation and first generation
+            继续使用: Further reading
+            完整安装指南: Full installation guide
+            生成第一个视频: Generate your first video
+            模型结构与权重: Model structure and weights
+            性能基准: Benchmarks
+            模型与示例: Models and examples
+            模型总览: Model catalog
+            模型使用指南: Model guides
+            Wan2.1 与 VACE: Wan2.1 and VACE
+            更多模型示例: More model examples
+            加速优化: Acceleration
+            模型量化: Model quantization
+            特征缓存: Feature caching
+            注意力机制: Attention
+            参数卸载: Parameter offload
+            并行推理: Parallel inference
+            变分辨率推理: Variable resolution
+            步数蒸馏: Step distillation
+            部署指南: Deployment
+            按资源与延迟选择: Resources and latency
+            低资源部署: Low-resource deployment
+            低延迟部署: Low-latency deployment
+            接入与运行: Integration and serving
+            LoRA 部署: LoRA deployment
+            服务化部署: Inference services
+            Windows 本地部署: Windows deployment
+            进阶部署: Advanced deployment
+            分离式推理: Disaggregated inference
+            Qwen Image 编码器: Qwen Image encoder
+            Qwen Image VAE TensorRT: Qwen Image VAE with TensorRT
+            开发指南: Developer guides
+            新增请求参数: Adding request parameters
+            性能分析: Performance profiling
+  - search:
+      lang: [zh, en]
+
+hooks:
+  - theme/hooks.py
+watch:
+  - theme
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      slugify: !!python/name:markdown.extensions.toc.slugify_unicode
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_css:
+  - assets/vendor/katex/katex.min.css
+  - assets/stylesheets/lightx2v.css
+extra_javascript:
+  - assets/javascripts/catalog.js
+  - assets/javascripts/reading.js
+  - assets/vendor/katex/katex.min.js
+  - assets/javascripts/math.js
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ModelTC/LightX2V
+      name: LightX2V on GitHub
+
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    anchors: warn

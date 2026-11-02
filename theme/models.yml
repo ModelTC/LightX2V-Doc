@@ -1,0 +1,148 @@
+- name: Wan2.1
+  category: video
+  description: 从 1.3B 文生视频开始，也可使用 I2V、VACE 与蒸馏模型。
+  tags: [文生视频, 图生视频, VACE]
+  source: scripts/wan/README_zh.md
+  source_en: scripts/wan/README.md
+  description_en: "Start with 1.3B text-to-video, or use I2V, VACE and distilled models."
+  tags_en: ["Text-to-video", "Image-to-video", "VACE"]
+  page: models/wan.md
+- name: Wan2.2
+  category: video
+  description: 提供视频生成、语音驱动视频与 Animate 系列的运行入口。
+  tags: [文生视频, 图生视频, Animate]
+  source: scripts/wan22/README_zh.md
+  source_en: scripts/wan22/README.md
+  description_en: "Video generation, speech-driven video and Animate task examples."
+  tags_en: ["Text-to-video", "Image-to-video", "Animate"]
+  page: models/wan22.md
+- name: MiniMax-H3
+  category: video
+  description: 同步生成音频与视频，支持文本、首帧和参考输入等任务。
+  tags: [文生音视频, 图生音视频]
+  source: scripts/minimax_h3/README_zh.md
+  source_en: scripts/minimax_h3/README.md
+  description_en: "Generate synchronized audio and video from text, first frames and reference inputs."
+  tags_en: ["Text-to-audiovisual", "Image-to-audiovisual"]
+- name: LTX
+  category: video
+  description: LTX-2、2.3 与 2.5 的音视频生成及蒸馏推理示例。
+  tags: [文生音视频, 图生音视频]
+  source: scripts/ltx2/README_zh.md
+  source_en: scripts/ltx2/README.md
+  description_en: "Audio and video generation with LTX-2, 2.3 and 2.5, including distilled inference."
+  tags_en: ["Text-to-audiovisual", "Image-to-audiovisual"]
+- name: HunyuanVideo-1.5
+  category: video
+  description: HunyuanVideo-1.5 模型的环境、权重与推理运行说明。
+  tags: [视频生成]
+  source: scripts/hunyuan_video_15/README.md
+  source_en: scripts/hunyuan_video_15/README.md
+  description_en: "Environment, weights and inference instructions for HunyuanVideo-1.5."
+  tags_en: ["Video generation"]
+- name: Self-Forcing
+  category: video
+  description: 自回归视频生成，以及对应的 FP8 量化推理配置。
+  tags: [自回归, 视频生成]
+  source: scripts/self_forcing/README_zh.md
+  source_en: scripts/self_forcing/README.md
+  description_en: "Autoregressive video generation and corresponding FP8 inference configurations."
+  tags_en: ["Autoregressive", "Video generation"]
+- name: Qwen-Image-2.1
+  category: image
+  description: 文本生成图像与提示词驱动的图像编辑，包含 Turbo 模型用法。
+  tags: [文生图, 图像编辑, Turbo]
+  source: scripts/qwen_image_21/README_zh.md
+  source_en: scripts/qwen_image_21/README.md
+  description_en: "Text-to-image generation and prompt-driven image editing, including Turbo."
+  tags_en: ["Text-to-image", "Image editing", "Turbo"]
+  page: models/qwen-image-2.1.md
+- name: Qwen-Image
+  category: image
+  description: Qwen-Image、Edit、Layered 系列与对应蒸馏权重的使用指南。
+  tags: [文生图, 图像编辑, 分层图像]
+  source: scripts/qwen_image/README_zh.md
+  source_en: scripts/qwen_image/README.md
+  description_en: "Qwen-Image, Edit and Layered models with their corresponding distilled weights."
+  tags_en: ["Text-to-image", "Image editing", "Layered images"]
+- name: Z-Image
+  category: image
+  description: Z-Image-Turbo 的图像生成、编辑与多卡运行示例。
+  tags: [文生图, 图生图, Turbo]
+  source: scripts/z_image/README_zh.md
+  source_en: scripts/z_image/README.md
+  description_en: "Image generation, editing and multi-GPU examples for Z-Image-Turbo."
+  tags_en: ["Text-to-image", "Image-to-image", "Turbo"]
+- name: FLUX.2
+  category: image
+  description: FLUX.2 dev 与 klein 模型的运行脚本和配置。
+  tags: [图像生成, dev, klein]
+  source: scripts/flux2
+  source_kind: tree
+  source_en: scripts/flux2
+  description_en: "Inference scripts and configurations for FLUX.2 dev and klein."
+  tags_en: ["Image generation", "dev", "klein"]
+- name: LongCat-Image
+  category: image
+  description: 文生图、图像编辑，以及 Edit-Turbo 模型的配置说明。
+  tags: [文生图, 图像编辑]
+  source: scripts/longcat/README_zh.md
+  source_en: scripts/longcat/README.md
+  description_en: "Text-to-image generation, image editing and Edit-Turbo configuration."
+  tags_en: ["Text-to-image", "Image editing"]
+- name: BAGEL
+  category: image
+  description: BAGEL 模型的图像生成与编辑示例。
+  tags: [图像生成, 图像编辑]
+  source: scripts/bagel/README.md
+  source_en: scripts/bagel/README.md
+  description_en: "Image generation and editing examples for BAGEL."
+  tags_en: ["Image generation", "Image editing"]
+- name: SeedVR2
+  category: restore
+  description: 使用 3B 或 7B 模型进行图像与视频超分辨率。
+  tags: [图像超分, 视频超分]
+  source: scripts/seedvr2/README_zh.md
+  source_en: scripts/seedvr2/README.md
+  description_en: "Image and video upscaling with 3B and 7B models."
+  tags_en: ["Image upscaling", "Video upscaling"]
+- name: SwiftVR
+  category: restore
+  description: 图像与视频恢复、超分辨率，以及相应模型转换方法。
+  tags: [图像修复, 视频修复, 超分辨率]
+  source: scripts/swiftvr/README_zh.md
+  source_en: scripts/swiftvr/README.md
+  description_en: "Image and video restoration, upscaling and model conversion."
+  tags_en: ["Image restoration", "Video restoration", "Upscaling"]
+- name: RelayVSR
+  category: restore
+  description: 提供原版 4× 模型和 LightX2V 原生 2× 模型的使用入口。
+  tags: [视频超分, 2×, 4×]
+  source: scripts/relayvsr/README_zh.md
+  source_en: scripts/relayvsr/README.md
+  description_en: "Entry points for the original 4× model and the native LightX2V 2× model."
+  tags_en: ["Video upscaling", "2×", "4×"]
+- name: EdenLive
+  category: world
+  description: 根据代理录屏、目标首帧与文本提示控制视频生成。
+  tags: [交互视频, 视频到视频]
+  source: scripts/edenlive/README_zh.md
+  source_en: scripts/edenlive/README.md
+  description_en: "Control video generation with text, a target first frame and proxy recordings."
+  tags_en: ["Interactive video", "Video-to-video"]
+- name: WorldMirror
+  category: world
+  description: 单步多头 3D 重建，输出深度、法线、相机与空间表示。
+  tags: [3D 重建, 深度估计]
+  source: scripts/worldmirror/README_zh.md
+  source_en: scripts/worldmirror/README.md
+  description_en: "Single-step 3D reconstruction with depth, normals, cameras and spatial representations."
+  tags_en: ["3D reconstruction", "Depth estimation"]
+- name: WorldPlay
+  category: world
+  description: WorldPlay 模型的运行入口与配置说明。
+  tags: [世界模型, 交互生成]
+  source: scripts/worldplay/README.md
+  source_en: scripts/worldplay/README.md
+  description_en: "Inference entry points and configurations for WorldPlay."
+  tags_en: ["World model", "Interactive generation"]

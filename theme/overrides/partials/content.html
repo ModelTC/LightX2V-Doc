@@ -1,0 +1,17 @@
+{# Keep Material's content actions; insert the small-screen outline after H1.
+   The desktop continues to use Material's right-hand table of contents. #}
+{% include "partials/tags.html" %}
+{% include "partials/actions.html" %}
+{% set heading, closing, body = page.content.partition('</h1>') %}
+{% if closing %}
+  {{ heading }}{{ closing }}
+  {% include "partials/mobile-toc.html" %}
+  {{ body }}
+{% else %}
+  <h1>{{ page.title | d(config.site_name, true) }}</h1>
+  {% include "partials/mobile-toc.html" %}
+  {{ page.content }}
+{% endif %}
+{% include "partials/source-file.html" %}
+{% include "partials/feedback.html" %}
+{% include "partials/comments.html" %}
