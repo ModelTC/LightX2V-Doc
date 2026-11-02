@@ -136,6 +136,6 @@ hide:
 
 **一起完善 LightX2V**
 
-[报告问题](https://github.com/ModelTC/LightX2V/issues) · [获取模型权重](https://huggingface.co/lightx2v) · [阅读技术博客](https://light-ai.top/LightX2V-BLOG/)
+[文档反馈](https://github.com/ModelTC/LightX2V-Doc/issues) · [推理问题](https://github.com/ModelTC/LightX2V/issues) · [获取模型权重](https://huggingface.co/lightx2v) · [阅读技术博客](https://light-ai.top/LightX2V-BLOG/)
 
 </div>

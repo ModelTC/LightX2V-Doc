@@ -1,8 +1,8 @@
 # Wan2.1 and VACE
 
-This directory provides inference, server, and distillation examples for Wan2.1 and VACE.
+This guide covers inference, server, and distillation examples for Wan2.1 and VACE.
 
-Set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in the script. Command paths below are relative to the repository root; absolute script paths also work.
+The example scripts are in `scripts/wan/` in the [LightX2V inference repository](https://github.com/ModelTC/LightX2V). Set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in the script, and run the commands below from that repository's root.
 
 ## Reading path
 

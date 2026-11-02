@@ -136,6 +136,6 @@ Prepare the environment, download [Wan2.1-T2V-1.3B](models/wan.md#first-run), an
 
 **Help improve LightX2V**
 
-[Report an issue](https://github.com/ModelTC/LightX2V/issues) · [Get model weights](https://huggingface.co/lightx2v) · [Read the technical blog](https://light-ai.top/LightX2V-BLOG/)
+[Documentation issues](https://github.com/ModelTC/LightX2V-Doc/issues) · [Inference issues](https://github.com/ModelTC/LightX2V/issues) · [Get model weights](https://huggingface.co/lightx2v) · [Read the technical blog](https://light-ai.top/LightX2V-BLOG/)
 
 </div>

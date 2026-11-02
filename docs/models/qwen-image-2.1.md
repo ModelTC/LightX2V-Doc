@@ -2,6 +2,8 @@
 
 使用文本生成图像，或结合参考图与提示词编辑图像。标准版和 Turbo 使用各自的权重、脚本和采样配置。
 
+示例脚本位于 [LightX2V 推理仓库](https://github.com/ModelTC/LightX2V)的 `scripts/qwen_image_21/` 目录，以下推理命令在该仓库根目录执行。
+
 ## 使用路径
 
 1. [选择任务与版本](#choose-task)：确认文生图或图像编辑，以及标准版或 Turbo。

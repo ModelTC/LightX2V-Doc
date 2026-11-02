@@ -113,7 +113,7 @@ If you change API addresses or ports, update `ENCODER_URL`, `TRANSFORMER_URL`, a
 
 ## Benchmark (summary)
 
-Environment: NVIDIA H100 SXM5 80 GB, `sage_attn2`, BF16, Mooncake RDMA. Baseline = single GPU; Disagg = Encoder / Transformer / Decoder on separate GPUs (three-stage further reduces Transformer card memory).
+The measurements below cover RTX 4090 24GB and NVIDIA H100 SXM5 80 GB; each section identifies its hardware and configuration. The H100 measurements use `sage_attn2`, BF16 and Mooncake RDMA. Baseline uses a single GPU; Disagg distributes pipeline stages across GPUs.
 
 - **RTX 4090 24GB (memory/PCIe-constrained)**: On memory-constrained GPUs (e.g. 4090 24GB), baseline often requires `cpu_offload=block` to run, while Disagg reduces per-GPU resident memory by splitting Encoder/DiT/VAE Decoder across processes/GPUs, which can reduce offload pressure and improve latency/throughput.
 
@@ -201,22 +201,22 @@ Set routing and queue parameters in `disagg_config`. Mooncake reads the file sel
 
 ### 2.1 T2V (Wan)
 
-**Encoder** (`configs/disagg/wan/wan_t2v_disagg_encoder.json`): `disagg_mode: "encoder"`, plus `bootstrap_addr`, `bootstrap_room`, `sender_engine_rank`, `receiver_engine_rank`.
+**Encoder** ([wan_t2v_disagg_encoder.json](https://github.com/ModelTC/LightX2V/blob/main/configs/disagg/wan/wan_t2v_disagg_encoder.json)): `disagg_mode: "encoder"`, plus `bootstrap_addr`, `bootstrap_room`, `sender_engine_rank`, `receiver_engine_rank`.
 
-**Transformer** (`configs/disagg/wan/wan_t2v_disagg_transformer.json`): `disagg_mode: "transformer"` and Phase2 fields:
+**Transformer** ([wan_t2v_disagg_transformer.json](https://github.com/ModelTC/LightX2V/blob/main/configs/disagg/wan/wan_t2v_disagg_transformer.json)): `disagg_mode: "transformer"` and Phase2 fields:
 
 - `decoder_engine_rank`: Decoder rank for Phase2.
 - `decoder_bootstrap_room`: Phase2 room; must match Decoder’s `bootstrap_room`.
 
-**Decoder** (`configs/disagg/wan/wan_t2v_disagg_decode.json`): `disagg_mode: "decode"`; `bootstrap_room` must equal Transformer’s `decoder_bootstrap_room`.
+**Decoder** ([wan_t2v_disagg_decode.json](https://github.com/ModelTC/LightX2V/blob/main/configs/disagg/wan/wan_t2v_disagg_decode.json)): `disagg_mode: "decode"`; `bootstrap_room` must equal Transformer’s `decoder_bootstrap_room`.
 
 ### 2.2 I2V (Wan)
 
-I2V uses CLIP ViT-H/14; you must set **`clip_embed_dim`: 329216** (257×1280) so Mooncake buffers are sized correctly. Both Encoder and Transformer configs need this.
+I2V uses CLIP ViT-H/14, whose full sequence output contains `257 × 1280 = 328960` elements. `clip_embed_dim` reserves capacity for the CLIP transfer buffer and must cover the actual output size. The existing [Encoder](https://github.com/ModelTC/LightX2V/blob/main/configs/disagg/wan/wan_i2v_disagg_encoder.json) and [Transformer](https://github.com/ModelTC/LightX2V/blob/main/configs/disagg/wan/wan_i2v_disagg_transformer.json) examples use `329216`, which is larger than the required element count. Keep this setting consistent between both stages.
 
 ### 2.3 Decoder example (Qwen Image I2I)
 
-`configs/disagg/qwen/qwen_image_i2i_disagg_decode.json`: `task: "i2i"`, `disagg_mode: "decode"`, plus `vae_z_dim`, `vae_stride`, `num_frames`, `size`, and `disagg_config` with `bootstrap_room` equal to Transformer’s `decoder_bootstrap_room`.
+[qwen_image_i2i_disagg_decode.json](https://github.com/ModelTC/LightX2V/blob/main/configs/disagg/qwen/qwen_image_i2i_disagg_decode.json): `task: "i2i"`, `disagg_mode: "decode"`, plus `vae_z_dim`, `vae_stride`, `num_frames`, `size`, and `disagg_config` with `bootstrap_room` equal to Transformer’s `decoder_bootstrap_room`.
 
 ### 2.4 Parameter reference
 
@@ -229,7 +229,7 @@ I2V uses CLIP ViT-H/14; you must set **`clip_embed_dim`: 329216** (257×1280) so
 | `receiver_engine_rank` | Phase1: Transformer rank; Phase2: Decoder rank |
 | `decoder_engine_rank` | **Transformer only**: Decoder rank for Phase2 |
 | `decoder_bootstrap_room` | **Transformer only**: Phase2 room; must match Decoder’s `bootstrap_room` |
-| `clip_embed_dim` | **I2V only**: 329216 for ViT-H/14 |
+| `clip_embed_dim` | Reserved CLIP transfer-buffer capacity in elements; **I2V only**, with 329216 in the existing examples |
 
 ---
 

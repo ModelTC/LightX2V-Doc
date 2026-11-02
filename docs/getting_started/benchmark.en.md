@@ -1,6 +1,6 @@
 # 🚀 Benchmark
 
-> Historical measurements: latency and memory figures were not rerun for this documentation update. The original records do not provide complete run dates and commit IDs. Software versions describe those runs, not current installation requirements. Speedups are calculated from the displayed times, relative to Wan2.1 Official on H200 and Wan2GP on RTX 4090 at the same resolution.
+> These are historical measurements. The original records do not provide complete run dates and commit IDs. Latency and memory figures describe the listed test environments, not current-version performance; software versions identify the test conditions. Speedups are calculated from the displayed times, relative to Wan2.1 Official on H200 and Wan2GP on RTX 4090 at the same resolution.
 
 
 > This document showcases the performance test results of LightX2V across different hardware environments, including detailed comparison data for H200 and RTX 4090 platforms.

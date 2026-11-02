@@ -1,8 +1,8 @@
 # Wan2.1 与 VACE
 
-本目录提供 Wan2.1 与 VACE 的推理、服务和蒸馏示例。
+本指南介绍 Wan2.1 与 VACE 的推理、服务和蒸馏示例。
 
-设置脚本中的 `lightx2v_path`、`model_path` 和 `CUDA_VISIBLE_DEVICES`。以下命令使用仓库相对路径，也可改用脚本绝对路径。
+示例脚本位于 [LightX2V 推理仓库](https://github.com/ModelTC/LightX2V)的 `scripts/wan/` 目录。设置脚本中的 `lightx2v_path`、`model_path` 和 `CUDA_VISIBLE_DEVICES`，并从该仓库根目录运行以下命令。
 
 ## 使用路径
 

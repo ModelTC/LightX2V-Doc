@@ -1,44 +1,85 @@
-# 维护约定
+# 维护指南
 
-## 内容与来源
+本文件面向文档和网站维护者。本地环境安装与预览命令见 [README.md](README.md)。
 
-本仓库在 2026-11-02 从 LightX2V 的本地文档预览迁入内容，包含当时的文档改进。初始教程来自 `docs/ZH_CN/source/`、`docs/EN/source/`，三组模型指南来自对应的 `scripts/*/README*.md`。迁移后，本仓库的 `docs/` 是新版网站的正文来源，不再在构建时读取推理仓库。
+## 内容维护
 
-每种语言的 benchmark、cache 包装页与其完整内容合并为一个页面。旧 MyST 锚点转换为显式 HTML 锚点，文档内部链接改为本站路径，引用的仓库图片已复制到 `theme/assets/repository/`。原文中的行内代码和代码块保留；GitHub 附件视频保留远程地址，按需加载并提供原生播放控件。运行命令的正确性仍需要对应推理环境验证。
+`docs/` 是本站的文档来源。LightX2V 推理仓库中的文档和模型 README 不会自动同步到本站；推理接口、配置或模型能力发生变化时，需要更新相关教程。
 
-原 LightX2V 仓库的 Sphinx 文档和 Read the Docs 配置继续保留；它们与本站不自动同步。推理代码发生变化时，请同时更新受影响的新站说明。
+### 页面与语言
 
-内容继承 LightX2V 的许可，见根目录 `LICENSE`。KaTeX 的许可、版本和归档校验信息位于 `theme/assets/vendor/katex/`。
+- 中文文件使用 `page.md`，英文使用同目录下的 `page.en.md`。
+- 导航引用中文文件路径，英文导航标题配置在 `mkdocs.yml` 的 `nav_translations` 中。严格构建会报告未加入导航的页面。
+- 中文页面位于站点根路径下，英文页面位于 `en/` 下，均使用 `.html` 地址。例如 `models/wan.html` 与 `en/models/wan.html`。
+- 新增或修改页面时同步维护两种语言。缺少翻译时，站点会显示回退提示，语言按钮会提供相应语言的首页入口。
 
-## 页面、语言与链接
+### 链接与资源
 
-- 中文文件使用 `page.md`，英文使用同目录的 `page.en.md`，例如 `docs/models/wan.md` 和 `docs/models/wan.en.md`。
-- 导航引用中文文件路径，英文标题写在 `mkdocs.yml` 的 `nav_translations` 中。严格构建会报告遗漏的导航项。
-- Markdown 内部链接使用相对路径和 `.md` 后缀；语言插件会让链接保持在当前语言。
-- 中文 URL 为根路径下的 `.html`，英文为对应的 `en/` 路径，现有页面地址不因这次拆分而改变。
-- 保持模型指南中的 `choose-task`、`first-run`、`next-steps` 锚点，首页和模型目录使用了这些入口。
-- 普通插图优先写成 Markdown 图片链接。原文保留的 HTML 图片和视频需要手动确认中英文输出路径；离线检查会检查本站文件和锚点。
+Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其解析到当前语言的页面。重命名文件或调整标题时，检查导航、交叉引用和已有锚点；模型指南中的 `choose-task`、`first-run`、`next-steps` 被首页和模型目录引用，应保持稳定。
 
-语言按钮跳转到同一篇文章。缺少翻译时，按钮明确提供另一个语言的首页入口，回退页面也显示原始语言提示。新页面应同时补齐两种语言。
+普通插图优先使用 Markdown 图片语法。共享资源放在 `theme/assets/`，构建后使用站点的 `assets/` 路径。使用原始 HTML 图片或视频标签时，分别检查中英文页面的相对路径。
 
-搜索使用一个共享的中英文索引，包含教程、模型指南和模板生成的模型目录；`jieba` 在构建阶段进行中文分词。
+视频应提供播放控件并按需加载。外部附件和模型资源需要网络访问，站点构建不会验证这些外部资源的可用性。
 
 ## 模型目录与主题
 
-`theme/models.yml` 保存模型分类、说明、标签和外部源码路径。`page: models/<slug>.md` 表示使用本地指南，必须提供中英文文件并加入导航；没有 `page` 的条目使用推理仓库的外部入口，目录入口显式设置 `source_kind: tree`。英文内容使用 `description_en`、`tags_en`、`source_en`。
+[`theme/models.yml`](theme/models.yml) 保存模型分类、说明、标签和源码入口：
 
-筛选状态使用 URL 参数 `model` 和 `task`，支持刷新、返回和切换语言；不占用 Material 全局搜索使用的 `q`。禁用 JavaScript 时仍显示全部模型和普通链接。
+- `description_en`、`tags_en`、`source_en` 保存对应的英文内容。
+- `page: models/<slug>.md` 表示使用本站指南，需要创建中英文文件并加入导航。
+- 没有 `page` 的条目链接到 LightX2V 推理仓库；链接目标为目录时设置 `source_kind: tree`。
 
-电脑端优先保留模型目录三列入口、左侧导航和右侧文章目录。低于 960 CSS 像素时，在标题后增加可折叠文章目录。`partials/content.html` 定制了这个位置，升级 Material 时需要复查。
+界面文案位于 `theme/i18n.yml`，模板位于 `theme/overrides/`，样式与交互脚本位于 `theme/assets/`。`theme/hooks.py` 负责生成模型目录、加入共享资源和补充语言切换逻辑。
 
-`theme/hooks.py` 只处理模型目录、共享资源和少量语言展示逻辑。全部文档都是普通 Markdown 文件，不再使用跨仓库虚拟页面。模板复用 Material；框架通过 `requirements.txt` 安装，不存放完整框架源码。
+界面调整以桌面阅读体验为主，同时保持手机端可用。检查导航、文章目录、模型筛选、深浅色主题和键盘操作；桌面端保留左右侧栏，手机端使用文章标题下的折叠目录。
 
-## 验证与升级
+模型筛选通过 URL 参数 `model` 和 `task` 保存状态，应支持刷新、浏览器返回和语言切换。全局搜索使用独立的 `q` 参数，其索引包含中英文内容。
 
-严格构建后运行 `theme/check_site.py`。有 `LIGHTX2V_DOCS_EDIT_URI` 时，检查器还会校验每页的编辑链接与本仓库的中英文 Markdown 文件对应。
+## 验证
 
-默认检查不需要推理仓库；如果本机有对应版本的 LightX2V，可额外传入 `--lightx2v-source /path/to/LightX2V`，检查外部 GitHub 代码链接对应的仓库路径是否存在。这不会验证远程网站或模型推理。
+提交前运行 README 中的严格构建和站点检查。检查器会验证站内链接、资源、语言切换、编辑链接与 Markdown 文件的对应关系，以及搜索和 sitemap。
 
-升级 `mkdocs-static-i18n` 或 Material 后，需要一起检查两种语言的导航、搜索、语言切换、sitemap 和缺失翻译回退。当前模板省略 HTML head 中的 alternate 链接，避免 Material 9.8 将每个文章地址当作独立站点根目录请求 sitemap；语言对应关系由 sitemap 和页面语言按钮提供。
+如果本机有对应版本的 LightX2V，可额外检查 GitHub 代码链接所引用的仓库路径：
 
-当前锁定的 Material 9.8.0 提示维护至 2027-05-05。正式迁移前应结合上线时间复查依赖的维护情况；现有 Markdown 内容与样式分开，便于后续升级。
+```bash
+python theme/check_site.py site --lightx2v-source ../LightX2V
+```
+
+该选项只检查本地文件是否存在，不检查远程网站或执行模型推理。
+
+更换托管路径时，在同一个终端中使用一致的站点地址构建和检查：
+
+```bash
+export LIGHTX2V_DOCS_URL=https://docs.example.invalid/LightX2V-Doc/
+python -m mkdocs build --strict
+python theme/check_site.py site
+unset LIGHTX2V_DOCS_URL
+```
+
+## 持续集成与发布
+
+[Documentation 工作流](.github/workflows/docs.yml) 在 Pull Request、推送到 `main` 或手动运行时构建并检查网站。构建成功后提供 `lightx2v-docs-preview` 下载包。发布还要求仓库变量 `DOCS_PUBLISH` 为 `true`，且运行来自 `main` 的推送或手动触发；Pull Request 不执行部署。
+
+仓库管理员首次启用 GitHub Pages 时：
+
+1. 在 **Settings → Pages → Build and deployment → Source** 中选择 **GitHub Actions**。
+2. 在 **Settings → Secrets and variables → Actions → Variables** 中设置 `DOCS_PUBLISH=true`。
+3. 在 **Actions → Documentation → Run workflow** 中选择 `main` 并运行，检查构建和部署结果。
+
+站点使用组织域名下的 `/LightX2V-Doc/` 路径。在组织主页已配置 `light-ai.top` 的前提下，本仓库保持 **Custom domain 为空**，由项目站点继承该域名。域名配置方式见 [GitHub Pages 文档](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages#using-a-custom-domain-across-multiple-repositories)。
+
+| 配置 | 作用 |
+| --- | --- |
+| `DOCS_PUBLISH` | GitHub 仓库变量，控制是否执行发布任务 |
+| `LIGHTX2V_DOCS_URL` | 构建环境变量，指定包含路径前缀的站点地址；发布时由 Pages 提供 |
+| `LIGHTX2V_DOCS_EDIT_URI` | 构建环境变量，指定文档仓库的完整编辑地址；CI 按仓库和分支设置 |
+
+修改默认站点地址或编辑仓库地址时，同步检查 `mkdocs.yml` 和 `theme/check_site.py` 中的默认值。将 `DOCS_PUBLISH` 设为 `false` 会停止后续自动部署，已发布的网站仍会保留。
+
+## 依赖与升级
+
+Python 依赖固定在 `requirements.txt` 中。升级 MkDocs、Material 或语言插件后，除严格构建外，还应手动检查两种语言的导航、搜索、语言切换、缺失翻译提示和文章目录。
+
+`theme/overrides/main.html` 定制了页面元数据，语言对应关系写入 sitemap；`partials/content.html` 定制了手机端目录的位置。升级主题时，对照上游模板检查这些覆盖文件，保留现有的语言链接行为。
+
+KaTeX 的分发文件、字体、许可证和来源信息位于 `theme/assets/vendor/katex/`。更新这些资源时，同步维护 `NOTICE.txt` 中的版本、来源和校验值，并检查公式与字体加载。

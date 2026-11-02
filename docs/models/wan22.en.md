@@ -1,6 +1,6 @@
 # Wan2.2
 
-Set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in the selected script. Commands below use repository-relative paths; absolute script paths also work.
+The example scripts are in `scripts/wan22/` in the [LightX2V inference repository](https://github.com/ModelTC/LightX2V). Set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in the selected script, and run the commands below from that repository's root.
 
 ## Reading path
 

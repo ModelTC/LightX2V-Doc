@@ -2,6 +2,8 @@
 
 Generate images from text, or edit reference images with a prompt. The standard and Turbo models use their own weights, scripts and sampling configurations.
 
+The example scripts are in `scripts/qwen_image_21/` in the [LightX2V inference repository](https://github.com/ModelTC/LightX2V). Run the inference commands below from that repository's root.
+
 ## Reading path
 
 1. [Choose a task and model](#choose-task): text-to-image or image editing, standard or Turbo.

@@ -337,7 +337,7 @@ Qwen Image 在 H100 上对 T2I/I2I 任务的测试，Disagg 模式 Text Encoder 
 
 ### 2.2 I2V 配置示例
 
-I2V 使用 **ViT-H/14** CLIP 图像编码器，其输出为完整序列特征（257 个 token × 1280 维），因此**必须额外指定 `clip_embed_dim`** 以保证 RDMA buffer 正确分配：
+I2V 使用 **ViT-H/14** CLIP 图像编码器，其完整序列特征包含 `257 × 1280 = 328960` 个元素。`clip_embed_dim` 用于预留 CLIP 传输缓冲区容量，必须覆盖实际输出大小；现有示例配置使用 `329216`。
 
 **Encoder 端（`configs/disagg/wan/wan_i2v_disagg_encoder.json`）**：
 
@@ -363,7 +363,7 @@ I2V 使用 **ViT-H/14** CLIP 图像编码器，其输出为完整序列特征（
 }
 ```
 
-> `clip_embed_dim = 257 × 1280 = 329216`。T2V 无 CLIP 编码器，无需此字段；I2V 若缺少此字段会在 Mooncake buffer copy 时报错。
+> `329216` 是示例配置的缓冲区容量，大于上述输出所需的 `328960` 个元素。T2V 无 CLIP 编码器，无需此字段；I2V 应显式配置足够的容量，避免缓冲区复制失败。
 >
 > **Transformer 端**同样需要 `clip_embed_dim: 329216`，与 Encoder 端保持一致。
 
@@ -389,7 +389,7 @@ Wan T2V Decoder 见上文；Qwen Image I2I Decoder 示例（`configs/disagg/qwen
 }
 ```
 
-Decoder 的 `bootstrap_room` 必须与 Transformer 配置中的 `**decoder_bootstrap_room**` 相同；`sender_engine_rank` / `receiver_engine_rank` 对应 Phase2 的 Transformer（发送方）与 Decoder（接收方）引擎 rank。
+Decoder 的 `bootstrap_room` 必须与 Transformer 配置中的 `decoder_bootstrap_room` 相同；`sender_engine_rank` / `receiver_engine_rank` 对应 Phase2 的 Transformer（发送方）与 Decoder（接收方）引擎 rank。
 
 ### 2.4 关键参数说明
 
@@ -403,7 +403,7 @@ Decoder 的 `bootstrap_room` 必须与 Transformer 配置中的 `**decoder_boots
 | `receiver_engine_rank`   | Phase1 中 Transformer 的 rank；Phase2 中 Decoder 的 rank              |
 | `decoder_engine_rank`    | **仅 Transformer 配置**：Phase2 中 Decoder 的 rank，用于建立 Phase2 发送      |
 | `decoder_bootstrap_room` | **仅 Transformer 配置**：Phase2 房间号，需与 Decoder 的 `bootstrap_room` 一致 |
-| `clip_embed_dim`         | CLIP 输出的展平元素总数（**仅 I2V 需要**，ViT-H/14 为 329216）                   |
+| `clip_embed_dim`         | CLIP 传输缓冲区预留的元素容量（**仅 I2V 需要**，现有示例配置使用 329216）          |
 
 
 ---
