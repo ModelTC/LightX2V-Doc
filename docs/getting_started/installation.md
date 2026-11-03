@@ -61,7 +61,7 @@ docker run --gpus all -it --ipc=host --name lightx2v \
   --entrypoint /bin/bash lightx2v/lightx2v:26052801-cu130
 ```
 
-在容器内安装当前仓库，然后继续[生成第一个视频](first_generation.md)：
+在容器内安装当前仓库，然后继续[生成第一个视频](index.md#download-model)：
 
 ```bash
 pip install -v -e .
@@ -384,4 +384,4 @@ pipe.generate(
 1. 在 [GitHub Issues](https://github.com/ModelTC/LightX2V/issues) 中搜索相关问题
 2. 提交新的 Issue 描述您的问题
 
-环境准备完成后，继续[生成第一个视频](first_generation.md)，或通过 [Python API](python_api.md) 接入应用。
+环境准备完成后，继续[生成第一个视频](index.md#download-model)，或通过 [Python API](python_api.md) 接入应用。

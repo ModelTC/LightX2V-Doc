@@ -67,7 +67,7 @@ hf download lightx2v/Wan2.1-Distill-Loras --local-dir lightx2v/Wan2.1-Distill-Lo
 bash scripts/wan/run_wan_t2v.sh
 ```
 
-完成后查看 `--save_result_path` 指定的视频，脚本默认保存到仓库内的 `save_results/output_lightx2v_wan_t2v.mp4`。完整安装到生成的分步说明见[生成第一个视频](../getting_started/first_generation.md)。
+完成后查看 `--save_result_path` 指定的视频，脚本默认保存到仓库内的 `save_results/output_lightx2v_wan_t2v.mp4`。完整安装到生成的分步说明见[生成第一个视频](../getting_started/index.md)。
 
 输入、提示词、seed 和输出路径在 sh 中修改；采样参数在 `--config_json` 指定的 JSON 中修改。`num_frames`、`size` 是未传入时的默认值，`size` 为 `[高, 宽]`。
 

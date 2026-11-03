@@ -59,7 +59,7 @@ docker run --gpus all -it --ipc=host --name lightx2v \
   --entrypoint /bin/bash lightx2v/lightx2v:26052801-cu130
 ```
 
-Inside the container, install the current checkout, then continue with [Generate Your First Video](first_generation.md):
+Inside the container, install the current checkout, then continue with [Generate Your First Video](index.md#download-model):
 
 ```bash
 pip install -v -e .
@@ -385,4 +385,4 @@ If you encounter problems during installation or usage, please:
 1. Search for related issues in [GitHub Issues](https://github.com/ModelTC/LightX2V/issues)
 2. Submit a new Issue describing your problem
 
-Once the environment is ready, [generate your first video](first_generation.md) or integrate with the [Python API](python_api.md).
+Once the environment is ready, [generate your first video](index.md#download-model) or integrate with the [Python API](python_api.md).

@@ -67,7 +67,6 @@ nav:
       - 安装与首次生成: getting_started/index.md
       - 继续使用:
           - 完整安装指南: getting_started/installation.md
-          - 生成第一个视频: getting_started/first_generation.md
           - Python API: getting_started/python_api.md
           - 模型结构与权重: getting_started/model_structure.md
           - 性能基准: getting_started/benchmark.md
@@ -143,7 +142,6 @@ plugins:
             安装与首次生成: Installation and first generation
             继续使用: Further reading
             完整安装指南: Full installation guide
-            生成第一个视频: Generate your first video
             模型结构与权重: Model structure and weights
             性能基准: Benchmarks
             模型与示例: Models and examples
@@ -216,6 +214,7 @@ extra_javascript:
 extra:
   generator: false
   redirects:
+    getting_started/first_generation.html: getting_started/index.md
     getting-started/quickstart.html: getting_started/index.md
     getting_started/quickstart.html: getting_started/installation.md
   social:

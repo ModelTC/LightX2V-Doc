@@ -9,17 +9,11 @@ hide:
 
 <p class="lx-page-lead">从任务出发，找到模型与运行示例。</p>
 
-<p class="lx-starters-label" id="第一次使用">按步骤完成模型准备与首次运行。</p>
+<div class="lx-catalog-intro" id="第一次使用" markdown>
 
-<div class="lx-model-starters" markdown>
-
-[<span class="lx-starter-kind">视频入门</span>**Wan2.1**<span>准备 1.3B 模型，运行第一个视频示例。</span>](wan.md#first-run)
-[<span class="lx-starter-kind">视频与动画</span>**Wan2.2**<span>按任务选择 MoE、TI2V 或 Animate。</span>](wan22.md#choose-task)
-[<span class="lx-starter-kind">图像生成与编辑</span>**Qwen-Image-2.1**<span>选择标准版或 Turbo，开始生成与编辑。</span>](qwen-image-2.1.md#choose-task)
+第一次使用？从[首次生成](../getting_started/index.md)开始，或阅读 [Wan2.2](wan22.md#choose-task)、[Qwen-Image-2.1](qwen-image-2.1.md#choose-task) 指南。
 
 </div>
-
-<p class="lx-catalog-note">“使用指南”提供本站的完整教程；“GitHub 示例”指向 LightX2V 仓库中的说明或运行脚本。</p>
 
 <!-- model-catalog -->
 

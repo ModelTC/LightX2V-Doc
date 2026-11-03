@@ -144,7 +144,7 @@ def version_asset_urls(output, config):
     # Rewrite resource attributes only; preserve relative paths, SVG view
     # fragments and query strings without touching document links or examples.
     return re.sub(
-        r"(?P<tag><(?:link|script|img)\b[^>]*?\b(?:href|src)=)"
+        r"(?P<tag><(?:link|script|img)\b[^>]*?\b(?:href|src)=|<video\b[^>]*?\bposter=)"
         r"(?P<quote>[\"'])(?P<url>[^\"']+)(?P=quote)",
         replace,
         output,

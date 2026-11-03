@@ -16,6 +16,7 @@
       <button type="button" class="lx-clear-filters" data-reset-filters data-clear-active hidden>{{ ui.reset }}</button>
     </div>
   </div>
+  <p class="lx-catalog-note">{{ ui.catalog_note }}</p>
   <div class="lx-model-list" id="model-list">
     {% for model in models %}
     <article class="lx-model" data-category="{{ model.category }}" data-search="{{ model.search_text }}">

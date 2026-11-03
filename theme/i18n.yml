@@ -4,6 +4,7 @@ zh:
     image: 图像生成与编辑
     restore: 修复与超分
     world: 交互与空间
+  catalog_note: 使用指南提供本站教程；GitHub 示例链接到仓库说明与脚本。
   search_label: 查找模型
   search_placeholder: 中英文名称或任务，如 Wan、图像编辑…
   filter_label: 按任务筛选模型
@@ -24,6 +25,7 @@ en:
     image: Image generation and editing
     restore: Restoration and upscaling
     world: Interaction and spatial tasks
+  catalog_note: Usage guides open on this site; GitHub examples link to repository instructions and scripts.
   search_label: Find a model
   search_placeholder: Name or task in English or Chinese, e.g. Wan, image editing…
   filter_label: Filter models by task

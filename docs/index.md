@@ -38,6 +38,43 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 
 </div>
 
+<div class="lx-section-heading" markdown>
+
+## 看看 LightX2V 能做什么 { #探索模型生态 }
+
+[浏览全部模型](models/index.md){ .lx-text-link }
+
+</div>
+
+先确定要生成或处理的内容，再选择对应模型与运行示例。
+
+<div class="lx-capabilities" markdown>
+
+<figure class="lx-showcase" data-showcase>
+<button class="lx-showcase-play" type="button" hidden>
+<img src="assets/showcase/wan-i2v.webp" width="768" height="496" alt="" loading="lazy">
+<span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>播放生成示例</span>
+</button>
+<video controls preload="none" playsinline width="768" height="496" poster="assets/showcase/wan-i2v.webp" src="https://github.com/user-attachments/assets/7bffe48f-e433-430b-91dc-ac745908ba3a" aria-label="生成视频：在锅中翻炒蔬菜"></video>
+<p class="lx-showcase-error" role="status" hidden>暂时无法加载视频。<a href="https://github.com/user-attachments/assets/7bffe48f-e433-430b-91dc-ac745908ba3a">打开原视频</a></p>
+<figcaption>
+<strong>Wan2.1 · 图像生成视频</strong>
+<span>来自 LightX2V 性能基准的生成示例。</span>
+<a href="getting_started/benchmark.html">查看配置与效果对比</a>
+</figcaption>
+</figure>
+
+<div class="lx-task-shortcuts" markdown>
+
+[:material-video-outline: **视频与音视频**<span class="lx-task-description">从文本或图像生成视频，或生成同步音视频。</span><span class="lx-task-models">Wan、MiniMax-H3、LTX</span>](models/index.md?task=video#model-catalog)
+[:material-image-outline: **图像生成与编辑**<span class="lx-task-description">从提示词生成图像，或对已有图像进行编辑。</span><span class="lx-task-models">Qwen-Image、Z-Image、FLUX.2</span>](models/index.md?task=image#model-catalog)
+[:material-auto-fix: **修复与超分**<span class="lx-task-description">修复图像与视频，提升分辨率和细节。</span><span class="lx-task-models">SeedVR2、SwiftVR、RelayVSR</span>](models/index.md?task=restore#model-catalog)
+[:material-cube-outline: **交互与空间**<span class="lx-task-description">探索交互视频、世界模型与三维重建。</span><span class="lx-task-models">EdenLive、WorldMirror、WorldPlay</span>](models/index.md?task=world#model-catalog)
+
+</div>
+
+</div>
+
 ## 运行与集成 { #从这里开始 }
 
 先完成[环境与模型准备](getting_started/index.md)，再选择命令行、Python 或 HTTP API。命令行和 Python 示例均在 LightX2V 仓库根目录运行。
@@ -48,37 +85,37 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 
     ### 生成第一个视频
 
-    以 Wan2.1-T2V-1.3B 为例。将模型路径替换为本地目录，并在配置中选择与 GPU 匹配的[注意力算子](method_tutorials/attention.md)。
+    完成[快速入门中的准备步骤](getting_started/index.md)后，复用模型目录与入门配置，直接运行生成。
 
     ```bash title="Terminal"
     python -m lightx2v.infer \
       --model_cls wan2.1 \
       --task t2v \
-      --model_path /path/to/Wan2.1-T2V-1.3B \
-      --config_json configs/wan/wan_t2v.json \
+      --model_path models/Wan2.1-T2V-1.3B \
+      --config_json configs/wan/wan_t2v_quickstart.json \
       --prompt "A cat walking on a sunny beach." \
       --negative_prompt "blurry, low quality" \
       --seed 42 \
       --save_result_path save_results/first_video.mp4
     ```
 
-    [查看完整生成流程 :material-arrow-right:](getting_started/first_generation.md){ .lx-text-link }
+    [查看完整生成流程 :material-arrow-right:](getting_started/index.md){ .lx-text-link }
 
 === ":material-code-braces: Python"
 
     ### 在应用中调用
 
-    创建 Pipeline，加载模型后调用 `generate()`。替换模型路径，并确认配置中的[注意力算子](method_tutorials/attention.md)适用于当前 GPU。
+    复用[快速入门](getting_started/index.md)中下载的模型和生成的配置。创建 Pipeline，加载模型后调用 `generate()`。
 
     ```python title="generate.py"
     from lightx2v import LightX2VPipeline
 
     pipe = LightX2VPipeline(
-        model_path="/path/to/Wan2.1-T2V-1.3B",
+        model_path="models/Wan2.1-T2V-1.3B",
         model_cls="wan2.1",
         task="t2v",
     )
-    pipe.create_generator(config_json="configs/wan/wan_t2v.json")
+    pipe.create_generator(config_json="configs/wan/wan_t2v_quickstart.json")
     pipe.generate(
         prompt="A cat walking on a sunny beach.",
         negative_prompt="blurry, low quality",
@@ -107,25 +144,6 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
     ```
 
     [查看服务与客户端指南 :material-arrow-right:](deploy_guides/deploy_service.md){ .lx-text-link }
-
-</div>
-
-<div class="lx-section-heading" markdown>
-
-## 按任务找到模型 { #探索模型生态 }
-
-[浏览全部模型](models/index.md){ .lx-text-link }
-
-</div>
-
-先确定要生成或处理的内容，再选择对应模型与运行示例。
-
-<div class="lx-task-shortcuts" markdown>
-
-[:material-video-outline: **视频与音视频**<span class="lx-task-description">从文本或图像生成视频，或生成同步音视频。</span><span class="lx-task-models">Wan、MiniMax-H3、LTX</span>](models/index.md?task=video#model-catalog)
-[:material-image-outline: **图像生成与编辑**<span class="lx-task-description">从提示词生成图像，或对已有图像进行编辑。</span><span class="lx-task-models">Qwen-Image、Z-Image、FLUX.2</span>](models/index.md?task=image#model-catalog)
-[:material-auto-fix: **修复与超分**<span class="lx-task-description">修复图像与视频，提升分辨率和细节。</span><span class="lx-task-models">SeedVR2、SwiftVR、RelayVSR</span>](models/index.md?task=restore#model-catalog)
-[:material-cube-outline: **交互与空间**<span class="lx-task-description">探索交互视频、世界模型与三维重建。</span><span class="lx-task-models">EdenLive、WorldMirror、WorldPlay</span>](models/index.md?task=world#model-catalog)
 
 </div>
 

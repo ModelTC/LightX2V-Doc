@@ -164,3 +164,31 @@
   new MutationObserver(enhanceResults).observe(results, { childList: true });
   enhanceResults();
 })();
+
+/* A local poster keeps the example quiet until the reader chooses to play it. */
+(() => {
+  "use strict";
+  const showcase = document.querySelector("[data-showcase]");
+  if (!showcase) return;
+  const button = showcase.querySelector(".lx-showcase-play");
+  const video = showcase.querySelector("video");
+  const error = showcase.querySelector(".lx-showcase-error");
+  button.hidden = false;
+  video.hidden = true;
+  const failed = () => {
+    const restoreFocus = document.activeElement === video;
+    video.hidden = true;
+    button.hidden = false;
+    error.hidden = false;
+    if (restoreFocus) button.focus({ preventScroll: true });
+  };
+  video.addEventListener("error", failed);
+  button.addEventListener("click", () => {
+    button.hidden = true;
+    error.hidden = true;
+    video.hidden = false;
+    video.load();
+    video.focus({ preventScroll: true });
+    video.play().catch(failed);
+  });
+})();

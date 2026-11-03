@@ -69,7 +69,7 @@ Run from the repository root:
 bash scripts/wan/run_wan_t2v.sh
 ```
 
-Open the video at `--save_result_path` when inference finishes. The default is `save_results/output_lightx2v_wan_t2v.mp4` inside the repository. For a walkthrough, see [Generate your first video](../getting_started/first_generation.md).
+Open the video at `--save_result_path` when inference finishes. The default is `save_results/output_lightx2v_wan_t2v.mp4` inside the repository. For a walkthrough, see [Generate your first video](../getting_started/index.md).
 
 Edit inputs, prompts, seed, and output paths in the shell script, and sampling parameters in the JSON selected by `--config_json`. The JSON fields `num_frames` and `size` supply defaults when omitted from the command or request. `size` is `[height, width]`.
 

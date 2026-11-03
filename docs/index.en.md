@@ -38,6 +38,43 @@ LightX2V supports a range of popular models for image generation, image editing,
 
 </div>
 
+<div class="lx-section-heading" markdown>
+
+## Explore what you can create { #explore-the-model-ecosystem }
+
+[Browse all models](models/index.md){ .lx-text-link }
+
+</div>
+
+Choose what you want to create or process, then find a model and its examples.
+
+<div class="lx-capabilities" markdown>
+
+<figure class="lx-showcase" data-showcase>
+<button class="lx-showcase-play" type="button" hidden>
+<img src="../assets/showcase/wan-i2v.webp" width="768" height="496" alt="" loading="lazy">
+<span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Play example</span>
+</button>
+<video controls preload="none" playsinline width="768" height="496" poster="../assets/showcase/wan-i2v.webp" src="https://github.com/user-attachments/assets/7bffe48f-e433-430b-91dc-ac745908ba3a" aria-label="A generated video of vegetables being stirred in a pan"></video>
+<p class="lx-showcase-error" role="status" hidden>Video unavailable. <a href="https://github.com/user-attachments/assets/7bffe48f-e433-430b-91dc-ac745908ba3a">Open the source video</a></p>
+<figcaption>
+<strong>Wan2.1 · Image to video</strong>
+<span>A generation example from the LightX2V benchmarks.</span>
+<a href="getting_started/benchmark.html">View configuration and comparisons</a>
+</figcaption>
+</figure>
+
+<div class="lx-task-shortcuts" markdown>
+
+[:material-video-outline: **Video and audio**<span class="lx-task-description">Generate video from text or images, with options for synchronized audio.</span><span class="lx-task-models">Wan, MiniMax-H3, LTX</span>](models/index.md?task=video#model-catalog)
+[:material-image-outline: **Image generation and editing**<span class="lx-task-description">Create images from prompts or edit existing images.</span><span class="lx-task-models">Qwen-Image, Z-Image, FLUX.2</span>](models/index.md?task=image#model-catalog)
+[:material-auto-fix: **Restoration and upscaling**<span class="lx-task-description">Restore images and videos, and improve resolution and detail.</span><span class="lx-task-models">SeedVR2, SwiftVR, RelayVSR</span>](models/index.md?task=restore#model-catalog)
+[:material-cube-outline: **Interaction and spatial tasks**<span class="lx-task-description">Explore interactive video, world models, and 3D reconstruction.</span><span class="lx-task-models">EdenLive, WorldMirror, WorldPlay</span>](models/index.md?task=world#model-catalog)
+
+</div>
+
+</div>
+
 ## Run and integrate { #start-here }
 
 Complete [environment and model setup](getting_started/index.md), then choose the CLI, Python, or HTTP API. Run CLI and Python examples from the LightX2V repository root.
@@ -48,37 +85,37 @@ Complete [environment and model setup](getting_started/index.md), then choose th
 
     ### Generate your first video
 
-    This example uses Wan2.1-T2V-1.3B. Replace the model path with your local directory and select an [attention backend](method_tutorials/attention.md) compatible with your GPU.
+    After the [quickstart setup](getting_started/index.md), reuse its model directory and starter configuration to generate a video.
 
     ```bash title="Terminal"
     python -m lightx2v.infer \
       --model_cls wan2.1 \
       --task t2v \
-      --model_path /path/to/Wan2.1-T2V-1.3B \
-      --config_json configs/wan/wan_t2v.json \
+      --model_path models/Wan2.1-T2V-1.3B \
+      --config_json configs/wan/wan_t2v_quickstart.json \
       --prompt "A cat walking on a sunny beach." \
       --negative_prompt "blurry, low quality" \
       --seed 42 \
       --save_result_path save_results/first_video.mp4
     ```
 
-    [Read the generation walkthrough :material-arrow-right:](getting_started/first_generation.md){ .lx-text-link }
+    [Read the generation walkthrough :material-arrow-right:](getting_started/index.md){ .lx-text-link }
 
 === ":material-code-braces: Python"
 
     ### Call inference from your app
 
-    Create a pipeline, load the model, then call `generate()`. Replace the model path and check that the configured [attention backend](method_tutorials/attention.md) supports your GPU.
+    Reuse the model and configuration created in the [quickstart](getting_started/index.md). Create a pipeline, load the model, then call `generate()`.
 
     ```python title="generate.py"
     from lightx2v import LightX2VPipeline
 
     pipe = LightX2VPipeline(
-        model_path="/path/to/Wan2.1-T2V-1.3B",
+        model_path="models/Wan2.1-T2V-1.3B",
         model_cls="wan2.1",
         task="t2v",
     )
-    pipe.create_generator(config_json="configs/wan/wan_t2v.json")
+    pipe.create_generator(config_json="configs/wan/wan_t2v_quickstart.json")
     pipe.generate(
         prompt="A cat walking on a sunny beach.",
         negative_prompt="blurry, low quality",
@@ -107,25 +144,6 @@ Complete [environment and model setup](getting_started/index.md), then choose th
     ```
 
     [Read the service and client guide :material-arrow-right:](deploy_guides/deploy_service.md){ .lx-text-link }
-
-</div>
-
-<div class="lx-section-heading" markdown>
-
-## Find models by task { #explore-the-model-ecosystem }
-
-[Browse all models](models/index.md){ .lx-text-link }
-
-</div>
-
-Choose what you want to create or process, then find a model and its examples.
-
-<div class="lx-task-shortcuts" markdown>
-
-[:material-video-outline: **Video and audio**<span class="lx-task-description">Generate video from text or images, with options for synchronized audio.</span><span class="lx-task-models">Wan, MiniMax-H3, LTX</span>](models/index.md?task=video#model-catalog)
-[:material-image-outline: **Image generation and editing**<span class="lx-task-description">Create images from prompts or edit existing images.</span><span class="lx-task-models">Qwen-Image, Z-Image, FLUX.2</span>](models/index.md?task=image#model-catalog)
-[:material-auto-fix: **Restoration and upscaling**<span class="lx-task-description">Restore images and videos, and improve resolution and detail.</span><span class="lx-task-models">SeedVR2, SwiftVR, RelayVSR</span>](models/index.md?task=restore#model-catalog)
-[:material-cube-outline: **Interaction and spatial tasks**<span class="lx-task-description">Explore interactive video, world models, and 3D reconstruction.</span><span class="lx-task-models">EdenLive, WorldMirror, WorldPlay</span>](models/index.md?task=world#model-catalog)
 
 </div>
 
