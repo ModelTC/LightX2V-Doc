@@ -28,19 +28,19 @@ Already have the model and [starter configuration](#starter-config)? Skip to [st
 
 </nav>
 
-## 1. Prepare the environment and model { #prepare }
+## Prepare the environment and model { #prepare .lx-step-title data-step="1" }
 
 <a id="1-prepare-the-environment"></a>
 In terminal 1 on the GPU host, clone the repository or enter your existing checkout. Run the remaining repository commands from its root:
 
-```bash
+```bash title="Terminal 1 · GPU host"
 git clone https://github.com/ModelTC/LightX2V.git
 cd LightX2V
 ```
 
 Start the container. Docker downloads the image automatically on first use:
 
-```bash
+```bash title="Terminal 1 · GPU host"
 docker run --gpus all -it --ipc=host --name lightx2v-quickstart \
   -p 127.0.0.1:8080:8080 \
   -v "$PWD":/workspace/LightX2V \
@@ -50,13 +50,13 @@ docker run --gpus all -it --ipc=host --name lightx2v-quickstart \
 
 **Run the setup and server commands inside the container.** Install the current checkout:
 
-```bash
+```bash title="Terminal 1 · inside the container"
 python -m pip install -v -e .
 ```
 
 Check GPU availability:
 
-```bash
+```bash title="Terminal 1 · inside the container"
 python - <<'PYTHON'
 import torch
 assert torch.cuda.is_available(), "CUDA is not available"
@@ -66,6 +66,14 @@ print("PyTorch:", torch.__version__, "CUDA:", torch.version.cuda)
 print("VRAM (GiB):", round(torch.cuda.get_device_properties(0).total_memory / 2**30, 1))
 PYTHON
 ```
+
+<div class="lx-expected" markdown>
+
+**Check passed**
+
+The command finishes without errors and prints the GPU model, PyTorch / CUDA versions, and GPU memory capacity.
+
+</div>
 
 ??? info "How much GPU and host memory do I need?"
     This example uses the original 1.3B weights with CPU offload to reduce GPU memory use. Host memory must hold offloaded weights and buffers. Actual usage depends on PyTorch, attention backends, resolution, and frame count. The 1.3B parameter count excludes the text encoder and VAE, so it does not describe the memory requirements of the full pipeline.
@@ -77,7 +85,7 @@ PYTHON
 <a id="download-the-model"></a>
 Install the download tool, then fetch the complete model including its text encoder and VAE:
 
-```bash
+```bash title="Terminal 1 · inside the container"
 python -m pip install -U huggingface_hub
 hf download Wan-AI/Wan2.1-T2V-1.3B \
   --local-dir models/Wan2.1-T2V-1.3B
@@ -92,7 +100,7 @@ If you already have the weights, skip the download and set `--model_path` below 
 
 Copy the repository configuration, select PyTorch's built-in `torch_sdpa` attention, and enable CPU offload. This creates a separate configuration file and preserves the original.
 
-```bash
+```bash title="Terminal 1 · inside the container"
 python - <<'PYTHON'
 import json
 from pathlib import Path
@@ -112,11 +120,11 @@ PYTHON
 This example does not need a separate FlashAttention installation. CPU offload adds transfer overhead; after your first run, choose an [attention backend](../method_tutorials/attention.md) and [acceleration approach](../method_tutorials/index.md) for your hardware.
 
 <a id="run-generation"></a>
-## 2. Start the service { #start-server }
+## Start the service { #start-server .lx-step-title data-step="2" }
 
 Keep terminal 1 open. Run inside the container, or in your existing LightX2V environment:
 
-```bash title="Terminal 1 · keep running"
+```bash title="Terminal 1 · inside the container, keep running"
 CUDA_VISIBLE_DEVICES=0 python -m lightx2v.server \
   --model_cls wan2.1 --task t2v \
   --model_path models/Wan2.1-T2V-1.3B \
@@ -130,66 +138,46 @@ Wait for `Application startup complete.` in the log. In a second terminal on the
 curl --fail --silent --show-error http://localhost:8080/health
 ```
 
-A ready API returns `{"status":"ok"}`. The first startup loads the model and can take time. This walkthrough uses API port **8080** and metrics port **8081**; existing repository launchers usually use **8000**. Always match the request URL to your server's port.
+<div class="lx-expected" markdown>
 
-## 3. Send a request and get the result { #send-request }
+**Expected result**
+
+The API returns `{"status":"ok"}` when ready. The first startup loads the model and can take time.
+
+</div>
+
+This walkthrough uses API port **8080** and metrics port **8081**; existing repository launchers usually use **8000**. Always match the request URL to your server's port.
+
+## Send a request and get the result { #send-request .lx-step-title data-step="3" }
 
 If you used Docker above, enter that running container from terminal 2:
 
-```bash title="Terminal 2 · enter the existing container"
+```bash title="Terminal 2 · GPU host"
 docker exec -it lightx2v-quickstart /bin/bash
 ```
 
-Otherwise, activate the same Python environment in terminal 2 and enter the LightX2V repository. The following **Python HTTP client** sends a request, waits for completion, and downloads the video. It uses `requests`, included in the LightX2V environment; it does not load a model.
+Otherwise, activate the same Python environment in terminal 2 and enter the LightX2V repository.
 
-```bash title="Terminal 2 · submit, wait, and download"
-python - <<'PYTHON'
-import time
-import uuid
-from pathlib import Path
+Expand and copy the complete command below, then run it in **terminal 2** (inside the container if using Docker). This HTTP client submits a task, waits for completion, and downloads the video. It only needs `requests`, included in the environment.
 
-import requests
+<details class="lx-request-example" markdown>
+<summary>Expand and copy the request command</summary>
 
-base_url = "http://localhost:8080"
-response = requests.post(f"{base_url}/v1/tasks/video/", json={
-    "prompt": "A cat walking on a sunny beach.",
-    "negative_prompt": "blurry, low quality",
-    "seed": 42,
-    "size": [480, 832],
-    "num_frames": 81,
-    "save_result_path": f"quickstart_{uuid.uuid4().hex}.mp4",
-}, timeout=30)
-response.raise_for_status()
-task_id = response.json()["task_id"]
-print(f"Task: {task_id}", flush=True)
+<!-- quickstart-client -->
 
-deadline = time.monotonic() + 1800
-while time.monotonic() < deadline:
-    response = requests.get(f"{base_url}/v1/tasks/{task_id}/status", timeout=30)
-    response.raise_for_status()
-    task = response.json()
-    if task["status"] == "completed":
-        break
-    if task["status"] in {"failed", "cancelled"}:
-        raise RuntimeError(f"{task['status']}: {task.get('error') or task_id}")
-    print(task["status"], flush=True)
-    time.sleep(2)
-else:
-    raise TimeoutError(f"Timed out waiting for task {task_id}; query its status before retrying.")
+</details>
 
-output = Path("save_results/first_video.mp4")
-output.parent.mkdir(parents=True, exist_ok=True)
-with requests.get(f"{base_url}/v1/tasks/{task_id}/result", stream=True, timeout=(10, 300)) as response:
-    response.raise_for_status()
-    with output.with_suffix(".mp4.part").open("wb") as file:
-        for chunk in response.iter_content(chunk_size=1024 * 1024):
-            file.write(chunk)
-output.with_suffix(".mp4.part").replace(output)
-print(f"Saved to: {output.resolve()}")
-PYTHON
-```
+You can also [download the Python client](../assets/examples/first_request.py){ download="first_request.py" }, save it to the LightX2V repository root on the GPU host, and run `python first_request.py` in terminal 2.
 
-The client prints the task ID, then `pending` or `processing`, followed by the local output path. It polls for up to 30 minutes; a timeout stops waiting without cancelling the server task. Keep the printed ID to [query or cancel it](../deploy_guides/deploy_service.md#poll-download-and-cancel) before submitting again.
+<div class="lx-expected" markdown>
+
+**Expected result**
+
+The client prints `Task: …`, then `pending` (queued) or `processing` (generating) while waiting. On completion, it prints `Saved to: …/save_results/first_video.mp4`.
+
+</div>
+
+It polls for up to 30 minutes; a timeout stops waiting without cancelling the server task. Keep the printed ID to [query or cancel it](../deploy_guides/deploy_service.md#poll-download-and-cancel) before submitting again.
 
 <a id="4-run-and-inspect-the-result"></a>
 <a id="open-the-result"></a>

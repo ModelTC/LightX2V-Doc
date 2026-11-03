@@ -141,10 +141,10 @@ def version_asset_urls(output, config):
         value = url[1] + versions[url[2]] + (url[3] or "")
         return match["tag"] + match["quote"] + value + match["quote"]
 
-    # Rewrite resource attributes only; preserve relative paths, SVG view
-    # fragments and query strings without touching document links or examples.
+    # Version resource and download URLs in attributes; preserve document links,
+    # example code, relative paths, SVG view fragments and query strings.
     return re.sub(
-        r"(?P<tag><(?:link|script|img)\b[^>]*?\b(?:href|src)=|<video\b[^>]*?\bposter=)"
+        r"(?P<tag><(?:a|link|script|img)\b[^>]*?\b(?:href|src)=|<video\b[^>]*?\bposter=)"
         r"(?P<quote>[\"'])(?P<url>[^\"']+)(?P=quote)",
         replace,
         output,
@@ -169,7 +169,14 @@ def on_page_markdown(markdown, page, config, files):
         )
         return markdown.replace("<!-- hero-visual -->", visual)
 
-    if getattr(page.file, "norm_src_uri", page.file.src_uri) != "models/index.md":
+    source = getattr(page.file, "norm_src_uri", page.file.src_uri)
+    if source == "getting_started/index.md":
+        # The downloadable client and both displayed examples share one source.
+        client = (HERE / "assets/examples/first_request.py").read_text(encoding="utf-8")
+        command = "```bash\npython - <<'PYTHON'\n" + client.rstrip() + "\nPYTHON\n```"
+        return markdown.replace("<!-- quickstart-client -->", command)
+
+    if source != "models/index.md":
         return markdown
 
     locale = config.plugins["i18n"].current_language

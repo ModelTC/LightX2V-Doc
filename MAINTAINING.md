@@ -35,7 +35,7 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 首次生成统一维护在 `docs/getting_started/index.md` 及英文版本；`first_generation.html` 通过跳转保留旧地址。入门配置使用 SDPA 与 CPU 卸载，首页服务启动与离线示例复用该配置；变更时同步检查推理仓库的参数与实现。
 
-入门视频请求客户端使用 HTTP 提交任务、轮询 `status` 并流式下载完成的结果；提交响应的字段为 `task_status`。检查成功、失败、取消、等待超时和 HTTP 错误，确保超时不会被误写成任务已取消；GPU 真实推理需单独验证。
+入门视频请求客户端维护在 `theme/assets/examples/first_request.py`；中英文页面中的 `<!-- quickstart-client -->` 由构建钩子替换为可复制的完整命令，与下载文件共用同一份代码。客户端使用 HTTP 提交任务、轮询 `status` 并流式下载完成的结果；提交响应的字段为 `task_status`。检查成功、失败、取消、等待超时和 HTTP 错误，确保超时不会被误写成任务已取消；GPU 真实推理需单独验证。
 
 普通插图优先使用 Markdown 图片语法。共享资源放在 `theme/assets/`，构建后使用站点的 `assets/` 路径。使用原始 HTML 图片或视频标签时，分别检查中英文页面的相对路径。
 

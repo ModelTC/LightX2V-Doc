@@ -28,19 +28,19 @@ description: 启动 LightX2V 模型服务，通过 HTTP 请求生成并下载第
 
 </nav>
 
-## 1. 准备环境与模型 { #prepare }
+## 准备环境与模型 { #prepare .lx-step-title data-step="1" }
 
 <a id="1-准备运行环境"></a>
 在 GPU 宿主机的终端 1 获取仓库，已有仓库则进入对应目录。后续仓库内命令均从根目录执行：
 
-```bash
+```bash title="终端 1 · GPU 宿主机"
 git clone https://github.com/ModelTC/LightX2V.git
 cd LightX2V
 ```
 
 启动容器；首次运行会自动下载镜像：
 
-```bash
+```bash title="终端 1 · GPU 宿主机"
 docker run --gpus all -it --ipc=host --name lightx2v-quickstart \
   -p 127.0.0.1:8080:8080 \
   -v "$PWD":/workspace/LightX2V \
@@ -50,13 +50,13 @@ docker run --gpus all -it --ipc=host --name lightx2v-quickstart \
 
 **环境准备与服务启动命令在容器内执行。** 安装当前仓库：
 
-```bash
+```bash title="终端 1 · 容器内"
 python -m pip install -v -e .
 ```
 
 检查 GPU 是否可用：
 
-```bash
+```bash title="终端 1 · 容器内"
 python - <<'PYTHON'
 import torch
 assert torch.cuda.is_available(), "CUDA is not available"
@@ -66,6 +66,14 @@ print("PyTorch:", torch.__version__, "CUDA:", torch.version.cuda)
 print("VRAM (GiB):", round(torch.cuda.get_device_properties(0).total_memory / 2**30, 1))
 PYTHON
 ```
+
+<div class="lx-expected" markdown>
+
+**检查通过**
+
+命令无报错，并显示 GPU 型号、PyTorch / CUDA 版本与显存容量。
+
+</div>
 
 ??? info "需要多少显存和内存？"
     本例使用原版 1.3B 权重，并启用 CPU 卸载以降低 GPU 显存占用，主机内存需容纳卸载的权重和缓冲区。实际占用随 PyTorch、算子、尺寸和帧数变化；1.3B 仅指生成模型的参数规模，不包含文本编码器与 VAE，不能据此估算整个流程的显存需求。
@@ -77,7 +85,7 @@ PYTHON
 <a id="下载模型"></a>
 安装下载工具，获取包含文本编码器和 VAE 的完整模型目录：
 
-```bash
+```bash title="终端 1 · 容器内"
 python -m pip install -U huggingface_hub
 hf download Wan-AI/Wan2.1-T2V-1.3B \
   --local-dir models/Wan2.1-T2V-1.3B
@@ -92,7 +100,7 @@ hf download Wan-AI/Wan2.1-T2V-1.3B \
 
 复制仓库配置，使用 PyTorch 自带的 `torch_sdpa` 注意力实现，并开启 CPU 卸载。新配置写入独立文件，原配置保留。
 
-```bash
+```bash title="终端 1 · 容器内"
 python - <<'PYTHON'
 import json
 from pathlib import Path
@@ -112,11 +120,11 @@ PYTHON
 本例无需额外安装 FlashAttention。CPU 卸载会增加数据搬运时间；跑通后可根据显卡选择[注意力算子](../method_tutorials/attention.md)与[加速方案](../method_tutorials/index.md)。
 
 <a id="运行生成"></a>
-## 2. 启动服务 { #start-server }
+## 启动服务 { #start-server .lx-step-title data-step="2" }
 
 保持终端 1 运行。在容器内，或已有的 LightX2V 环境中执行：
 
-```bash title="终端 1 · 保持运行"
+```bash title="终端 1 · 容器内，保持运行"
 CUDA_VISIBLE_DEVICES=0 python -m lightx2v.server \
   --model_cls wan2.1 --task t2v \
   --model_path models/Wan2.1-T2V-1.3B \
@@ -130,66 +138,46 @@ CUDA_VISIBLE_DEVICES=0 python -m lightx2v.server \
 curl --fail --silent --show-error http://localhost:8080/health
 ```
 
-正常返回 `{"status":"ok"}`。首次启动需要加载模型，请耐心等待。本教程使用 API 端口 **8080**、指标端口 **8081**；仓库已有启动脚本通常使用 **8000**，请求地址需与实际服务端口一致。
+<div class="lx-expected" markdown>
 
-## 3. 发送请求并获取结果 { #send-request }
+**预期结果**
+
+返回 `{"status":"ok"}`，表示接口已就绪。首次启动需要加载模型，请耐心等待。
+
+</div>
+
+本教程使用 API 端口 **8080**、指标端口 **8081**；仓库已有启动脚本通常使用 **8000**，请求地址需与实际服务端口一致。
+
+## 发送请求并获取结果 { #send-request .lx-step-title data-step="3" }
 
 使用上面的 Docker 环境时，在终端 2 进入正在运行的容器：
 
-```bash title="终端 2 · 进入已有容器"
+```bash title="终端 2 · GPU 宿主机"
 docker exec -it lightx2v-quickstart /bin/bash
 ```
 
-使用已有 Python 环境时，在终端 2 激活同一环境并进入 LightX2V 仓库。下面的 **Python HTTP 客户端**会提交请求、等待完成并下载视频。它只依赖环境中已有的 `requests`，不加载模型。
+使用已有 Python 环境时，在终端 2 激活同一环境并进入 LightX2V 仓库。
 
-```bash title="终端 2 · 提交、等待并下载"
-python - <<'PYTHON'
-import time
-import uuid
-from pathlib import Path
+展开并复制下面的完整命令，在**终端 2** 执行（Docker 用户在容器内）。这个 HTTP 客户端会提交请求、等待完成并下载视频，只依赖环境中已有的 `requests`。
 
-import requests
+<details class="lx-request-example" markdown>
+<summary>展开并复制请求命令</summary>
 
-base_url = "http://localhost:8080"
-response = requests.post(f"{base_url}/v1/tasks/video/", json={
-    "prompt": "A cat walking on a sunny beach.",
-    "negative_prompt": "blurry, low quality",
-    "seed": 42,
-    "size": [480, 832],
-    "num_frames": 81,
-    "save_result_path": f"quickstart_{uuid.uuid4().hex}.mp4",
-}, timeout=30)
-response.raise_for_status()
-task_id = response.json()["task_id"]
-print(f"Task: {task_id}", flush=True)
+<!-- quickstart-client -->
 
-deadline = time.monotonic() + 1800
-while time.monotonic() < deadline:
-    response = requests.get(f"{base_url}/v1/tasks/{task_id}/status", timeout=30)
-    response.raise_for_status()
-    task = response.json()
-    if task["status"] == "completed":
-        break
-    if task["status"] in {"failed", "cancelled"}:
-        raise RuntimeError(f"{task['status']}: {task.get('error') or task_id}")
-    print(task["status"], flush=True)
-    time.sleep(2)
-else:
-    raise TimeoutError(f"Timed out waiting for task {task_id}; query its status before retrying.")
+</details>
 
-output = Path("save_results/first_video.mp4")
-output.parent.mkdir(parents=True, exist_ok=True)
-with requests.get(f"{base_url}/v1/tasks/{task_id}/result", stream=True, timeout=(10, 300)) as response:
-    response.raise_for_status()
-    with output.with_suffix(".mp4.part").open("wb") as file:
-        for chunk in response.iter_content(chunk_size=1024 * 1024):
-            file.write(chunk)
-output.with_suffix(".mp4.part").replace(output)
-print(f"Saved to: {output.resolve()}")
-PYTHON
-```
+也可[下载 Python 客户端](../assets/examples/first_request.py){ download="first_request.py" }，将其保存到 GPU 主机上的 LightX2V 仓库根目录，再在终端 2 运行 `python first_request.py`。
 
-客户端先输出任务 ID，再显示 `pending`（排队）或 `processing`（生成中），完成后输出本地文件路径。默认最多轮询 30 分钟；超时只停止等待，不会取消服务端任务。请保留任务 ID，[查询或取消任务](../deploy_guides/deploy_service.md#查询下载与取消)后再决定是否重新提交。
+<div class="lx-expected" markdown>
+
+**预期结果**
+
+先显示 `Task: …`，等待时显示 `pending`（排队）或 `processing`（生成中），完成后显示 `Saved to: …/save_results/first_video.mp4`。
+
+</div>
+
+默认最多轮询 30 分钟；超时只停止等待，不会取消服务端任务。请保留任务 ID，[查询或取消任务](../deploy_guides/deploy_service.md#查询下载与取消)后再决定是否重新提交。
 
 <a id="4-运行并查看结果"></a>
 <a id="查看结果"></a>
