@@ -1,41 +1,69 @@
 # 注意力机制
 
+先按 GPU 选择后端，再检查所选模型的配置字段和并行限制。安装了算子并不代表当前硬件、模型和输入形状都能使用它。
+
+## 按 GPU 选择 { #按-gpu-选择 }
+
+| 场景 | 建议起点 | 使用前确认 |
+| --- | --- | --- |
+| 首次运行、排查额外算子安装问题 | `torch_sdpa` | 使用 PyTorch 自带实现；仍需满足模型的设备、精度和显存要求 |
+| A100 / A800、RTX 3090 / 4090 | `flash_attn2` 或 `sage_attn2` | 安装与 PyTorch、CUDA、GPU 架构匹配的版本；不要使用默认 `flash_attn3` |
+| H100 / H200 | `flash_attn3`；也可对比 `sage_attn2` | FlashAttention 3 面向 Hopper；使用模型配套环境 |
+| RTX 5090 | 模型专用配置中的 `sage_attn2` 或 `torch_sdpa` | 使用 SM120 环境；进一步评估 `sage_attn3` 时需单独安装 Blackwell 实现并比较画质 |
+| 评估 FlashAttention 4 | `flash_attn4` | 上游面向 Hopper / Blackwell；当前 LightX2V 适配仅接受 batch size 1，不提供 varlen 路径 |
+
+硬件要求见 [FlashAttention](https://github.com/Dao-AILab/flash-attention) 和 [SageAttention](https://github.com/thu-ml/SageAttention)。模型专用配置优先于通用选择表；Qwen-Image-2.1 的 A100、Hopper 和 5090 路径见[模型指南](../models/qwen-image-2.1.md#2-环境安装)。
+
 ## LightX2V支持的注意力机制
 
-| 名称               | 类型名称         | GitHub 链接 |
-|--------------------|------------------|-------------|
-| Flash Attention 2  | `flash_attn2`    | [flash-attention v2](https://github.com/Dao-AILab/flash-attention) |
-| Flash Attention 3  | `flash_attn3`    | [flash-attention v3](https://github.com/Dao-AILab/flash-attention) |
-| Sage Attention 2   | `sage_attn2`     | [SageAttention](https://github.com/thu-ml/SageAttention) |
-| Radial Attention   | `radial_attn`    | [Radial Attention](https://github.com/mit-han-lab/radial-attention) |
-| Sol-Attn           | `sol_attn`       | [Sol-Attn](https://github.com/NVlabs/Sana/tree/sol-engine/techniques/sparse_backends) |
-| Sparge Attention   | `sparge_attn`     | [Sparge Attention](https://github.com/thu-ml/SpargeAttn) |
+以下为常用配置名称，不是所有内部后端的完整列表：
 
----
+| 后端 | 配置值 | 定位与限制 |
+| --- | --- | --- |
+| PyTorch SDPA | `torch_sdpa` | 无需额外安装 attention 包，适合作为对照起点 |
+| FlashAttention 2 | `flash_attn2` | Dense attention，按已安装版本核对设备支持 |
+| FlashAttention 3 | `flash_attn3` | Hopper dense attention |
+| FlashAttention 4 | `flash_attn4` | CuTeDSL 实现；当前适配限制见上表 |
+| SageAttention 2 | `sage_attn2` | 量化 attention；替换后比较生成效果 |
+| SageAttention 3 | `sage_attn3` | Blackwell FP4 attention；不是安装 SageAttention 2 后即可使用 |
+| Radial Attention | `radial_attn` | 稀疏视频 self-attention，不能用于 cross-attention |
+| Sol-Attn | `sol_attn` | 需匹配模型布局和 shape，完整例子见下文 |
+| Sparge Attention | `sparge_attn` | 稀疏后端，需要配套依赖与模型设置 |
+
+注册实现见 [attention 后端目录](https://github.com/ModelTC/LightX2V/tree/main/lightx2v/common/ops/attn)。不要把这些名称直接替换到所有模型或并行模式中；稀疏布局、mask、varlen 和分布式通信可能要求专用实现。
 
 ## 配置示例
 
-注意力机制的config文件在[这里](https://github.com/ModelTC/lightx2v/tree/main/configs/attentions)
+以下均为字段片段，合并到完整 JSON 中，再将服务或 CLI 的 `--config_json` 指向该文件。
 
-通过指定--config_json到具体的config文件，即可以测试不同的注意力机制
+=== "Wan2.1 T2V"
 
-比如对于radial_attn，配置如下：
+    ```json
+    {
+      "self_attn_1_type": "torch_sdpa",
+      "cross_attn_1_type": "torch_sdpa"
+    }
+    ```
 
-```json
-{
-  "self_attn_1_type": "radial_attn",
-  "cross_attn_1_type": "flash_attn3",
-  "cross_attn_2_type": "flash_attn3"
-}
+=== "Qwen-Image-2.1"
+
+    ```json
+    {
+      "attn_type": "torch_sdpa"
+    }
+    ```
+
+    这只替换 DiT attention。希望一并使用 Torch RoPE、归一化等算子时，标准版可从 [qwen_image_21_torch.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21_torch.json) 开始；Turbo 需保留自身采样配置。
+
+Wan 的 `cross_attn_2_type` 用于图像交叉注意力。Wan2.1 I2V/FLF2V 和 Wan2.2 Animate/Animate2 需要保留；T2V/VACE，以及关闭图像编码器的 Wan2.2 MoE、TI2V、S2V 无需此字段。用 SDPA 运行前一组任务时，也将此字段设为 `torch_sdpa`。
+
+运行前查看 GPU 和软件环境：
+
+```bash
+python -c "import torch; print(torch.__version__, torch.version.cuda); print(torch.cuda.get_device_name(0), torch.cuda.get_device_capability(0))"
 ```
 
-如需更换为其他类型，只需将对应值替换为上述表格中的类型名称即可。
-
-Wan 的 `cross_attn_2_type` 用于图像交叉注意力。Wan2.1 的 I2V/FLF2V 和 Wan2.2 的 Animate/Animate2 配置需要保留；T2V/VACE，以及关闭图像编码器的 Wan2.2 MoE、TI2V 和 S2V 配置无需此字段。
-
-tips: radial_attn因为稀疏算法原理的限制只能用在self attention
-
-如需进一步定制注意力机制的行为，请参考各注意力库的官方文档或实现代码。
+再用同一模型、seed、尺寸与采样设置完成一次请求，检查日志及输出。性能比较应排除模型加载、首次编译和预热；稀疏或量化后端还应比较画质。仅成功导入包不足以证明 kernel 可运行。
 
 ### 在 Wan2.1 上使用 Sol-Attn
 

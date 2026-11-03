@@ -1,8 +1,10 @@
-# Service Deployment
+# Service API reference { #service-deployment }
 
 <p class="lx-page-lead">Run a model as an API service, submit generation tasks and retrieve the results.</p>
 
 LightX2V provides a FastAPI service with asynchronous task queues. Start it with `python -m lightx2v.server`. The startup model and task determine which request fields are supported; see [Adding Request Parameters](../developer_guides/request_parameters.md).
+
+New to LightX2V? Start with [your first service request](../getting_started/index.md), including automatic waiting and result download. This reference covers model-specific entry points, task management, and API routes. Examples here use port **8000**; the quickstart uses **8080**. Match URLs to the port of your running server.
 
 <nav class="lx-guide-path" aria-label="Asynchronous video task workflow" markdown>
 
@@ -14,7 +16,7 @@ LightX2V provides a FastAPI service with asynchronous task queues. Start it with
 
 ## Choose a model-specific service
 
-Prepare the environment and weights in the model guide, complete an offline generation, then use the corresponding server and client:
+Prepare the environment, weights, and configuration in the model guide, then start the server and send a request:
 
 | Model | Guide | What to select |
 | --- | --- | --- |
@@ -31,6 +33,8 @@ bash scripts/server/start_server.sh
 ```
 
 The example loads Wan2.1 T2V with `configs/wan/wan_t2v.json` and listens on port 8000. Change `--model_cls`, `--task`, and `--config_json` together when selecting another model. `--max_queue_size` defaults to 10 and counts both pending and processing tasks.
+
+Check `curl --fail http://localhost:8000/health` after model loading; a ready API returns `{"status":"ok"}`. Keep the server terminal running.
 
 ## Submit a video task
 
@@ -81,7 +85,7 @@ Cancelling one task leaves other pending tasks in the queue. `scripts/server/sto
 
 For an image model started with `--task t2i` or `--task i2i`, use `/v1/tasks/image/` (JSON) or `/v1/tasks/image/form` (multipart). `/v1/tasks/image/sync` waits for completion and normally returns PNG bytes; when `presigned_url` is supplied it uploads the result and returns JSON. It accepts `timeout_seconds` as a query parameter (default 600).
 
-OpenAI-compatible image endpoints are also available at `/v1/images/generations` and `/v1/images/edits`. Check the running service's `/docs` for request schemas and `/v1/service/metadata` for model/task capabilities.
+OpenAI-compatible image endpoints are also available at `/v1/images/generations` and `/v1/images/edits`. Check the running service's `/docs` for request schemas and `/v1/service/metadata` for the loaded model identity.
 
 ## Multiple GPUs and multiple services
 
@@ -119,6 +123,7 @@ The helper currently submits to the compatibility route `POST /v1/tasks/` for vi
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
+| `/health` | GET | Check API availability |
 | `/v1/tasks/video/` | POST | Submit a video task as JSON |
 | `/v1/tasks/video/form` | POST | Submit a video task with multipart uploads |
 | `/v1/tasks/image/` | POST | Submit an image task as JSON |
@@ -131,7 +136,7 @@ The helper currently submits to the compatibility route `POST /v1/tasks/` for vi
 | `/v1/tasks/{task_id}` | DELETE | Cancel one task |
 | `/v1/tasks/all/running` | DELETE | Cancel all pending/processing tasks |
 | `/v1/service/status` | GET | Inspect service execution state |
-| `/v1/service/metadata` | GET | Inspect model/task capabilities |
+| `/v1/service/metadata` | GET | Inspect the loaded model |
 | `/v1/files/download/{file_path}` | GET | Download an allowed output file |
 | `/v1/images/generations` | POST | OpenAI-compatible image generation |
 | `/v1/images/edits` | POST | OpenAI-compatible image editing |

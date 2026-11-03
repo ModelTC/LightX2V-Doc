@@ -42,8 +42,11 @@ python -m lightx2v.infer \
   --task t2v \
   --model_path /path/to/model \
   --config_json /path/to/config.json \
-  --prompt "Your prompt here"
+  --prompt "Your prompt here" \
+  --save_result_path save_results/wan_lora.mp4
 ```
+
+The video is saved to `save_results/wan_lora.mp4`. The current Wan CLI does not save a video when `--save_result_path` is omitted.
 
 ### Multiple LoRAs Configuration
 

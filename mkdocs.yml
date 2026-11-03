@@ -7,6 +7,12 @@ edit_uri: !ENV [LIGHTX2V_DOCS_EDIT_URI, "https://github.com/ModelTC/LightX2V-Doc
 docs_dir: docs
 site_dir: site
 use_directory_urls: false
+# Retain published reference pages without placing them in the navigation.
+not_in_nav: |
+  getting_started/benchmark.md
+  getting_started/benchmark.en.md
+  deploy_guides/windows_legacy.md
+  deploy_guides/windows_legacy.en.md
 copyright: Copyright © 2026 LightX2V Team
 
 theme:
@@ -64,12 +70,13 @@ nav:
           - LightX2V Studio: https://x2v.light-ai.top/
           - macOS 应用: https://github.com/ModelTC/LightX2V-Mac-App
   - 快速入门:
-      - 安装与首次生成: getting_started/index.md
+      - 启动服务与首次请求: getting_started/index.md
       - 继续使用:
           - 完整安装指南: getting_started/installation.md
-          - Python API: getting_started/python_api.md
-          - 模型结构与权重: getting_started/model_structure.md
-          - 性能基准: getting_started/benchmark.md
+          - 服务 API 参考: deploy_guides/deploy_service.md
+          - 离线推理: getting_started/offline_inference.md
+          - Python Pipeline: getting_started/python_api.md
+          - Wan 权重组织与加载: getting_started/model_structure.md
   - 模型与示例:
       - 模型总览: models/index.md
       - 模型使用指南:
@@ -95,14 +102,12 @@ nav:
           - 低延迟部署: deploy_guides/for_low_latency.md
       - 接入与运行:
           - LoRA 部署: deploy_guides/lora_deploy.md
-          - 服务化部署: deploy_guides/deploy_service.md
-          - Gradio: deploy_guides/deploy_gradio.md
-          - ComfyUI: deploy_guides/deploy_comfyui.md
+          - 图形界面与生态集成: deploy_guides/interfaces.md
           - Windows 本地部署: deploy_guides/deploy_local_windows.md
       - 进阶部署:
           - 分离式推理: deploy_guides/disagg.md
           - Qwen Image 编码器: deploy_guides/qwen_image_encoder.md
-          - Qwen Image VAE TensorRT: deploy_guides/qwen_image_vae_tensorrt.md
+          - Qwen Image VAE TensorRT 接入参考: deploy_guides/qwen_image_vae_tensorrt.md
   - 开发指南:
       - 新增请求参数: developer_guides/request_parameters.md
       - 性能分析: method_tutorials/torch_profiling.md
@@ -139,11 +144,13 @@ plugins:
             相关应用: Related applications
             macOS 应用: macOS app
             快速入门: Getting started
-            安装与首次生成: Installation and first generation
+            启动服务与首次请求: Service quickstart
+            服务 API 参考: Service API reference
+            离线推理: Offline inference
             继续使用: Further reading
             完整安装指南: Full installation guide
-            模型结构与权重: Model structure and weights
-            性能基准: Benchmarks
+            Wan 权重组织与加载: Wan weights and loading
+            图形界面与生态集成: Interfaces and integrations
             模型与示例: Models and examples
             模型总览: Model catalog
             模型使用指南: Model guides
@@ -165,12 +172,11 @@ plugins:
             低延迟部署: Low-latency deployment
             接入与运行: Integration and serving
             LoRA 部署: LoRA deployment
-            服务化部署: Inference services
             Windows 本地部署: Windows deployment
             进阶部署: Advanced deployment
             分离式推理: Disaggregated inference
             Qwen Image 编码器: Qwen Image encoder
-            Qwen Image VAE TensorRT: Qwen Image VAE with TensorRT
+            Qwen Image VAE TensorRT 接入参考: Qwen Image VAE TensorRT reference
             开发指南: Developer guides
             新增请求参数: Adding request parameters
             性能分析: Performance profiling
@@ -214,6 +220,8 @@ extra_javascript:
 extra:
   generator: false
   redirects:
+    deploy_guides/deploy_gradio.html: deploy_guides/interfaces.md
+    deploy_guides/deploy_comfyui.html: deploy_guides/interfaces.md
     getting_started/first_generation.html: getting_started/index.md
     getting-started/quickstart.html: getting_started/index.md
     getting_started/quickstart.html: getting_started/installation.md

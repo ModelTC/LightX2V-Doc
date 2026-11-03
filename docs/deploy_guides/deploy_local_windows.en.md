@@ -1,90 +1,71 @@
 # Windows Local Deployment Guide
 
-## 📖 Overview
+Run a service from the current checkout in a dedicated Python environment, then generate through HTTP requests. Use [standalone integrations](interfaces.md) for graphical interfaces.
 
-This document provides detailed instructions for deploying LightX2V locally on Windows environments, including batch file inference, Gradio Web interface inference, and other usage methods.
+## Prepare the environment and model
 
-## 🚀 Quick Start
+Follow the [Windows installation instructions](../getting_started/installation.md#windows-environment-setup) first. These commands use **Windows CMD / Anaconda Prompt**, not PowerShell or Bash. Activate the LightX2V environment and enter the inference repository root.
 
-### Environment Requirements
+This example uses a BF16-capable NVIDIA GPU, original Wan2.1-T2V-1.3B weights and CPU offload. Host and GPU memory must still hold the components and intermediate results; the 1.3B parameter count alone does not determine memory requirements. Download the complete model and copy the config:
 
-#### Hardware Requirements
-- **GPU**: NVIDIA GPU, recommended 8GB+ VRAM
-- **Memory**: Recommended 16GB+ RAM
-- **Storage**: Strongly recommended to use SSD solid-state drives, mechanical hard drives will cause slow model loading
-
-
-## 🎯 Usage Methods
-
-### Method 1: Using Batch File Inference
-
-Refer to [Quick Start Guide](../getting_started/installation.md) to install environment, and use [batch files](https://github.com/ModelTC/LightX2V/tree/main/scripts/win) to run.
-
-### Method 2: Using Gradio Web Interface Inference
-
-#### Manual Gradio Configuration
-
-Refer to [Quick Start Guide](../getting_started/installation.md) to install environment, refer to [Gradio Deployment Guide](deploy_gradio.md)
-
-#### Legacy Bundle: One-Click Gradio Startup
-
-The download and usage instructions below apply to the legacy bundle. See [Gradio-Lightx2v](https://github.com/ModelTC/Gradio-Lightx2v) for the separate application. A corresponding new bundle has not been provided; the environment below is not a verified deployment of the new application.
-
-**📦 Download Software Package**
-
-- [Quark Cloud](https://pan.quark.cn/s/f44023dcf8c8)
-
-**📁 Directory Structure**
-After extraction, ensure the directory structure is as follows:
-
-```
-├── env/                        # LightX2V environment directory
-├── LightX2V/                   # LightX2V project directory
-├── start_lightx2v.bat          # One-click startup script
-├── lightx2v_config.txt         # Configuration file
-├── LightX2V使用说明.txt         # LightX2V usage instructions
-├── outputs/                    # Generated video save directory
-└── models/                     # Model storage directory
+```bat
+python -m pip install -U huggingface_hub
+hf download Wan-AI/Wan2.1-T2V-1.3B --local-dir models/Wan2.1-T2V-1.3B
+copy configs\wan\wan_t2v.json configs\wan\wan_t2v_windows.json
 ```
 
-**⚠️ Note for RTX 50 Series GPU Users**: We provide a dedicated runtime environment. Please download from [Quark Cloud](https://pan.quark.cn/s/52b9a8c8f07a), extract and replace the `env/` directory in the software package.
+Open `configs/wan/wan_t2v_windows.json` and merge in these fields, retaining the original 50-step sampling settings and CFG. Do not replace the entire file with this fragment:
 
-**📥 Model Download**:
-
-You can directly download from the Gradio frontend, with two download sources provided: HuggingFace and ModelScope. You can choose according to your situation, or refer to the [Model Structure Documentation](../getting_started/model_structure.md) to manually download.
-
-
-**📋 Configuration Parameters**
-
-Edit the `lightx2v_config.txt` file and modify the following parameters as needed:
-
-```ini
-
-# Interface language (zh: Chinese, en: English)
-lang=en
-
-# Server port
-port=8032
-
-# GPU device ID (0, 1, 2...)
-gpu=0
-
-# Model path
-model_path=models/
+```json
+{
+  "self_attn_1_type": "torch_sdpa",
+  "cross_attn_1_type": "torch_sdpa",
+  "cpu_offload": true,
+  "offload_granularity": "block",
+  "t5_cpu_offload": true,
+  "vae_cpu_offload": true
+}
 ```
 
-**🚀 Start Service**
+This selects PyTorch SDPA, so the example does not need an additional FlashAttention installation.
 
-Double-click to run the `start_lightx2v.bat` file, the script will:
+## Start a service and send a request
 
-1. Automatically read configuration file
-2. Verify model paths and file integrity
-3. Start Gradio Web interface
-4. Automatically open browser to access service
+Start the service in terminal 1 and leave it running:
 
+```bat
+set CUDA_VISIBLE_DEVICES=0
+python -m lightx2v.server ^
+  --model_cls wan2.1 --task t2v ^
+  --model_path models/Wan2.1-T2V-1.3B ^
+  --config_json configs/wan/wan_t2v_windows.json ^
+  --host 127.0.0.1 --port 8080 --metric_port 8081
+```
 
-![Gradio English Interface](../assets/repository/figs/portabl_windows/pic_gradio_en.png)
+Wait for `Application startup complete.`. Open another CMD terminal on the same computer, check readiness and submit a request:
 
-**⚠️ Important Notes**:
+```bat
+curl.exe --fail http://localhost:8080/health
+curl.exe --fail -X POST http://localhost:8080/v1/tasks/video/ ^
+  -H "Content-Type: application/json" ^
+  -d "{\"prompt\":\"A cat walking on a sunny beach.\",\"seed\":42,\"save_result_path\":\"windows_first_video.mp4\"}"
+```
 
-- **Display Issues**: Follow the bundled instructions for the legacy environment. The separate application uses Gradio 5.50.0; see its repository for installation.
+Keep the returned `task_id` and replace `TASK_ID` below. Query status first; run the download command only once `status` is `completed`:
+
+```bat
+curl.exe --fail http://localhost:8080/v1/tasks/TASK_ID/status
+curl.exe --fail http://localhost:8080/v1/tasks/TASK_ID/result -o first_video.mp4
+```
+
+The result is downloaded to `first_video.mp4` in terminal 2's current directory. For `failed` tasks, inspect the response error and service logs. See the [service API reference](deploy_service.md) for task management.
+
+## Other entry points
+
+- [Python Pipeline](../getting_started/python_api.md): reuse a model in a Python process.
+- [Windows batch scripts](https://github.com/ModelTC/LightX2V/tree/main/scripts/win): edit repository and model paths and check the matching config first. The config referenced by `run_wan_t2v.bat` uses four steps and requires quantized T5 weights; it is not the original model's 50-step example.
+- [Gradio and ComfyUI](interfaces.md): install in the application's required environment and check its supported models.
+
+<a id="legacy-bundle-one-click-gradio-startup"></a>
+
+The old bundle's download, configuration and startup records are in [Legacy Windows bundle](windows_legacy.md).

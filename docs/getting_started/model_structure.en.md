@@ -1,16 +1,18 @@
-# Model Format and Loading Guide
+# Wan Weights and Loading { #model-format-and-loading-guide }
+
+This page covers **Wan2.1 / Wan2.2** model directories, standalone DiT weights and LoRAs. Other models, including Qwen and LTX, use different components and loaders; find their guides in the [model catalog](../models/index.md).
 
 ## 📖 Overview
 
-LightX2V is a flexible video generation inference framework that supports multiple model sources and formats, providing users with rich options:
+| Download | Contents | Also required |
+| --- | --- | --- |
+| Complete official Wan directory | DiT, model config, and the variant's encoders, VAE and tokenizers | A runtime config matching the task and resolution |
+| LightX2V single-file DiT | Original-precision, quantized or distilled generation weights | Base model configs, encoders, VAE and tokenizers; a matching quantization backend or distillation schedule |
+| LoRA | Weight updates relative to a base model | Matching base model, supporting components and LoRA loading config |
 
-- ✅ **Wan Official Models**: Directly compatible with officially released complete models from Wan2.1 and Wan2.2
-- ✅ **Single-File Models**: Supports single-file format models released by LightX2V (including quantized versions)
-- ✅ **LoRA Models**: Supports loading distilled LoRAs released by LightX2V
+**Single-file refers to the DiT weights, not a complete inference package.** `--model_path` still points to the base model directory. Use `dit_original_ckpt` or `dit_quantized_ckpt` for a standalone DiT; Wan2.2 MoE needs separate high-noise and low-noise branches. See the examples below.
 
-This document provides detailed instructions on how to use various model formats, configuration parameters, and best practices.
-
----
+For a first run, use a complete official directory with the [service quickstart](index.md), then replace DiT weights or add LoRAs.
 
 ## 🗂️ Format 1: Wan Official Models
 
@@ -19,7 +21,7 @@ This document provides detailed instructions on how to use various model formats
 - [Wan2.2 Collection](https://huggingface.co/collections/Wan-AI/wan22-68ac4ae80a8b477e79636fc8)
 
 ### Model Features
-- **Official Guarantee**: Complete models officially released by Wan-AI with highest quality
+- **Official weights**: Base models released by Wan-AI, suitable for establishing a comparison baseline
 - **Complete Components**: Includes all necessary components (DIT, T5, CLIP, VAE)
 - **Original Precision**: Uses BF16/FP32 precision with no quantization loss
 - **Strong Compatibility**: Fully compatible with Wan official toolchain

@@ -1,6 +1,8 @@
-# Python API
+# Python Pipeline { #python-api }
 
 <p class="lx-page-lead">在 Python 中创建 Pipeline，复用模型进行生成，并按需配置加速选项。</p>
+
+本页在 Python 进程内直接加载模型。如需通过 Python 调用已运行的服务，请使用 [HTTP 请求示例](index.md#send-request)。
 
 先按[完整安装指南](installation.md)安装 LightX2V。下列示例从仓库根目录运行，请将模型、输入和输出路径替换为本地路径。
 

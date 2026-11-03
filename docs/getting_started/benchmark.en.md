@@ -1,4 +1,4 @@
-# 🚀 Benchmark
+# Wan2.1 Historical Benchmarks { #benchmarks }
 
 > These are historical measurements. The original records do not provide complete run dates and commit IDs. Latency and memory figures describe the listed test environments, not current-version performance; software versions identify the test conditions. Speedups are calculated from the displayed times, relative to Wan2.1 Official on H200 and Wan2GP on RTX 4090 at the same resolution.
 

@@ -7,16 +7,16 @@ description: Choose an API, Python or graphical interface for LightX2V, then con
 
 <p class="lx-page-lead">Take generation into an application: choose an interface, then configure for your resources and performance needs.</p>
 
-Complete an offline generation using a [model guide](../models/index.md) to verify the weights, kernels and configuration. Then choose an entry point for your application.
+Use the HTTP service for application integration: [start a model and send your first request](../getting_started/index.md), then choose deployment settings for your resources and latency needs.
 
 ## <span class="lx-heading-icon" aria-hidden="true">:material-connection:</span> Choose an interface { #choose-an-interface .lx-icon-heading data-toc-label="Choose an interface" }
 
 <div class="lx-destinations" markdown>
 
 [:material-console-network-outline: **HTTP API service**<span>Run a model service, submit generation tasks, check their status and retrieve results.</span><span class="lx-destination-action">Read the service guide</span>](deploy_service.md)
-[:material-code-braces: **Python application**<span>Create a pipeline in your code and reuse the loaded model across generation calls.</span><span class="lx-destination-action">Explore the Python API</span>](../getting_started/python_api.md)
-[:material-monitor-dashboard: **Gradio interface**<span>Use the standalone Gradio application, following its installation and startup instructions.</span><span class="lx-destination-action">Find the Gradio application</span>](deploy_gradio.md)
-[:material-vector-polyline: **ComfyUI workflow**<span>Add LightX2V inference to a visual workflow through the standalone integration nodes.</span><span class="lx-destination-action">Explore the ComfyUI integration</span>](deploy_comfyui.md)
+[:material-code-braces: **Python Pipeline**<span>Create a pipeline in your code and reuse the loaded model across generation calls.</span><span class="lx-destination-action">Explore the Python API</span>](../getting_started/python_api.md)
+[:material-monitor-dashboard: **Gradio interface**<span>Use the standalone Gradio application, following its installation and startup instructions.</span><span class="lx-destination-action">Find the Gradio application</span>](interfaces.md#gradio)
+[:material-vector-polyline: **ComfyUI workflow**<span>Add LightX2V inference to a visual workflow through the standalone integration nodes.</span><span class="lx-destination-action">Explore the ComfyUI integration</span>](interfaces.md#comfyui)
 
 </div>
 
@@ -70,9 +70,9 @@ Deploy encoding, Transformer and decoding stages separately, configuring communi
 
 <div markdown>
 
-Explore standalone deployment paths for the Qwen Image encoder and VAE.
+Encoder separation and VAE optimization for Qwen-Image-2512 / Edit-2511; TensorRT integration requires compatible engines.
 
-[Encoder deployment](qwen_image_encoder.md) · [VAE TensorRT](qwen_image_vae_tensorrt.md)
+[Encoder deployment](qwen_image_encoder.md) · [Integrate existing TensorRT engines](qwen_image_vae_tensorrt.md)
 
 </div>
 </div>

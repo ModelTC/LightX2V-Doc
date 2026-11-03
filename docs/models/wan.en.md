@@ -1,6 +1,6 @@
 # Wan2.1 and VACE
 
-This guide covers inference, server, and distillation examples for Wan2.1 and VACE.
+Start a Wan2.1 or VACE service and send video generation requests. Offline inference and distillation examples are also available.
 
 The example scripts are in `scripts/wan/` in the [LightX2V inference repository](https://github.com/ModelTC/LightX2V). Set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in the script, and run the commands below from that repository's root.
 
@@ -8,9 +8,8 @@ The example scripts are in `scripts/wan/` in the [LightX2V inference repository]
 
 1. [Choose a task](#choose-task): text-to-video, image-to-video, first/last frames or VACE.
 2. [Prepare the environment and weights](#environment-and-weights): install dependencies and download the matching model.
-3. [Generate your first video](#first-run): configure T2V 1.3B and inspect its output.
-4. [Tune inference](#next-steps): choose configurations for memory, latency or multiple GPUs.
-5. [Start a service](#server): launch the selected task and submit a request.
+3. [Start a service and send a request](#first-run): load the model once and retrieve the generated video.
+4. [Tune inference](#next-steps): choose configurations for memory, latency, or multiple GPUs.
 
 ## Environment and weights
 
@@ -41,39 +40,17 @@ and LoRA paths in the selected JSON to the downloaded local files.
 
 ## Basic tasks
 
-| Task | Script | Example weights | Configuration |
+| Task | Server launcher | Example weights | Configuration |
 | --- | --- | --- | --- |
-| Text to video | [run_wan_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_t2v.sh) | [Wan2.1-T2V-1.3B](https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B) | [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) |
-| Image to video | [run_wan_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_i2v.sh) | [Wan2.1-I2V-14B-480P](https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P) | [wan_i2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_i2v.json) |
-| First and last frames to video | [run_wan_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_flf2v.sh) | [Wan2.1-FLF2V-14B-720P](https://huggingface.co/Wan-AI/Wan2.1-FLF2V-14B-720P) | [wan_flf2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_flf2v.json) |
-| Reference image/video conditioning | [run_wan_vace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_vace.sh) | [Wan2.1-VACE-14B](https://huggingface.co/Wan-AI/Wan2.1-VACE-14B) | [wan_vace.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_vace.json) |
+| Text to video | [start_server_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_t2v.sh) | [Wan2.1-T2V-1.3B](https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B) | [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) |
+| Image to video | [start_server_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_i2v.sh) | [Wan2.1-I2V-14B-480P](https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P) | [wan_i2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_i2v.json) |
+| First and last frames to video | [start_server_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_flf2v.sh) | [Wan2.1-FLF2V-14B-720P](https://huggingface.co/Wan-AI/Wan2.1-FLF2V-14B-720P) | [wan_flf2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_flf2v.json) |
+| Reference image/video conditioning | [start_server_vace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_vace.sh) | [Wan2.1-VACE-14B](https://huggingface.co/Wan-AI/Wan2.1-VACE-14B) | [wan_vace.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_vace.json) |
 
 <a id="first-run"></a>
+## Start a service and send a request { #server }
 
-### First generation: T2V 1.3B
-
-After installing the environment and downloading T2V 1.3B, open [run_wan_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_t2v.sh) and set:
-
-| Setting | Value |
-| --- | --- |
-| `lightx2v_path` | Absolute path to your LightX2V checkout |
-| `model_path` | Absolute path to the downloaded Wan2.1-T2V-1.3B directory |
-| `CUDA_VISIBLE_DEVICES` | GPU ID to use |
-| `--prompt`, `--save_result_path` | Generation prompt and output file location |
-
-The default [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) uses `flash_attn3` and disables CPU offload. Check [attention backend compatibility](../method_tutorials/attention.md) first. If you need offload, choose a matching configuration from [low-resource deployment](../deploy_guides/for_low_resource.md).
-
-Run from the repository root:
-
-```bash
-bash scripts/wan/run_wan_t2v.sh
-```
-
-Open the video at `--save_result_path` when inference finishes. The default is `save_results/output_lightx2v_wan_t2v.mp4` inside the repository. For a walkthrough, see [Generate your first video](../getting_started/index.md).
-
-Edit inputs, prompts, seed, and output paths in the shell script, and sampling parameters in the JSON selected by `--config_json`. The JSON fields `num_frames` and `size` supply defaults when omitted from the command or request. `size` is `[height, width]`.
-
-## Server
+For your first Wan2.1 1.3B service, follow the [complete quickstart](../getting_started/index.md). Set repository/model paths and GPU IDs in the server script. Its default configuration uses `flash_attn3` without CPU offload; check [attention compatibility](../method_tutorials/attention.md) and [offload settings](../method_tutorials/offload.md) before starting.
 
 Scripts and clients are in `server/`, using the weights listed above. The default listening address is `0.0.0.0:8000`.
 
@@ -92,10 +69,20 @@ T2V example:
 bash scripts/wan/server/start_server_t2v.sh
 ```
 
+Wait for `Application startup complete.`. In terminal 2, use the same environment and container (or enter it with `docker exec`), then check:
+
+```bash
+curl --fail --silent --show-error http://localhost:8000/health
+```
+
+The response should be `{"status":"ok"}`. Keep terminal 1 running.
+
 ```bash
 # Terminal 2: submit a request after the model loads
 python scripts/wan/server/post_t2v.py
 ```
+
+The video client prints a `task_id`; it does not wait for or download the finished video. Continue with [querying status and downloading results](../deploy_guides/deploy_service.md#poll-download-and-cancel), or use the [automatic Python HTTP client](../getting_started/index.md#send-request) with `base_url` changed to `http://localhost:8000` and the request fields matched to this model and task.
 
 Edit `url` and `message` in the client. Images accept Base64 or absolute paths; VACE videos use absolute paths in `video_path`. Files referenced by absolute paths must be accessible to the server. Set the output location with `save_result_path`.
 
@@ -104,6 +91,30 @@ Edit `url` and `message` in the client. Images accept Base64 or absolute paths; 
 T2V uses the Reuse entry above. For I2V, add `"enable_reuse": true` and `"reuse_cache_path": "save_results/reuse_cache/wan_i2v"` to the base JSON, start the regular I2V server, and add `reuse` to the client's `message`. Use a separate cache directory for each model or server.
 
 Use `reuse=False` for the first request and `reuse=True` to reuse input encodings. Keep the prompt, negative prompt, frame count, size, and I2V image paths and contents unchanged. The seed may change; use `False` when changing inputs.
+
+<a id="first-generation-t2v-13b"></a>
+## Offline CLI { #offline-inference }
+
+After installing the environment and downloading T2V 1.3B, open [run_wan_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_t2v.sh) and set:
+
+| Setting | Value |
+| --- | --- |
+| `lightx2v_path` | Absolute path to your LightX2V checkout |
+| `model_path` | Absolute path to the downloaded Wan2.1-T2V-1.3B directory |
+| `CUDA_VISIBLE_DEVICES` | GPU ID to use |
+| `--prompt`, `--save_result_path` | Generation prompt and output file location |
+
+The default [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) uses `flash_attn3` and disables CPU offload. Check [attention backend compatibility](../method_tutorials/attention.md) first. If you need offload, choose a matching configuration from [low-resource deployment](../deploy_guides/for_low_resource.md).
+
+Run from the repository root:
+
+```bash
+bash scripts/wan/run_wan_t2v.sh
+```
+
+Open the video at `--save_result_path` when inference finishes. The default is `save_results/output_lightx2v_wan_t2v.mp4` inside the repository. For a walkthrough, see [Offline inference](../getting_started/offline_inference.md).
+
+Edit inputs, prompts, seed, and output paths in the shell script, and sampling parameters in the JSON selected by `--config_json`. The JSON fields `num_frames` and `size` supply defaults when omitted from the command or request. `size` is `[height, width]`.
 
 ## Multiple GPUs
 
@@ -144,9 +155,9 @@ For T2V/I2V, add `"use_compile": true` to enable compilation and `"warmup": true
 - `run_wan_t2v_distill_dynamic_cfg.sh`: a dynamic CFG model; `cfg_scale` in the JSON controls guidance strength.
 - `run_wan_t2v_distill_model_ulysses.sh`: an eight-GPU Ulysses example for the full distilled T2V model.
 
-## Python API examples
+## Python Pipeline examples { #python-api-examples }
 
-See the [Python API guide](../getting_started/python_api.md) for
+See the [Python Pipeline guide](../getting_started/python_api.md) for
 generator setup, configuration precedence, offload and repeated generation.
 Edit paths in the selected file, then run it from the repository root after installation.
 These examples retain their own model, sampling and attention settings; using a
@@ -179,4 +190,4 @@ see the [offload guide](../deploy_guides/for_low_resource.md).
 | Use low-precision weights | [Model quantization](../method_tutorials/quantization.md); choose a backend matching the weight format |
 | Reduce sampling steps or use LoRA | [Distillation examples](#distillation), [step distillation](../method_tutorials/step_distill.md), [LoRA configuration and combination limits](../deploy_guides/lora_deploy.md) |
 | Use multiple GPUs | [Multi-GPU examples](#multiple-gpus), [parallel inference](../method_tutorials/parallel.md) |
-| Integrate an application | [Server examples](#server), [inference services](../deploy_guides/deploy_service.md), [Python API](../getting_started/python_api.md) |
+| Integrate an application | [Server examples](#server), [inference services](../deploy_guides/deploy_service.md), [Python Pipeline](../getting_started/python_api.md) |

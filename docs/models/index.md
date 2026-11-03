@@ -11,7 +11,7 @@ hide:
 
 <div class="lx-catalog-intro" id="第一次使用" markdown>
 
-第一次使用？从[首次生成](../getting_started/index.md)开始，或阅读 [Wan2.2](wan22.md#choose-task)、[Qwen-Image-2.1](qwen-image-2.1.md#choose-task) 指南。
+第一次使用？从[服务入门](../getting_started/index.md)开始，或阅读 [Wan2.2](wan22.md#choose-task)、[Qwen-Image-2.1](qwen-image-2.1.md#choose-task) 指南。
 
 </div>
 

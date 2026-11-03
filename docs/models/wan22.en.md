@@ -1,6 +1,6 @@
 # Wan2.2
 
-<p class="lx-page-lead">Choose a model for your task, generate a video, then tune inference and deployment.</p>
+<p class="lx-page-lead">Choose a model, start its service, and send video generation requests.</p>
 
 The example scripts are in `scripts/wan22/` in the [LightX2V inference repository](https://github.com/ModelTC/LightX2V). Set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in the selected script, and run the commands below from that repository's root.
 
@@ -8,11 +8,11 @@ The example scripts are in `scripts/wan22/` in the [LightX2V inference repositor
 
 1. [**Choose a task**<span>Compare MoE, TI2V, S2V and Animate.</span>](#choose-task)
 2. [**Prepare weights**<span>Set up and get the matching model.</span>](#environment-and-weights)
-3. [**Generate a video**<span>Start with the MoE T2V example.</span>](#first-run)
+3. [**Start a service**<span>Send your first MoE T2V request.</span>](#first-run)
 
 </nav>
 
-Already generating? Continue with [performance tuning](#next-steps) or [service deployment](#server).
+Already have a running service? See [requests and results](#server), or continue with [performance tuning](#next-steps).
 
 <a id="choose-task"></a>
 
@@ -20,7 +20,7 @@ Already generating? Continue with [performance tuning](#next-steps) or [service 
 
 MoE T2V and I2V use their respective A14B weights. TI2V text-to-video and image-to-video share the 5B model. S2V and Animate have their own models and input types. When changing models, select the matching script and JSON together.
 
-| Task | Script | Model weights |
+| Task | Configuration example | Model weights |
 | --- | --- | --- |
 | MoE text-to-video | [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh) | Wan2.2-T2V-A14B |
 | MoE image-to-video | [run_wan22_moe_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_i2v.sh) | Wan2.2-I2V-A14B |
@@ -57,8 +57,49 @@ Keep `model_path` pointed at the complete base model directory. Set the checkpoi
 and LoRA paths in the selected JSON to the downloaded local files.
 
 <a id="first-run"></a>
+## Start a service and send a request { #server }
 
-## First generation: MoE T2V
+Set repository/model paths and GPU IDs in the server script. Its default configuration uses `flash_attn3` without CPU offload; check [attention compatibility](../method_tutorials/attention.md) and [offload settings](../method_tutorials/offload.md) before starting.
+
+Choose a MoE T2V service; both use port 8000. Single-GPU and TP4 services share `server/post_t2v.py`:
+
+| GPUs | Startup script |
+| --- | --- |
+| Single GPU | `server/start_server_t2v.sh` |
+| TP4 | `server/start_server_t2v_tp.sh` |
+
+```bash
+# Terminal 1: start the service
+bash scripts/wan22/server/start_server_t2v.sh
+```
+
+Wait for `Application startup complete.`. In terminal 2, use the same environment and container (or enter it with `docker exec`), then check:
+
+```bash
+curl --fail --silent --show-error http://localhost:8000/health
+```
+
+The response should be `{"status":"ok"}`. Keep terminal 1 running.
+
+```bash
+# Terminal 2: send a request after the model loads
+python scripts/wan22/server/post_t2v.py
+```
+
+The video client prints a `task_id`; it does not wait for or download the finished video. Continue with [querying status and downloading results](../deploy_guides/deploy_service.md#poll-download-and-cancel), or use the [automatic Python HTTP client](../getting_started/index.md#send-request) with `base_url` changed to `http://localhost:8000` and the request fields matched to this model and task.
+
+For I2V or FLF2V, update the single-GPU service's `model_path`, `--task`, and `--config_json` to match the corresponding offline script, then use `scripts/wan/server/post_i2v.py` or `post_flf2v.py`. The task is selected at service startup. For TI2V, also set `--model_cls wan2.2` and use its weights and shared JSON.
+
+Edit `url` and `message` in the client. Images accept Base64 or server-accessible absolute paths; set `save_result_path` for output.
+
+### Reuse
+
+For MoE T2V, select [wan_moe_t2v_reuse.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_moe_t2v_reuse.json) in the single-GPU service and add `reuse` to `message` in `server/post_t2v.py`. For MoE I2V, add `"enable_reuse": true` and `"reuse_cache_path": "save_results/reuse_cache/wan22_moe_i2v"` to its base JSON, then add `reuse` to the normal client's `message`. Use separate cache directories for different models or services.
+
+Use `reuse=False` for the first request and `reuse=True` to reuse input encodings. Keep prompts, frame count, dimensions, and I2V image path/content unchanged; seed may change. Use `False` when changing inputs.
+
+<a id="first-generation-moe-t2v"></a>
+## Offline CLI { #offline-inference }
 
 Install the environment and download `Wan2.2-T2V-A14B` above. Open [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh), set `lightx2v_path` and `model_path` to absolute repository and model paths, select `CUDA_VISIBLE_DEVICES`, and adjust `--prompt` and `--save_result_path` as needed.
 
@@ -77,35 +118,6 @@ When switching to a preset with `enable_cfg: false`, remove `--negative_prompt` 
 MoE T2V and I2V use different weights. Both TI2V tasks share [wan_ti2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_ti2v.json), or [wan_ti2v_4090.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_ti2v_4090.json) for CPU offload with FlashAttention2.
 
 Animate scripts preprocess the driving video and reference image before inference. The replacement script defaults to [wan_animate_replace_4090.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_animate_replace_4090.json), which needs quantized DiT/T5/CLIP weights; use [wan_animate_replace.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_animate_replace.json) for original weights. Animate2 takes a reference image and driving video directly; set its component paths in the JSON.
-
-## Server
-
-Choose a MoE T2V service; both use port 8000. Single-GPU and TP4 services share `server/post_t2v.py`:
-
-| GPUs | Startup script |
-| --- | --- |
-| Single GPU | `server/start_server_t2v.sh` |
-| TP4 | `server/start_server_t2v_tp.sh` |
-
-```bash
-# Terminal 1: start the service
-bash scripts/wan22/server/start_server_t2v.sh
-```
-
-```bash
-# Terminal 2: send a request after the model loads
-python scripts/wan22/server/post_t2v.py
-```
-
-For I2V or FLF2V, update the single-GPU service's `model_path`, `--task`, and `--config_json` to match the corresponding offline script, then use `scripts/wan/server/post_i2v.py` or `post_flf2v.py`. The task is selected at service startup. For TI2V, also set `--model_cls wan2.2` and use its weights and shared JSON.
-
-Edit `url` and `message` in the client. Images accept Base64 or server-accessible absolute paths; set `save_result_path` for output.
-
-### Reuse
-
-For MoE T2V, select [wan_moe_t2v_reuse.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_moe_t2v_reuse.json) in the single-GPU service and add `reuse` to `message` in `server/post_t2v.py`. For MoE I2V, add `"enable_reuse": true` and `"reuse_cache_path": "save_results/reuse_cache/wan22_moe_i2v"` to its base JSON, then add `reuse` to the normal client's `message`. Use separate cache directories for different models or services.
-
-Use `reuse=False` for the first request and `reuse=True` to reuse input encodings. Keep prompts, frame count, dimensions, and I2V image path/content unchanged; seed may change. Use `False` when changing inputs.
 
 ## Multiple GPUs
 
@@ -186,9 +198,9 @@ Paths below are relative to `inference/`:
 
 RainFusion, NPU, and Extreme examples retain their own operator and communication settings. Use matching hardware and dependencies; NPU scripts select devices with `ASCEND_RT_VISIBLE_DEVICES`.
 
-## Python API examples
+## Python Pipeline examples { #python-api-examples }
 
-See the [Python API guide](../getting_started/python_api.md) for
+See the [Python Pipeline guide](../getting_started/python_api.md) for
 generator setup, configuration precedence, offload and repeated generation.
 Edit paths in the selected file, then run it from the repository root after installation.
 These examples retain their own model, sampling and attention settings; using a
@@ -218,4 +230,4 @@ the [offload guide](../deploy_guides/for_low_resource.md).
 | Use quantized weights | [Model quantization](../method_tutorials/quantization.md); MoE requires matching high- and low-noise DiT weights |
 | Use distillation or LoRA | [Distillation presets](#distillation), [Animate LoRA](#animate-lora), [LoRA naming and combination limits](../deploy_guides/lora_deploy.md) |
 | Use multiple GPUs | [Multi-GPU examples](#multiple-gpus), [parallel inference](../method_tutorials/parallel.md) |
-| Integrate an application | [Server examples](#server), [inference services](../deploy_guides/deploy_service.md), [Python API](../getting_started/python_api.md) |
+| Integrate an application | [Server examples](#server), [inference services](../deploy_guides/deploy_service.md), [Python Pipeline](../getting_started/python_api.md) |

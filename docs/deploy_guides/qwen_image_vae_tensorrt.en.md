@@ -1,6 +1,18 @@
-# Qwen Image VAE TensorRT acceleration
+# Qwen Image VAE TensorRT Integration Reference { #qwen-image-vae-tensorrt-acceleration }
 
 TensorRT accelerates Qwen Image's VAE Encoder and Decoder. Use static engines for fixed-resolution T2I and multi-profile engines for I2I with varying input dimensions.
+
+This reference is for **Qwen-Image-2512 / Qwen-Image-Edit-2511 with compatible TensorRT engines already available**. The `qwen_image_21` runner uses a different VAE loader; these settings do not apply directly.
+
+!!! info "Confirm the engine source first"
+    This page and the linked configs do not provide engine downloads or ONNX export and TensorRT build instructions. Without `.trt` files, first run the model with its default PyTorch VAE. Obtain the engine files and build details from their provider before continuing. Setting `vae_type` does not generate engines.
+
+Before use, confirm:
+
+- The model and weight revision, build GPU, CUDA and TensorRT versions, and precision.
+- Both encoder and decoder files are present with the directory names below.
+- Static sizes, or multi-profile sizes and ordering, match the mappings below.
+- The first request's logs confirm engine loading. Compare output quality and warmed-up timings against PyTorch.
 
 ## Prepare and run
 

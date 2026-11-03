@@ -1,35 +1,37 @@
 ---
-title: Installation and first generation
-description: Install LightX2V, download Wan2.1, and generate your first video with a continuous set of commands.
+title: Service quickstart
+description: Start a LightX2V model service, send an HTTP request, and download your first generated video.
 ---
 
-# Installation and first generation
+# Service quickstart
 
+<a id="installation-and-first-generation"></a>
 <a id="generate-your-first-video"></a>
-<p class="lx-page-lead">Turn a text prompt into your first video with Wan2.1-T2V-1.3B.</p>
+<p class="lx-page-lead">Start the model once. Send requests to generate and download videos.</p>
 
 <div class="lx-run-summary" markdown>
 
-**This example** <span>Text to video</span><span>480 × 832 · 81 frames</span><span>One NVIDIA GPU</span>
+**This example** <span>Wan2.1-T2V-1.3B</span><span>480 × 832 · 81 frames</span><span>HTTP API</span>
 
 </div>
 
 <a id="before-you-begin"></a>
-This walkthrough uses **Linux and a BF16-capable NVIDIA GPU**, with Docker for setup. Install Docker and NVIDIA Container Toolkit first, and use a driver compatible with the image's CUDA 13.0 runtime. For Conda, another CUDA version, or Windows, follow the [full installation guide](installation.md) first.
+This walkthrough uses **Linux and a BF16-capable NVIDIA GPU**. Docker requires NVIDIA Container Toolkit and a driver compatible with the image's CUDA 13.0 runtime. For other environments, see [installation](installation.md).
 
-Already have a LightX2V environment? Skip to [model download](#download-model). Run all commands from the **LightX2V repository root**.
+Already have the model and [starter configuration](#starter-config)? Skip to [starting the service](#start-server). Already have this service running? Go to [sending a request](#send-request).
 
-<nav class="lx-guide-path lx-quickstart-path" aria-label="First generation steps" markdown>
+<nav class="lx-guide-path lx-quickstart-path" aria-label="Service quickstart" markdown>
 
-1. [**Set up**<span>Enter the container and check the GPU.</span>](#1-prepare-the-environment)
-2. [**Download**<span>Get the complete 1.3B model.</span>](#download-model)
-3. [**Generate**<span>Run inference and open the output.</span>](#3-configure-generation)
+1. [**Prepare**<span>Set up the environment and model.</span>](#prepare)
+2. [**Start a service**<span>Load the model in terminal 1.</span>](#start-server)
+3. [**Send a request**<span>Generate and download in terminal 2.</span>](#send-request)
 
 </nav>
 
-## 1. Prepare the environment
+## 1. Prepare the environment and model { #prepare }
 
-Clone the repository on the host, or enter your existing checkout:
+<a id="1-prepare-the-environment"></a>
+In terminal 1 on the GPU host, clone the repository or enter your existing checkout. Run the remaining repository commands from its root:
 
 ```bash
 git clone https://github.com/ModelTC/LightX2V.git
@@ -39,13 +41,14 @@ cd LightX2V
 Start the container. Docker downloads the image automatically on first use:
 
 ```bash
-docker run --gpus all -it --ipc=host \
+docker run --gpus all -it --ipc=host --name lightx2v-quickstart \
+  -p 127.0.0.1:8080:8080 \
   -v "$PWD":/workspace/LightX2V \
   -w /workspace/LightX2V \
   --entrypoint /bin/bash lightx2v/lightx2v:26052801-cu130
 ```
 
-**Run the remaining commands inside the container.** Install the current checkout:
+**Run the setup and server commands inside the container.** Install the current checkout:
 
 ```bash
 python -m pip install -v -e .
@@ -69,7 +72,7 @@ PYTHON
 
     Leave disk space for model downloads and extraction. For constrained hardware, read the [low-resource guide](../deploy_guides/for_low_resource.md) before choosing quantization or distillation settings intended for different weights.
 
-## 2. Download the model { #download-model }
+### Download the model { #download-model }
 
 <a id="download-the-model"></a>
 Install the download tool, then fetch the complete model including its text encoder and VAE:
@@ -82,10 +85,10 @@ hf download Wan-AI/Wan2.1-T2V-1.3B \
 
 If you already have the weights, skip the download and set `--model_path` below to your local directory. You can also download the same model through ModelScope.
 
-## 3. Generate a video { #3-configure-generation }
-
+<a id="3-configure-generation"></a>
 <a id="configure-and-run"></a>
-### Prepare a starter configuration
+<a id="prepare-a-starter-configuration"></a>
+### Prepare a starter configuration { #starter-config }
 
 Copy the repository configuration, select PyTorch's built-in `torch_sdpa` attention, and enable CPU offload. This creates a separate configuration file and preserves the original.
 
@@ -108,46 +111,116 @@ PYTHON
 
 This example does not need a separate FlashAttention installation. CPU offload adds transfer overhead; after your first run, choose an [attention backend](../method_tutorials/attention.md) and [acceleration approach](../method_tutorials/index.md) for your hardware.
 
-### Run generation
+<a id="run-generation"></a>
+## 2. Start the service { #start-server }
 
-```bash
-mkdir -p save_results
-CUDA_VISIBLE_DEVICES=0 python -m lightx2v.infer \
-  --model_cls wan2.1 \
-  --task t2v \
+Keep terminal 1 open. Run inside the container, or in your existing LightX2V environment:
+
+```bash title="Terminal 1 · keep running"
+CUDA_VISIBLE_DEVICES=0 python -m lightx2v.server \
+  --model_cls wan2.1 --task t2v \
   --model_path models/Wan2.1-T2V-1.3B \
   --config_json configs/wan/wan_t2v_quickstart.json \
-  --prompt "A cat walking on a sunny beach." \
-  --negative_prompt "blurry, low quality" \
-  --size 480 832 \
-  --num_frames 81 \
-  --seed 42 \
-  --save_result_path save_results/first_video.mp4
+  --host 0.0.0.0 --port 8080 --metric_port 8081
 ```
 
+Wait for `Application startup complete.` in the log. In a second terminal on the **same GPU host**, check the API:
+
+```bash title="Terminal 2 · GPU host"
+curl --fail --silent --show-error http://localhost:8080/health
+```
+
+A ready API returns `{"status":"ok"}`. The first startup loads the model and can take time. This walkthrough uses API port **8080** and metrics port **8081**; existing repository launchers usually use **8000**. Always match the request URL to your server's port.
+
+## 3. Send a request and get the result { #send-request }
+
+If you used Docker above, enter that running container from terminal 2:
+
+```bash title="Terminal 2 · enter the existing container"
+docker exec -it lightx2v-quickstart /bin/bash
+```
+
+Otherwise, activate the same Python environment in terminal 2 and enter the LightX2V repository. The following **Python HTTP client** sends a request, waits for completion, and downloads the video. It uses `requests`, included in the LightX2V environment; it does not load a model.
+
+```bash title="Terminal 2 · submit, wait, and download"
+python - <<'PYTHON'
+import time
+import uuid
+from pathlib import Path
+
+import requests
+
+base_url = "http://localhost:8080"
+response = requests.post(f"{base_url}/v1/tasks/video/", json={
+    "prompt": "A cat walking on a sunny beach.",
+    "negative_prompt": "blurry, low quality",
+    "seed": 42,
+    "size": [480, 832],
+    "num_frames": 81,
+    "save_result_path": f"quickstart_{uuid.uuid4().hex}.mp4",
+}, timeout=30)
+response.raise_for_status()
+task_id = response.json()["task_id"]
+print(f"Task: {task_id}", flush=True)
+
+deadline = time.monotonic() + 1800
+while time.monotonic() < deadline:
+    response = requests.get(f"{base_url}/v1/tasks/{task_id}/status", timeout=30)
+    response.raise_for_status()
+    task = response.json()
+    if task["status"] == "completed":
+        break
+    if task["status"] in {"failed", "cancelled"}:
+        raise RuntimeError(f"{task['status']}: {task.get('error') or task_id}")
+    print(task["status"], flush=True)
+    time.sleep(2)
+else:
+    raise TimeoutError(f"Timed out waiting for task {task_id}; query its status before retrying.")
+
+output = Path("save_results/first_video.mp4")
+output.parent.mkdir(parents=True, exist_ok=True)
+with requests.get(f"{base_url}/v1/tasks/{task_id}/result", stream=True, timeout=(10, 300)) as response:
+    response.raise_for_status()
+    with output.with_suffix(".mp4.part").open("wb") as file:
+        for chunk in response.iter_content(chunk_size=1024 * 1024):
+            file.write(chunk)
+output.with_suffix(".mp4.part").replace(output)
+print(f"Saved to: {output.resolve()}")
+PYTHON
+```
+
+The client prints the task ID, then `pending` or `processing`, followed by the local output path. It polls for up to 30 minutes; a timeout stops waiting without cancelling the server task. Keep the printed ID to [query or cancel it](../deploy_guides/deploy_service.md#poll-download-and-cancel) before submitting again.
+
 <a id="4-run-and-inspect-the-result"></a>
-### Open the result
+<a id="open-the-result"></a>
+### Open the video
 
-When inference finishes, open **`save_results/first_video.mp4`** in the repository. If you ran on a remote server, download the file to play it locally. The first run includes model loading; runtime depends on your hardware and configuration.
+Open **`save_results/first_video.mp4`** in the LightX2V checkout. With this Docker setup, the mounted directory also makes it available on the host. For a remote server, download the file to your computer.
 
-Change `--prompt` to describe another scene and `--seed` to set the random seed. The command's `--size` (height, width) and `--num_frames` override the corresponding JSON defaults. See the [Wan2.1 guide](../models/wan.md) for more generation options.
+The request's `save_result_path` names a server-side output file; the client's `output` is the downloaded copy. Change `prompt` and run the client again to generate another video. The service stays loaded. `size` is `[height, width]`; `num_frames` and other supplied fields override the startup defaults.
+
+Press **Ctrl+C in terminal 1** to stop the service. Explore request schemas at [http://localhost:8080/docs](http://localhost:8080/docs), or use the [service API reference](../deploy_guides/deploy_service.md) for cURL, queues, and other models. When browsing from another computer, forward port 8080 to that computer first.
 
 ## Troubleshooting
 
 | Symptom | First check |
 | --- | --- |
-| GPU check fails | Run `nvidia-smi` on the host and check driver compatibility and GPU access in Docker; see [installation](installation.md) |
-| Missing model files | Check that the download finished and `--model_path` points to the complete model directory |
-| `CUDA out of memory` | Use the configuration created above and check other GPU processes; see the [low-resource guide](../deploy_guides/for_low_resource.md) |
-| Process exits with `Killed` | Check available host memory; CPU offload still needs sufficient RAM |
+| GPU check fails | Check `nvidia-smi`, the driver and Docker GPU access; see [installation](installation.md) |
+| Missing weights | Check the download and `--model_path`; requests run against the model loaded by the server |
+| `/health` cannot connect | Check terminal 1 for loading progress or errors; verify the port and Docker's `-p` mapping |
+| Port already in use | Stop the conflicting process or change both the API/metrics ports as needed; update Docker mapping and client URL too |
+| `CUDA out of memory` or `Killed` | Check GPU/host memory and use the starter configuration; see [low-resource deployment](../deploy_guides/for_low_resource.md) |
+| Task failed | Read the returned error and terminal 1 logs; do not download until the status is `completed` |
 
 <a id="continue"></a>
 ## Next steps
 
 <div class="lx-next-links" markdown>
 
-[**Try another model**<span>Video, image editing, upscaling, and interaction.</span>](../models/index.md)
-[**Improve efficiency**<span>Choose quantization, distillation, caching, or parallelism.</span>](../method_tutorials/index.md)
-[**Build an application**<span>Reuse a pipeline with the Python API.</span>](python_api.md)
+[**Choose another model**<span>Find matching server and request examples.</span>](../models/index.md)
+[**Use the service API**<span>Request fields, task status, and queues.</span>](../deploy_guides/deploy_service.md)
+[**Improve efficiency**<span>Quantization, distillation, caching, and parallelism.</span>](../method_tutorials/index.md)
 
 </div>
+
+Other ways to run: [offline CLI](offline_inference.md) or [Python Pipeline](python_api.md).

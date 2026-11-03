@@ -19,9 +19,13 @@
 
 例如，Wan2.2 指南对应 [`docs/models/wan22.md`](docs/models/wan22.md) 和 [`docs/models/wan22.en.md`](docs/models/wan22.en.md)。新增页面时，同时更新 `mkdocs.yml` 中的导航和英文标题。
 
-快速入门内容统一放在 `docs/getting_started/`：`index.md` 是安装与首次生成的入口，`installation.md` 是完整安装指南，其余页面分别介绍生成、Python API、模型结构与性能基准。英文文件使用相同文件名加 `.en.md` 后缀。
+快速入门内容统一放在 `docs/getting_started/`：`index.md` 以“准备环境与模型 → 启动服务 → 发送请求并获取结果”为推荐路径；`installation.md` 是完整安装指南，`offline_inference.md` 和 `python_api.md` 分别介绍离线命令行与进程内 Pipeline，权重组织页明确以 Wan 为范围，性能基准保留为历史参考。英文文件使用相同文件名加 `.en.md` 后缀。
 
-完整安装指南的三种方式通过 `lx-method-links` 直达对应章节，详细步骤保留在同一页面，便于链接与搜索。`docs/deploy_guides/index.md` 是部署总览，按接入方式和运行需求连接已有指南；新增部署入口时同步维护英文版本与导航。
+完整安装指南的三种方式通过 `lx-method-links` 直达对应章节，详细步骤保留在同一页面，便于链接与搜索。服务 API 参考仍保留 `docs/deploy_guides/deploy_service.md` 的网址，导航入口放在“快速入门”；它负责请求参数、任务状态和队列。`docs/deploy_guides/index.md` 是部署总览，按接入方式和运行需求连接已有指南；新增部署入口时同步维护英文版本与导航。
+
+部署入口统一维护在 `docs/deploy_guides/interfaces.md`：Gradio 与 ComfyUI 的旧网址通过 redirects 跳转到该页，修改时保留旧锚点。Windows 当前源码流程位于 `deploy_local_windows.md`，旧整合包说明仅从该页末尾链接进入。Wan2.1 历史性能保留首页示例等正文链接。这两个参考页面保留原网址，通过 `mkdocs.yml` 的 `not_in_nav` 声明不加入导航；其他页面仍需通过导航完整性检查。
+
+优化教程先给模型适用范围与可执行流程，再放原理和历史数据。修改缓存、并行或注意力设置时，对照推理仓库的 runner、后端注册、完整配置和启动脚本；不能把某个模型的能力写成所有模型均支持。TensorRT 页目前只介绍已有引擎接入，补齐可验证的导出或下载流程后再扩展为完整教程。
 
 ### 链接与资源
 
@@ -29,7 +33,9 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 已发布页面改名时，在 `mkdocs.yml` 的 `extra.redirects` 中登记旧 `.html` 地址到新 `.md` 文件的映射，并更新站内引用。构建钩子会为中英文生成跳转页；启用 JavaScript 时会保留查询参数和锚点，禁用时仍可跳转到新页面。跳转页不进入导航、搜索或 sitemap，无需在 `docs/` 中保留旧文件。
 
-首次生成统一维护在 `docs/getting_started/index.md` 及英文版本；`first_generation.html` 通过跳转保留旧地址。入门配置使用 SDPA 与 CPU 卸载，首页 CLI / Python 示例复用该配置；变更时同步检查推理仓库的参数与实现。
+首次生成统一维护在 `docs/getting_started/index.md` 及英文版本；`first_generation.html` 通过跳转保留旧地址。入门配置使用 SDPA 与 CPU 卸载，首页服务启动与离线示例复用该配置；变更时同步检查推理仓库的参数与实现。
+
+入门视频请求客户端使用 HTTP 提交任务、轮询 `status` 并流式下载完成的结果；提交响应的字段为 `task_status`。检查成功、失败、取消、等待超时和 HTTP 错误，确保超时不会被误写成任务已取消；GPU 真实推理需单独验证。
 
 普通插图优先使用 Markdown 图片语法。共享资源放在 `theme/assets/`，构建后使用站点的 `assets/` 路径。使用原始 HTML 图片或视频标签时，分别检查中英文页面的相对路径。
 
@@ -53,7 +59,7 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 中英文首页共用 `theme/overrides/partials/hero-visual.html` 中的 SVG 插画，由构建钩子替换首页的 `<!-- hero-visual -->` 标记。插画与主题颜色联动，不需要额外图片依赖。
 
-首页的命令行、Python 和服务 API 示例使用原生 Markdown 标签页，桌面端纵向排列，窄屏放在代码上方。示例与对应教程同步维护；修改时检查中英文代码一致、标签切换、键盘操作和复制按钮。提示框的图标与侧边线保留语义颜色，标题背景使用统一的浅灰或深色表面。
+首页沿用 `lx-examples` 的三种运行方式标签页：服务与请求、命令行、Python，默认选中服务与请求。桌面端标签在左侧，手机端放在代码上方；服务标签中依次展示两个终端的命令。首页与快速入门统一使用 API 端口 8080、指标端口 8081；模型专用脚本沿用其默认 8000 端口，文中明确区别。修改时检查中英文代码一致、复制按钮、Docker 端口映射和第二个终端的环境。提示框的图标与侧边线保留语义颜色，标题背景使用统一的浅灰或深色表面。
 
 首页生成示例使用性能基准中的 Wan2.1 I2V 视频（`LightX2V_1`），原视频地址为 `https://github.com/user-attachments/assets/7bffe48f-e433-430b-91dc-ac745908ba3a`。本地封面 `theme/assets/showcase/wan-i2v.webp` 取自该视频第 1 秒，视频本体留在外部，使用 `preload="none"`、本地封面按钮和来源链接，点击后才加载并显示原生播放器；无 JavaScript 时直接显示原生控件，加载失败时提供原视频链接。首页示例不代表快速入门的 T2V 输出；更换视频时同步更新封面、模型与来源。
 

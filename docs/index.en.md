@@ -77,9 +77,36 @@ Choose what you want to create or process, then find a model and its examples.
 
 ## Run and integrate { #start-here }
 
-Complete [environment and model setup](getting_started/index.md), then choose the CLI, Python, or HTTP API. Run CLI and Python examples from the LightX2V repository root.
+Complete [environment and model setup](getting_started/index.md#prepare), then start with the service API. Offline CLI and in-process Python examples are also available.
 
 <div class="lx-examples" markdown>
+
+=== ":material-api: Service API"
+
+    ### Start a service and send a request
+
+    Use the model and configuration from the [quickstart](getting_started/index.md#prepare). Keep terminal 1 running; send the request from terminal 2 after the service is ready.
+
+    ```bash title="Terminal 1 · start the service"
+    CUDA_VISIBLE_DEVICES=0 python -m lightx2v.server \
+      --model_cls wan2.1 --task t2v \
+      --model_path models/Wan2.1-T2V-1.3B \
+      --config_json configs/wan/wan_t2v_quickstart.json \
+      --host 0.0.0.0 --port 8080 --metric_port 8081
+    ```
+
+    ```bash title="Terminal 2 · send a request"
+    curl --fail-with-body http://localhost:8080/v1/tasks/video/ \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "prompt": "A cat walking on a sunny beach.",
+        "negative_prompt": "blurry, low quality",
+        "seed": 42,
+        "save_result_path": "first_video.mp4"
+      }'
+    ```
+
+    The response contains a `task_id`. [Wait for completion and download the video :material-arrow-right:](getting_started/index.md#send-request){ .lx-text-link }
 
 === ":material-console: CLI"
 
@@ -99,7 +126,7 @@ Complete [environment and model setup](getting_started/index.md), then choose th
       --save_result_path save_results/first_video.mp4
     ```
 
-    [Read the generation walkthrough :material-arrow-right:](getting_started/index.md){ .lx-text-link }
+    [Read the offline inference guide :material-arrow-right:](getting_started/offline_inference.md){ .lx-text-link }
 
 === ":material-code-braces: Python"
 
@@ -124,26 +151,7 @@ Complete [environment and model setup](getting_started/index.md), then choose th
     )
     ```
 
-    [Explore the Python API :material-arrow-right:](getting_started/python_api.md){ .lx-text-link }
-
-=== ":material-api: Service API"
-
-    ### Submit a task over HTTP
-
-    Start a Wan2.1 T2V service using the [deployment guide](deploy_guides/deploy_service.md). The response includes a `task_id` for checking progress and retrieving the result.
-
-    ```bash title="Terminal"
-    curl -X POST http://localhost:8000/v1/tasks/video/ \
-      -H 'Content-Type: application/json' \
-      -d '{
-        "prompt": "A cat walking on a sunny beach.",
-        "negative_prompt": "blurry, low quality",
-        "seed": 42,
-        "save_result_path": "first_video.mp4"
-      }'
-    ```
-
-    [Read the service and client guide :material-arrow-right:](deploy_guides/deploy_service.md){ .lx-text-link }
+    [Explore Python Pipeline :material-arrow-right:](getting_started/python_api.md){ .lx-text-link }
 
 </div>
 
@@ -159,7 +167,7 @@ Complete [environment and model setup](getting_started/index.md), then choose th
 
 <time datetime="2026-10-26">2026.10.26</time>
 
-[New autoregressive video model entry points](https://github.com/ModelTC/LightX2V/blob/main/README.md)<br><span>Scripts and configurations for TaoMate-H3, StreamRender-H3, Matrix-Game-4 and more.</span>
+[New autoregressive video model entry points](models/index.md)<br><span>Scripts and configurations for TaoMate-H3, StreamRender-H3, Matrix-Game-4 and more.</span>
 
 </div>
 <div markdown>

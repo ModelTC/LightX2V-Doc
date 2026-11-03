@@ -1,6 +1,18 @@
-# Qwen Image VAE TensorRT 加速
+# Qwen Image VAE TensorRT 接入参考 { #qwen-image-vae-tensorrt-加速 }
 
 TensorRT 可加速 Qwen Image 的 VAE Encoder 和 Decoder。固定分辨率的 T2I 使用静态引擎；需要适配多种输入尺寸的 I2I 使用多 profile 引擎。
+
+本页适用于 **Qwen-Image-2512 / Qwen-Image-Edit-2511，且已有兼容 TensorRT 引擎**的场景。`qwen_image_21` 使用另一套 VAE 加载实现，不能直接套用本页配置。
+
+!!! info "先确认引擎来源"
+    本页及下方配置不提供引擎下载或 ONNX 导出、TensorRT 构建流程。没有 `.trt` 文件时，先用默认 PyTorch VAE 跑通模型；需要 TensorRT 时，向引擎提供者取得文件和构建说明后再继续。设置 `vae_type` 不会自动生成引擎。
+
+使用前确认：
+
+- 引擎对应的模型与权重版本，以及构建时的 GPU、CUDA、TensorRT 版本和精度。
+- 文件包含 encoder 和 decoder，目录命名符合下文要求。
+- 静态引擎的尺寸，或多 profile 引擎的顺序与尺寸，与本页列出的映射一致。
+- 首次请求的日志确实加载了引擎；保留 PyTorch 对照结果，比较画质和预热后的耗时。
 
 ## 准备与启动
 

@@ -11,7 +11,7 @@ hide:
 
 <div class="lx-catalog-intro" id="first-time-here" markdown>
 
-New here? Start with [your first video](../getting_started/index.md), or follow the [Wan2.2](wan22.md#choose-task) and [Qwen-Image-2.1](qwen-image-2.1.md#choose-task) guides.
+New here? Start with [your first service request](../getting_started/index.md), or follow the [Wan2.2](wan22.md#choose-task) and [Qwen-Image-2.1](qwen-image-2.1.md#choose-task) guides.
 
 </div>
 

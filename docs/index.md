@@ -77,9 +77,36 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 
 ## 运行与集成 { #从这里开始 }
 
-先完成[环境与模型准备](getting_started/index.md)，再选择命令行、Python 或 HTTP API。命令行和 Python 示例均在 LightX2V 仓库根目录运行。
+先完成[环境与模型准备](getting_started/index.md#prepare)，推荐通过服务 API 使用。也可选择离线命令行或进程内的 Python 调用。
 
 <div class="lx-examples" markdown>
+
+=== ":material-api: 服务与请求"
+
+    ### 启动服务并发送请求
+
+    复用[快速入门](getting_started/index.md#prepare)中的模型与配置。保持终端 1 运行，确认服务就绪后，在终端 2 发送请求。
+
+    ```bash title="终端 1 · 启动服务"
+    CUDA_VISIBLE_DEVICES=0 python -m lightx2v.server \
+      --model_cls wan2.1 --task t2v \
+      --model_path models/Wan2.1-T2V-1.3B \
+      --config_json configs/wan/wan_t2v_quickstart.json \
+      --host 0.0.0.0 --port 8080 --metric_port 8081
+    ```
+
+    ```bash title="终端 2 · 发送请求"
+    curl --fail-with-body http://localhost:8080/v1/tasks/video/ \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "prompt": "A cat walking on a sunny beach.",
+        "negative_prompt": "blurry, low quality",
+        "seed": 42,
+        "save_result_path": "first_video.mp4"
+      }'
+    ```
+
+    请求返回 `task_id`。[等待完成并下载视频 :material-arrow-right:](getting_started/index.md#send-request){ .lx-text-link }
 
 === ":material-console: 命令行"
 
@@ -99,7 +126,7 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
       --save_result_path save_results/first_video.mp4
     ```
 
-    [查看完整生成流程 :material-arrow-right:](getting_started/index.md){ .lx-text-link }
+    [查看离线推理指南 :material-arrow-right:](getting_started/offline_inference.md){ .lx-text-link }
 
 === ":material-code-braces: Python"
 
@@ -124,26 +151,7 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
     )
     ```
 
-    [了解 Python API :material-arrow-right:](getting_started/python_api.md){ .lx-text-link }
-
-=== ":material-api: 服务 API"
-
-    ### 通过 HTTP 提交任务
-
-    先按[服务部署指南](deploy_guides/deploy_service.md)启动 Wan2.1 T2V 服务。请求返回 `task_id`，用于查询进度和获取生成结果。
-
-    ```bash title="Terminal"
-    curl -X POST http://localhost:8000/v1/tasks/video/ \
-      -H 'Content-Type: application/json' \
-      -d '{
-        "prompt": "A cat walking on a sunny beach.",
-        "negative_prompt": "blurry, low quality",
-        "seed": 42,
-        "save_result_path": "first_video.mp4"
-      }'
-    ```
-
-    [查看服务与客户端指南 :material-arrow-right:](deploy_guides/deploy_service.md){ .lx-text-link }
+    [了解 Python Pipeline :material-arrow-right:](getting_started/python_api.md){ .lx-text-link }
 
 </div>
 
@@ -159,7 +167,7 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 
 <time datetime="2026-10-26">2026.10.26</time>
 
-[新增自回归视频模型运行入口](https://github.com/ModelTC/LightX2V/blob/main/README_zh.md)<br><span>TaoMate-H3、StreamRender-H3、Matrix-Game-4 等模型的脚本与配置。</span>
+[新增自回归视频模型运行入口](models/index.md)<br><span>TaoMate-H3、StreamRender-H3、Matrix-Game-4 等模型的脚本与配置。</span>
 
 </div>
 <div markdown>

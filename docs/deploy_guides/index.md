@@ -7,16 +7,16 @@ description: 选择 LightX2V 的 API、Python 或图形界面接入方式，并�
 
 <p class="lx-page-lead">从一次生成走向应用：选择接入方式，再按资源与性能需求配置运行环境。</p>
 
-先通过[模型指南](../models/index.md)完成一次离线生成，确认权重、算子和配置可用。随后选择适合应用的入口。
+推荐通过 HTTP 服务接入应用：先[启动模型并发送第一个请求](../getting_started/index.md)，再按资源和延迟需求配置部署。
 
 ## <span class="lx-heading-icon" aria-hidden="true">:material-connection:</span> 选择接入方式 { #选择接入方式 .lx-icon-heading data-toc-label="选择接入方式" }
 
 <div class="lx-destinations" markdown>
 
 [:material-console-network-outline: **HTTP API 服务**<span>独立运行模型服务，提交生成任务，查询状态并获取结果。</span><span class="lx-destination-action">查看服务部署</span>](deploy_service.md)
-[:material-code-braces: **Python 应用**<span>在代码中创建 Pipeline，复用已加载的模型进行生成。</span><span class="lx-destination-action">查看 Python API</span>](../getting_started/python_api.md)
-[:material-monitor-dashboard: **Gradio 界面**<span>通过独立 Gradio 应用进行交互，按应用说明安装与启动。</span><span class="lx-destination-action">查看 Gradio 入口</span>](deploy_gradio.md)
-[:material-vector-polyline: **ComfyUI 工作流**<span>使用独立集成节点，把 LightX2V 推理接入可视化工作流。</span><span class="lx-destination-action">查看 ComfyUI 集成</span>](deploy_comfyui.md)
+[:material-code-braces: **Python Pipeline**<span>在代码中创建 Pipeline，复用已加载的模型进行生成。</span><span class="lx-destination-action">查看 Python API</span>](../getting_started/python_api.md)
+[:material-monitor-dashboard: **Gradio 界面**<span>通过独立 Gradio 应用进行交互，按应用说明安装与启动。</span><span class="lx-destination-action">查看 Gradio 入口</span>](interfaces.md#gradio)
+[:material-vector-polyline: **ComfyUI 工作流**<span>使用独立集成节点，把 LightX2V 推理接入可视化工作流。</span><span class="lx-destination-action">查看 ComfyUI 集成</span>](interfaces.md#comfyui)
 
 </div>
 
@@ -70,9 +70,9 @@ Gradio 与 ComfyUI 集成分别维护在独立仓库中，支持的模型和安�
 
 <div markdown>
 
-查看 Qwen Image 编码器与 VAE 的独立部署路径。
+Qwen-Image-2512 / Edit-2511 的编码器分离与 VAE 优化；TensorRT 接入需要已有兼容引擎。
 
-[编码器部署](qwen_image_encoder.md) · [VAE TensorRT](qwen_image_vae_tensorrt.md)
+[编码器部署](qwen_image_encoder.md) · [已有 TensorRT 引擎接入](qwen_image_vae_tensorrt.md)
 
 </div>
 </div>

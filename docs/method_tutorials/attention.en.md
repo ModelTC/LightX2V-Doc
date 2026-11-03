@@ -1,41 +1,69 @@
 # Attention Mechanisms
 
+Choose a backend for your GPU, then check the model's config fields and parallelism constraints. An installed operator is not necessarily compatible with every device, model or input shape.
+
+## Choose by GPU
+
+| Scenario | Starting point | Check before use |
+| --- | --- | --- |
+| First run or troubleshooting optional operators | `torch_sdpa` | Uses PyTorch's implementation; model device, precision and memory requirements still apply |
+| A100 / A800, RTX 3090 / 4090 | `flash_attn2` or `sage_attn2` | Match the build to PyTorch, CUDA and GPU architecture; do not retain `flash_attn3` |
+| H100 / H200 | `flash_attn3`, with `sage_attn2` as another candidate | FlashAttention 3 targets Hopper; use the model's matching environment |
+| RTX 5090 | `sage_attn2` or `torch_sdpa` from the model-specific config | Use an SM120 environment; `sage_attn3` needs the separate Blackwell implementation and output-quality evaluation |
+| Evaluating FlashAttention 4 | `flash_attn4` | Upstream targets Hopper / Blackwell; the current LightX2V adapter requires batch size 1 and has no varlen path |
+
+See [FlashAttention](https://github.com/Dao-AILab/flash-attention) and [SageAttention](https://github.com/thu-ml/SageAttention) for hardware requirements. Prefer model-specific configs over this general table. For Qwen-Image-2.1 on A100, Hopper or 5090, see the [model guide](../models/qwen-image-2.1.md#2-environment-setup).
+
 ## Attention Mechanisms Supported by LightX2V
 
-| Name               | Type Name        | GitHub Link |
-|--------------------|------------------|-------------|
-| Flash Attention 2  | `flash_attn2`    | [flash-attention v2](https://github.com/Dao-AILab/flash-attention) |
-| Flash Attention 3  | `flash_attn3`    | [flash-attention v3](https://github.com/Dao-AILab/flash-attention) |
-| Sage Attention 2   | `sage_attn2`     | [SageAttention](https://github.com/thu-ml/SageAttention) |
-| Radial Attention   | `radial_attn`    | [Radial Attention](https://github.com/mit-han-lab/radial-attention) |
-| Sol-Attn           | `sol_attn`       | [Sol-Attn](https://github.com/NVlabs/Sana/tree/sol-engine/techniques/sparse_backends) |
-| Sparge Attention   | `sparge_attn`     | [Sparge Attention](https://github.com/thu-ml/SpargeAttn) |
+These are common config names, not an exhaustive list of internal backends:
 
----
+| Backend | Config value | Purpose and limits |
+| --- | --- | --- |
+| PyTorch SDPA | `torch_sdpa` | No extra attention package; useful as a baseline |
+| FlashAttention 2 | `flash_attn2` | Dense attention; check the installed version's device support |
+| FlashAttention 3 | `flash_attn3` | Hopper dense attention |
+| FlashAttention 4 | `flash_attn4` | CuTeDSL implementation; current adapter limits are listed above |
+| SageAttention 2 | `sage_attn2` | Quantized attention; compare output quality after switching |
+| SageAttention 3 | `sage_attn3` | Blackwell FP4 attention; installing SageAttention 2 alone is insufficient |
+| Radial Attention | `radial_attn` | Sparse video self-attention, not cross-attention |
+| Sol-Attn | `sol_attn` | Requires a matching model layout and shape; see the complete examples below |
+| Sparge Attention | `sparge_attn` | Sparse backend with its own dependencies and model settings |
+
+See the registered [attention implementations](https://github.com/ModelTC/LightX2V/tree/main/lightx2v/common/ops/attn). Do not substitute these names across every model or parallel mode: sparse layouts, masks, variable lengths and distributed communication may require dedicated implementations.
 
 ## Configuration Examples
 
-The configuration files for attention mechanisms are located [here](https://github.com/ModelTC/lightx2v/tree/main/configs/attentions)
+Merge these fragments into a complete JSON config and pass it to the service or CLI with `--config_json`.
 
-By specifying --config_json to a specific config file, you can test different attention mechanisms.
+=== "Wan2.1 T2V"
 
-For example, for radial_attn, the configuration is as follows:
+    ```json
+    {
+      "self_attn_1_type": "torch_sdpa",
+      "cross_attn_1_type": "torch_sdpa"
+    }
+    ```
 
-```json
-{
-  "self_attn_1_type": "radial_attn",
-  "cross_attn_1_type": "flash_attn3",
-  "cross_attn_2_type": "flash_attn3"
-}
+=== "Qwen-Image-2.1"
+
+    ```json
+    {
+      "attn_type": "torch_sdpa"
+    }
+    ```
+
+    This replaces only DiT attention. For Torch RoPE, normalization and other operators, start the standard model from [qwen_image_21_torch.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21_torch.json). Turbo must retain its own sampling config.
+
+Wan's `cross_attn_2_type` controls image cross-attention. Keep it for Wan2.1 I2V/FLF2V and Wan2.2 Animate/Animate2; T2V/VACE and Wan2.2 MoE, TI2V and S2V with the image encoder disabled do not need it. Set it to `torch_sdpa` as well when using SDPA for the first group.
+
+Check the GPU and software environment before running:
+
+```bash
+python -c "import torch; print(torch.__version__, torch.version.cuda); print(torch.cuda.get_device_name(0), torch.cuda.get_device_capability(0))"
 ```
 
-To switch to other types, simply replace the corresponding values with the type names from the table above.
-
-For Wan, `cross_attn_2_type` selects image cross-attention. Keep it in Wan2.1 I2V/FLF2V and Wan2.2 Animate/Animate2 configs; T2V/VACE and Wan2.2 MoE, TI2V, and S2V configs with the image encoder disabled do not need it.
-
-Tips: radial_attn can only be used in self attention due to the limitations of its sparse algorithm principle.
-
-For further customization of attention mechanism behavior, please refer to the official documentation or implementation code of each attention library.
+Complete a request with the same model, seed, dimensions and sampling settings, and inspect logs and output. Exclude model loading, first compilation and warmup from timing. Also compare quality for sparse or quantized backends. Importing a package alone does not verify that its kernel runs.
 
 ### Sol-Attn on Wan2.1
 

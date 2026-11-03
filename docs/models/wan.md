@@ -1,6 +1,6 @@
 # Wan2.1 与 VACE
 
-本指南介绍 Wan2.1 与 VACE 的推理、服务和蒸馏示例。
+推荐启动 Wan2.1 / VACE 模型服务，通过请求生成视频。本页也保留离线推理与蒸馏示例。
 
 示例脚本位于 [LightX2V 推理仓库](https://github.com/ModelTC/LightX2V)的 `scripts/wan/` 目录。设置脚本中的 `lightx2v_path`、`model_path` 和 `CUDA_VISIBLE_DEVICES`，并从该仓库根目录运行以下命令。
 
@@ -8,9 +8,8 @@
 
 1. [选择任务](#choose-task)：确认文生视频、图生视频、首尾帧或 VACE。
 2. [准备环境与权重](#环境与权重)：安装依赖，下载所选任务对应的模型。
-3. [首次生成](#first-run)：以 T2V 1.3B 为例，配置路径并检查输出。
+3. [启动服务并发送请求](#first-run)：加载一次模型，提交任务并获取视频。
 4. [调整推理性能](#next-steps)：根据显存、延迟和多卡需求选择配置。
-5. [接入推理服务](#server-服务)：启动对应任务的服务，再提交请求。
 
 ## 环境与权重
 
@@ -39,39 +38,17 @@ hf download lightx2v/Wan2.1-Distill-Loras --local-dir lightx2v/Wan2.1-Distill-Lo
 
 ## 基础任务
 
-| 任务 | 脚本 | 示例权重 | 配置 |
+| 任务 | 启动服务 | 示例权重 | 配置 |
 | --- | --- | --- | --- |
-| 文生视频 | [run_wan_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_t2v.sh) | [Wan2.1-T2V-1.3B](https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B) | [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) |
-| 图生视频 | [run_wan_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_i2v.sh) | [Wan2.1-I2V-14B-480P](https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P) | [wan_i2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_i2v.json) |
-| 首尾帧生视频 | [run_wan_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_flf2v.sh) | [Wan2.1-FLF2V-14B-720P](https://huggingface.co/Wan-AI/Wan2.1-FLF2V-14B-720P) | [wan_flf2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_flf2v.json) |
-| 参考图／视频条件生成 | [run_wan_vace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_vace.sh) | [Wan2.1-VACE-14B](https://huggingface.co/Wan-AI/Wan2.1-VACE-14B) | [wan_vace.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_vace.json) |
+| 文生视频 | [start_server_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_t2v.sh) | [Wan2.1-T2V-1.3B](https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B) | [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) |
+| 图生视频 | [start_server_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_i2v.sh) | [Wan2.1-I2V-14B-480P](https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P) | [wan_i2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_i2v.json) |
+| 首尾帧生视频 | [start_server_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_flf2v.sh) | [Wan2.1-FLF2V-14B-720P](https://huggingface.co/Wan-AI/Wan2.1-FLF2V-14B-720P) | [wan_flf2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_flf2v.json) |
+| 参考图／视频条件生成 | [start_server_vace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/server/start_server_vace.sh) | [Wan2.1-VACE-14B](https://huggingface.co/Wan-AI/Wan2.1-VACE-14B) | [wan_vace.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_vace.json) |
 
 <a id="first-run"></a>
+## 启动服务并发送请求 { #server-服务 }
 
-### 首次生成：T2V 1.3B
-
-完成环境安装并下载 T2V 1.3B 后，打开 [run_wan_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_t2v.sh)，设置：
-
-| 设置 | 如何填写 |
-| --- | --- |
-| `lightx2v_path` | 当前 LightX2V 仓库的绝对路径 |
-| `model_path` | 下载后的 Wan2.1-T2V-1.3B 目录绝对路径 |
-| `CUDA_VISIBLE_DEVICES` | 实际使用的 GPU 编号 |
-| `--prompt`、`--save_result_path` | 生成内容和输出文件位置 |
-
-默认 [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) 使用 `flash_attn3`，关闭 CPU offload。先按[注意力机制](../method_tutorials/attention.md)确认算子兼容性；需要卸载时，参考[低资源部署](../deploy_guides/for_low_resource.md)选择匹配配置。
-
-从仓库根目录运行：
-
-```bash
-bash scripts/wan/run_wan_t2v.sh
-```
-
-完成后查看 `--save_result_path` 指定的视频，脚本默认保存到仓库内的 `save_results/output_lightx2v_wan_t2v.mp4`。完整安装到生成的分步说明见[生成第一个视频](../getting_started/index.md)。
-
-输入、提示词、seed 和输出路径在 sh 中修改；采样参数在 `--config_json` 指定的 JSON 中修改。`num_frames`、`size` 是未传入时的默认值，`size` 为 `[高, 宽]`。
-
-## Server 服务
+首次使用 Wan2.1 1.3B 服务，可直接跟随[完整快速入门](../getting_started/index.md)。先设置服务脚本中的仓库路径、模型路径与 GPU 编号。默认配置使用 `flash_attn3`、关闭 CPU offload，启动前核对[注意力算子](../method_tutorials/attention.md)与[卸载设置](../method_tutorials/offload.md)。
 
 入口位于 `server/`，权重选择同上，默认监听 `0.0.0.0:8000`。
 
@@ -90,10 +67,20 @@ bash scripts/wan/run_wan_t2v.sh
 bash scripts/wan/server/start_server_t2v.sh
 ```
 
+等待日志出现 `Application startup complete.`。终端 2 使用同一环境与容器（可通过 `docker exec` 进入），先检查：
+
+```bash
+curl --fail --silent --show-error http://localhost:8000/health
+```
+
+应返回 `{"status":"ok"}`。保持终端 1 运行。
+
 ```bash
 # 终端 2：模型加载完成后提交请求
 python scripts/wan/server/post_t2v.py
 ```
+
+视频客户端返回 `task_id`，不会自动等待或下载成品。接着[查询状态并下载结果](../deploy_guides/deploy_service.md#查询下载与取消)，或使用[自动等待的 Python HTTP 客户端](../getting_started/index.md#send-request)，将 `base_url` 改为 `http://localhost:8000`，并按当前模型与任务调整请求字段。
 
 客户端修改 `url` 和 `message`。图片可传 Base64 或绝对路径，VACE 视频通过 `video_path` 传绝对路径；绝对路径须服务端可访问。输出位置通过 `save_result_path` 设置。
 
@@ -102,6 +89,30 @@ python scripts/wan/server/post_t2v.py
 T2V 使用上表 Reuse 入口。I2V 在基础 JSON 中添加 `"enable_reuse": true`、`"reuse_cache_path": "save_results/reuse_cache/wan_i2v"`，使用普通服务，在客户端 `message` 中添加 `reuse`。不同模型或服务使用独立缓存目录。
 
 首次请求 `reuse=False`，复用输入编码时 `reuse=True`。提示词、负面提示词、帧数、尺寸及 I2V 图片路径和内容保持一致，可修改 seed；更换输入先用 `False`。
+
+<a id="首次生成t2v-13b"></a>
+## 离线命令行 { #offline-inference }
+
+完成环境安装并下载 T2V 1.3B 后，打开 [run_wan_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/run_wan_t2v.sh)，设置：
+
+| 设置 | 如何填写 |
+| --- | --- |
+| `lightx2v_path` | 当前 LightX2V 仓库的绝对路径 |
+| `model_path` | 下载后的 Wan2.1-T2V-1.3B 目录绝对路径 |
+| `CUDA_VISIBLE_DEVICES` | 实际使用的 GPU 编号 |
+| `--prompt`、`--save_result_path` | 生成内容和输出文件位置 |
+
+默认 [wan_t2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan/wan_t2v.json) 使用 `flash_attn3`，关闭 CPU offload。先按[注意力机制](../method_tutorials/attention.md)确认算子兼容性；需要卸载时，参考[低资源部署](../deploy_guides/for_low_resource.md)选择匹配配置。
+
+从仓库根目录运行：
+
+```bash
+bash scripts/wan/run_wan_t2v.sh
+```
+
+完成后查看 `--save_result_path` 指定的视频，脚本默认保存到仓库内的 `save_results/output_lightx2v_wan_t2v.mp4`。完整安装到生成的分步说明见[离线推理](../getting_started/offline_inference.md)。
+
+输入、提示词、seed 和输出路径在 sh 中修改；采样参数在 `--config_json` 指定的 JSON 中修改。`num_frames`、`size` 是未传入时的默认值，`size` 为 `[高, 宽]`。
 
 ## 多卡
 
@@ -142,9 +153,9 @@ T2V／I2V 在基础 JSON 中添加 `"use_compile": true` 开启编译、`"warmup
 - `run_wan_t2v_distill_dynamic_cfg.sh`：dynamic CFG 模型，JSON 中的 `cfg_scale` 控制引导强度。
 - `run_wan_t2v_distill_model_ulysses.sh`：完整蒸馏 T2V 模型的 8 卡 Ulysses 示例。
 
-## Python API 示例
+## Python Pipeline 示例 { #python-api-示例 }
 
-生成器创建、配置优先级、卸载和多次生成见 [Python API 指南](../getting_started/python_api.md)。
+生成器创建、配置优先级、卸载和多次生成见 [Python Pipeline 指南](../getting_started/python_api.md)。
 安装后，修改所选文件中的路径，从仓库根目录运行。各示例保留各自的模型、采样和注意力设置；
 改用 Shell 入口的 JSON 属于显式切换配置。
 
@@ -174,4 +185,4 @@ T2V Python 示例使用 14B 模型、`sage_attn2`、guidance 5、shift 5；基�
 | 使用低精度权重 | [模型量化](../method_tutorials/quantization.md)，并选择与权重匹配的后端 |
 | 减少推理步数或加载 LoRA | 本页[蒸馏示例](#蒸馏)、[步数蒸馏原理](../method_tutorials/step_distill.md)、[LoRA 配置与组合限制](../deploy_guides/lora_deploy.md) |
 | 使用多张 GPU | 本页[多卡示例](#多卡)、[并行推理指南](../method_tutorials/parallel.md) |
-| 接入应用 | 本页 [Server 服务](#server-服务)、[服务化部署](../deploy_guides/deploy_service.md)、[Python API](../getting_started/python_api.md) |
+| 接入应用 | 本页 [Server 服务](#server-服务)、[服务化部署](../deploy_guides/deploy_service.md)、[Python Pipeline](../getting_started/python_api.md) |

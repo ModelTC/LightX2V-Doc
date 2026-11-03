@@ -2,7 +2,7 @@
 
 <p class="lx-page-lead">选择安装方式，准备运行环境、镜像和算子依赖。</p>
 
-本页提供 Linux 与 Windows 的完整安装说明。希望先走通一次生成流程，可从[安装与首次生成](index.md)开始。
+本页提供 Linux 与 Windows 的完整安装说明。希望先走通一次生成流程，可从[启动服务与首次请求](index.md)开始。
 
 <div class="lx-method-links" id="目录" markdown>
 
@@ -56,18 +56,19 @@ cd LightX2V
 将仓库挂载到容器中，并直接进入该目录。使用其他镜像时，替换最后一行的镜像名称：
 
 ```bash
-docker run --gpus all -it --ipc=host --name lightx2v \
+docker run --gpus all -it --ipc=host --name lightx2v-quickstart \
+  -p 127.0.0.1:8080:8080 \
   -v "$PWD":/workspace/LightX2V -w /workspace/LightX2V \
   --entrypoint /bin/bash lightx2v/lightx2v:26052801-cu130
 ```
 
-在容器内安装当前仓库，然后继续[生成第一个视频](index.md#download-model)：
+在容器内安装当前仓库，然后继续[启动服务并生成第一个视频](index.md#download-model)：
 
 ```bash
 pip install -v -e .
 ```
 
-仓库目录中的模型和输出文件会保留在宿主机。退出容器后，可用 `docker start -ai lightx2v` 再次进入。
+仓库目录中的模型和输出文件会保留在宿主机。退出容器后，可用 `docker start -ai lightx2v-quickstart` 再次进入。此容器与快速入门共用名称和 8080 端口；已有该容器时直接复用，不要再次创建。使用默认 8000 端口的模型脚本时，应在创建容器时改为映射 `-p 127.0.0.1:8000:8000`，并同步修改请求地址。
 
 #### 3. 中国镜像源（可选）
 
@@ -384,4 +385,4 @@ pipe.generate(
 1. 在 [GitHub Issues](https://github.com/ModelTC/LightX2V/issues) 中搜索相关问题
 2. 提交新的 Issue 描述您的问题
 
-环境准备完成后，继续[生成第一个视频](index.md#download-model)，或通过 [Python API](python_api.md) 接入应用。
+环境准备完成后，继续[启动服务并生成第一个视频](index.md#download-model)，或通过 [Python Pipeline](python_api.md) 接入应用。

@@ -8,22 +8,74 @@
 
 1. [选择任务与版本](#choose-task)：确认文生图或图像编辑，以及标准版或 Turbo。
 2. [准备环境](#2-环境安装)和[模型权重](#1-模型下载)：按 GPU 和模型版本选择。
-3. [首次生成](#first-run)：设置脚本路径与输出，运行文生图示例。
+3. [启动服务并发送请求](#first-run)：生成或编辑图像，直接保存返回结果。
 4. [调整推理性能](#next-steps)：查看 RTX 5090 配置、量化与并行指南。
-5. [接入推理服务](#4-服务化部署与-api-调用)：通过客户端提交文生图或图像编辑请求。
 
 <a id="choose-task"></a>
 
 ## 选择任务与版本
 
-| 模型版本 | 任务入口 | 默认配置 |
+| 模型版本 | 离线示例 | 默认配置 |
 | --- | --- | --- |
 | Qwen-Image-2.1 | [文生图](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_t2i.sh) / [图像编辑](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_i2i.sh) | [qwen_image_21.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21.json)，40 步 |
 | Qwen-Image-2.1-Turbo | [文生图](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_turbo_t2i.sh) / [图像编辑](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_turbo_i2i.sh) | [qwen_image_21_turbo.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21_turbo.json)，8 步 |
 
-图像编辑额外需要参考图 `--image_path`。Turbo 使用配套权重和采样时间表，切换版本时同时更换模型目录、脚本与 JSON。RTX 5090 的量化和多卡入口见 [RTX 5090 案例](#32-rtx-5090-案例)。
+推荐通过[服务与请求](#first-run)使用所选模型，表中脚本可用于核对离线配置。图像编辑额外需要参考图（请求中为 `image_path`，命令行为 `--image_path`）。Turbo 使用配套权重和采样时间表，切换版本时同时更换模型目录、脚本与 JSON。RTX 5090 的量化和多卡入口见 [RTX 5090 案例](#32-rtx-5090-案例)。
 
-## 1. 模型下载
+## 1. 准备环境 { #2-环境安装 }
+
+已有运行环境时，按[完整安装指南](../getting_started/installation.md)检查依赖。镜像和推理配置都需匹配 GPU：
+
+| GPU | 启动配置 |
+| --- | --- |
+| H100 / H200 | 标准版使用 `qwen_image_21.json`，Turbo 使用 `qwen_image_21_turbo.json`；两者默认使用 `flash_attn3` |
+| A100 / A800 | 标准版先使用 [qwen_image_21_torch.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21_torch.json)，采用 SDPA 与 Torch 算子 |
+| RTX 5090 | 使用下方专用镜像及 [RTX 5090 配置](#32-rtx-5090-案例) |
+
+A100 不应沿用默认 `flash_attn3`。该后端面向 Hopper，详见 [FlashAttention 官方要求](https://github.com/Dao-AILab/flash-attention#flashattention-3-beta-release)。选好配置后，同步修改服务或离线脚本的 `--config_json`；显存不足时仍需选择匹配的卸载设置。
+
+A100 使用 Turbo 时，保留 Turbo JSON 中的 `infer_steps`、`sigmas`、`do_time_shift` 等采样字段，将下列算子字段合并进去；不要直接使用标准版的 40 步 Torch 配置：
+
+```json
+{
+  "attn_type": "torch_sdpa",
+  "rope_type": "torch_real_rope",
+  "layer_norm_type": "torch",
+  "modulate_type": "torch",
+  "fused_qk_rms_norm": false,
+  "fused_block_ops": false
+}
+```
+
+根据 GPU 型号选择 [LightX2V Docker 镜像](https://hub.docker.com/r/lightx2v/lightx2v/tags)。在宿主机的工作目录中拉取对应镜像：
+
+```bash
+# H100 / H200 / A100（配置按上表选择）
+docker pull lightx2v/lightx2v:26062001
+
+# RTX 5090
+docker pull lightx2v/lightx2v:26062001-cu130-5090-fix-260921
+```
+
+使用所选镜像启动容器：
+
+```bash
+docker run --gpus all -it --ipc=host --name lightx2v-qwen \
+  -p 127.0.0.1:8000:8000 -v "$PWD":/workspace -w /workspace \
+  --entrypoint /bin/bash [镜像id]
+```
+
+在容器内下载 LightX2V 源码：
+
+```bash
+git clone https://github.com/ModelTC/LightX2V.git
+cd LightX2V
+python -m pip install -v -e .
+```
+
+后续命令均在容器内的 LightX2V 仓库根目录执行。已有仓库时直接进入并安装；第二个终端可用 `docker exec -it -w /workspace/LightX2V lightx2v-qwen /bin/bash` 进入同一环境。
+
+## 2. 下载模型 { #1-模型下载 }
 
 官方模型权重：[Qwen/Qwen-Image-2.1](https://huggingface.co/Qwen/Qwen-Image-2.1)。下载命令：
 
@@ -37,39 +89,46 @@ Turbo 模型权重：[Qwen/Qwen-Image-2.1-Turbo](https://huggingface.co/Qwen/Qwe
 hf download Qwen/Qwen-Image-2.1-Turbo --local-dir Qwen/Qwen-Image-2.1-Turbo
 ```
 
-## 2. 环境安装
-
-已有运行环境时，按[完整安装指南](../getting_started/installation.md)检查依赖。通用配置使用 `flash_attn3`；算子选择见[注意力机制](../method_tutorials/attention.md)，RTX 5090 使用下文对应的镜像与专用配置。
-
-根据 GPU 型号选择 [LightX2V Docker 镜像](https://hub.docker.com/r/lightx2v/lightx2v/tags)。在宿主机的工作目录中拉取对应镜像：
-
-```bash
-# H100, A100等
-docker pull lightx2v/lightx2v:26062001
-
-# RTX 5090
-docker pull lightx2v/lightx2v:26062001-cu130-5090-fix-260921
-```
-
-使用所选镜像启动容器：
-
-```bash
-docker run --gpus all -itd --ipc=host --name [容器名] -v [挂载设置] --entrypoint /bin/bash [镜像id]
-```
-
-在容器内下载 LightX2V 源码：
-
-```bash
-git clone https://github.com/ModelTC/LightX2V.git
-```
-
-后续命令均在容器内的 LightX2V 仓库根目录执行。
-
-## 3. 离线推理
-
 <a id="first-run"></a>
+## 3. 启动服务并发送请求 { #4-服务化部署与-api-调用 }
 
-### 3.1 通用案例
+先修改 `server/start_server.sh` 中的仓库路径、模型路径和 GPU 编号，然后启动：
+
+```bash title="终端 1 · 保持运行"
+bash scripts/qwen_image_21/server/start_server.sh
+```
+
+默认端口为 `8000`，同一个服务支持文生图和图生图。
+
+等待日志出现 `Application startup complete.`，在同一容器中用 `curl --fail http://localhost:8000/health` 检查就绪。保持服务终端运行。此脚本默认使用标准版；选择 Turbo 时，同时更换模型目录与 `configs/qwen_image_21/qwen_image_21_turbo.json`。
+
+服务启动完成后，在同一容器新开终端并发送请求：
+
+=== "文生图"
+
+    ```bash title="终端 2 · 发送请求"
+    python scripts/qwen_image_21/server/post_t2i.py
+    ```
+
+=== "图像编辑"
+
+    先将客户端中的 `image_path` 改为参考图路径，再执行：
+
+    ```bash title="终端 2 · 发送请求"
+    python scripts/qwen_image_21/server/post_i2i.py
+    ```
+
+这两个 HTTP 客户端会等待 PNG 响应，并分别保存到本地 `save_results/qwen_image_21_t2i.png`、`save_results/qwen_image_21_i2i.png`。修改提示词后再次运行客户端即可，服务无需重启。此处使用同步图像接口，不需要像异步视频任务那样轮询任务 ID。
+
+直接修改代码中的 `url`、`message`、`output_path`；图生图还需设置 `image_path`。两个脚本已分别设置 `task: "t2i"` 和 `task: "i2i"`。
+
+请求的 `size` 按 `[高, 宽]` 填写，完整规则见[尺寸设置](#31-通用案例)。图生图需自动确定尺寸时，删除 `message` 中的 `size` 字段。
+
+在 `message` 中设置 `"resolution": 2048` 可仅为本次请求覆盖启动配置；省略或传 `null` 则使用配置。图片表单接口以及 `/v1/images/generations`、`/v1/images/edits` 也支持 `resolution`。
+
+## 4. 离线推理 { #3-离线推理 }
+
+### 通用案例 { #31-通用案例 }
 
 首次生成可使用标准版文生图入口 [qwen_image_21_t2i.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_t2i.sh)。完成上述环境准备并下载 `Qwen-Image-2.1` 后，修改对应 bash 脚本中的 `lightx2v_path`（仓库绝对路径）、`model_path`（模型根目录绝对路径）和 `CUDA_VISIBLE_DEVICES`（GPU 编号），再从仓库根目录运行。使用 Turbo 权重时，前往 [Turbo 入口](#qwen-image-21-turbo)。
 
@@ -109,7 +168,7 @@ bash scripts/qwen_image_21/qwen_image_21_turbo_i2i.sh
 
 图生图按需修改 `--image_path` 和 `--prompt`，默认参考图为模型目录下的 `assets/turbo-boat-input.png`。
 
-### 3.2 RTX 5090 案例
+### RTX 5090 案例 { #32-rtx-5090-案例 }
 
 示例采用的优化技术包括：
 
@@ -161,32 +220,6 @@ bash scripts/qwen_image_21/qwen_image_21_i2i_5090_2k_sp2.sh
 同一实例中首次请求后，连续三次请求取中位数；双卡每次取较慢 rank 的耗时。端到端耗时包含图片保存，不包含模型加载和一次性初始化。
 
 运行时在日志中搜索 **`RUN pipeline cost`**，查看单次 pipeline 耗时，单位为秒。
-
-## 4. 服务化部署与 API 调用
-
-先修改 `server/start_server.sh` 中的仓库路径、模型路径和 GPU 编号，然后启动：
-
-```bash
-bash scripts/qwen_image_21/server/start_server.sh
-```
-
-默认端口为 `8000`，同一个服务支持文生图和图生图。
-
-服务启动完成后，在同一容器新开终端并发送请求：
-
-```bash
-# 文生图
-python scripts/qwen_image_21/server/post_t2i.py
-
-# 图生图
-python scripts/qwen_image_21/server/post_i2i.py
-```
-
-直接修改代码中的 `url`、`message`、`output_path`；图生图还需设置 `image_path`。两个脚本已分别设置 `task: "t2i"` 和 `task: "i2i"`。
-
-服务请求使用相同的尺寸规则。图生图需自动确定尺寸时，删除 `message` 中的 `size` 字段。
-
-在 `message` 中设置 `"resolution": 2048` 可仅为本次请求覆盖启动配置；省略或传 `null` 则使用配置。图片表单接口以及 `/v1/images/generations`、`/v1/images/edits` 也支持 `resolution`。
 
 <a id="next-steps"></a>
 

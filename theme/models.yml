@@ -48,6 +48,30 @@
   source_en: scripts/self_forcing/README.md
   description_en: "Autoregressive video generation and corresponding FP8 inference configurations."
   tags_en: ["Autoregressive", "Video generation"]
+- name: TaoMate-H3
+  category: video
+  description: H3 自回归文生音视频入口；示例默认使用 8 卡和配套三步配置。
+  tags: [自回归, 文生音视频]
+  source: scripts/taomate_h3/run_t2av_3step.sh
+  source_en: scripts/taomate_h3/run_t2av_3step.sh
+  description_en: "Autoregressive H3 text-to-audiovisual entry point; the example uses eight GPUs and a matching three-step config."
+  tags_en: ["Autoregressive", "Text-to-audiovisual"]
+- name: StreamRender-H3
+  category: video
+  description: 结合参考图与语义视频的自回归生成；提供配套两步、多卡示例。
+  tags: [自回归, 视频到视频, 参考图]
+  source: scripts/streamrender_h3/run_refv2v_2step.sh
+  source_en: scripts/streamrender_h3/run_refv2v_2step.sh
+  description_en: "Autoregressive generation conditioned on a reference image and semantic video, with a two-step multi-GPU example."
+  tags_en: ["Autoregressive", "Video-to-video", "Reference image"]
+- name: Realtime-Video
+  category: video
+  description: 自回归文生视频入口，默认使用 8 张 RTX 5090 的 FP8 配置。
+  tags: [自回归, 文生视频]
+  source: scripts/realtime_video/run_5090.sh
+  source_en: scripts/realtime_video/run_5090.sh
+  description_en: "Autoregressive text-to-video entry point with an FP8 config for eight RTX 5090 GPUs by default."
+  tags_en: ["Autoregressive", "Text-to-video"]
 - name: Qwen-Image-2.1
   category: image
   description: 文本生成图像与提示词驱动的图像编辑，包含 Turbo 模型用法。
@@ -122,6 +146,22 @@
   source_en: scripts/relayvsr/README.md
   description_en: "Entry points for the original 4× model and the native LightX2V 2× model."
   tags_en: ["Video upscaling", "2×", "4×"]
+- name: Matrix-Game-4
+  category: world
+  description: 基于游戏录屏与参考图的生成入口；需要设置 VIDEO_PATH 和匹配的场景权重。
+  tags: [世界模型, 视频到视频]
+  source: scripts/matrix_game4/run_matrix_game4.sh
+  source_en: scripts/matrix_game4/run_matrix_game4.sh
+  description_en: "Generation from game recordings and a reference image; set VIDEO_PATH and use matching scene weights."
+  tags_en: ["World model", "Video-to-video"]
+- name: LingBot-Fast
+  category: world
+  description: 结合首帧与动作输入生成视频；提供默认 8 卡的 RTX 5090 运行配置。
+  tags: [世界模型, 动作控制, 自回归]
+  source: scripts/lingbot_fast/run_5090.sh
+  source_en: scripts/lingbot_fast/run_5090.sh
+  description_en: "Video generation from a first frame and action inputs, with an eight-GPU RTX 5090 config by default."
+  tags_en: ["World model", "Action control", "Autoregressive"]
 - name: EdenLive
   category: world
   description: 根据代理录屏、目标首帧与文本提示控制视频生成。

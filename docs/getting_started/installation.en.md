@@ -2,7 +2,7 @@
 
 <p class="lx-page-lead">Choose an installation method and prepare the environment, images and kernels.</p>
 
-This page provides full setup instructions for Linux and Windows. For a walkthrough to your first output, start with [Installation and first generation](index.md).
+This page provides full setup instructions for Linux and Windows. For a walkthrough to your first output, start with [Start a service and send your first request](index.md).
 
 <div class="lx-method-links" id="table-of-contents" markdown>
 
@@ -54,18 +54,19 @@ cd LightX2V
 Mount the repository and open a shell in its directory. Replace the image name on the last line if you selected another image:
 
 ```bash
-docker run --gpus all -it --ipc=host --name lightx2v \
+docker run --gpus all -it --ipc=host --name lightx2v-quickstart \
+  -p 127.0.0.1:8080:8080 \
   -v "$PWD":/workspace/LightX2V -w /workspace/LightX2V \
   --entrypoint /bin/bash lightx2v/lightx2v:26052801-cu130
 ```
 
-Inside the container, install the current checkout, then continue with [Generate Your First Video](index.md#download-model):
+Inside the container, install the current checkout, then continue with [Start a service and generate your first video](index.md#download-model):
 
 ```bash
 pip install -v -e .
 ```
 
-Models and outputs stored in the repository directory persist on the host. After exiting, use `docker start -ai lightx2v` to enter the container again.
+Models and outputs stored in the repository directory persist on the host. After exiting, use `docker start -ai lightx2v-quickstart` to enter it again. This shares the quickstart's container name and port 8080; reuse an existing container instead of creating it again. For model scripts using port 8000, publish `-p 127.0.0.1:8000:8000` when creating the container and use the matching request address.
 
 #### 3. China Mirror Source (Optional)
 
@@ -376,7 +377,7 @@ pipe.generate(
 ```
 
 !!! tip "More examples"
-    For more usage examples including quantization, offloading, caching, and other advanced configurations, please refer to the [Python API guide](python_api.md).
+    For more usage examples including quantization, offloading, caching, and other advanced configurations, please refer to the [Python Pipeline guide](python_api.md).
 
 ## <span class="lx-heading-icon" aria-hidden="true">:material-lifebuoy:</span> Get Help { #get-help .lx-icon-heading data-toc-label="Get Help" }
 
@@ -385,4 +386,4 @@ If you encounter problems during installation or usage, please:
 1. Search for related issues in [GitHub Issues](https://github.com/ModelTC/LightX2V/issues)
 2. Submit a new Issue describing your problem
 
-Once the environment is ready, [generate your first video](index.md#download-model) or integrate with the [Python API](python_api.md).
+Once the environment is ready, [start a service and generate your first video](index.md#download-model) or integrate with the [Python Pipeline](python_api.md).

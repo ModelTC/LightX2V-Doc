@@ -1,8 +1,10 @@
-# 服务部署
+# 服务 API 参考 { #服务部署 }
 
 <p class="lx-page-lead">将模型作为 API 服务运行，提交生成任务并获取结果。</p>
 
 LightX2V 通过 FastAPI 提供带异步任务队列的推理服务，启动入口为 `python -m lightx2v.server`。启动时选择的模型和任务决定请求支持哪些字段，详见[新增请求参数](../developer_guides/request_parameters.md)。
+
+首次使用请从[启动服务与首次请求](../getting_started/index.md)开始，其中包含自动等待和结果下载。本页用于查找模型入口、任务管理与接口。以下示例使用 **8000** 端口，快速入门使用 **8080**；请按正在运行的服务修改请求地址。
 
 <nav class="lx-guide-path" aria-label="异步视频任务流程" markdown>
 
@@ -14,7 +16,7 @@ LightX2V 通过 FastAPI 提供带异步任务队列的推理服务，启动入�
 
 ## 按模型选择服务入口
 
-先按模型指南准备环境和权重，完成离线生成，再使用对应的服务脚本与客户端：
+先按模型指南准备环境、权重与配置，再启动对应服务并发送请求：
 
 | 模型 | 专用指南 | 选择时注意 |
 | --- | --- | --- |
@@ -31,6 +33,8 @@ bash scripts/server/start_server.sh
 ```
 
 示例使用 Wan2.1 T2V、`configs/wan/wan_t2v.json`，监听 8000 端口。切换模型时，需要配套修改 `--model_cls`、`--task` 和 `--config_json`。`--max_queue_size` 默认为 10，统计等待中和执行中的任务总数。
+
+模型加载完成后，用 `curl --fail http://localhost:8000/health` 检查就绪，应返回 `{"status":"ok"}`。保持服务终端运行。
 
 ## 提交视频任务
 
@@ -81,7 +85,7 @@ curl -X DELETE http://localhost:8000/v1/tasks/TASK_ID
 
 图像模型以 `--task t2i` 或 `--task i2i` 启动后，使用 `/v1/tasks/image/`（JSON）或 `/v1/tasks/image/form`（multipart）。`/v1/tasks/image/sync` 等待完成，通常直接返回 PNG 字节；设置 `presigned_url` 时会上传结果并返回 JSON。该接口的查询参数 `timeout_seconds` 默认为 600。
 
-另提供 OpenAI 兼容接口 `/v1/images/generations` 和 `/v1/images/edits`。可在运行中服务的 `/docs` 查看请求结构，在 `/v1/service/metadata` 查看模型/任务能力。
+另提供 OpenAI 兼容接口 `/v1/images/generations` 和 `/v1/images/edits`。可在运行中服务的 `/docs` 查看请求结构，在 `/v1/service/metadata` 查看已加载的模型信息。
 
 ## 多 GPU 与多服务
 
@@ -119,6 +123,7 @@ all_succeeded = process_tasks_async(messages, available_urls)
 
 | 接口 | 方法 | 用途 |
 |------|------|------|
+| `/health` | GET | 检查接口是否可用 |
 | `/v1/tasks/video/` | POST | 通过 JSON 提交视频任务 |
 | `/v1/tasks/video/form` | POST | 通过 multipart 上传并提交视频任务 |
 | `/v1/tasks/image/` | POST | 通过 JSON 提交图像任务 |
@@ -131,7 +136,7 @@ all_succeeded = process_tasks_async(messages, available_urls)
 | `/v1/tasks/{task_id}` | DELETE | 取消单个任务 |
 | `/v1/tasks/all/running` | DELETE | 取消所有等待中/执行中的任务 |
 | `/v1/service/status` | GET | 查询服务执行状态 |
-| `/v1/service/metadata` | GET | 查询模型/任务能力 |
+| `/v1/service/metadata` | GET | 查询已加载的模型信息 |
 | `/v1/files/download/{file_path}` | GET | 下载允许访问的输出文件 |
 | `/v1/images/generations` | POST | OpenAI 兼容图像生成 |
 | `/v1/images/edits` | POST | OpenAI 兼容图像编辑 |

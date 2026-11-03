@@ -1,0 +1,62 @@
+# Legacy Windows Bundle
+
+This page preserves the old Gradio bundle instructions for users who already have that version. It is not the installation procedure for current LightX2V or the standalone Gradio application. For new installations, use [Windows deployment](deploy_local_windows.md) or [interfaces and integrations](interfaces.md).
+
+**📦 Download Software Package**
+
+- [Quark Cloud](https://pan.quark.cn/s/f44023dcf8c8)
+
+**📁 Directory Structure**
+After extraction, ensure the directory structure is as follows:
+
+```
+├── env/                        # LightX2V environment directory
+├── LightX2V/                   # LightX2V project directory
+├── start_lightx2v.bat          # One-click startup script
+├── lightx2v_config.txt         # Configuration file
+├── LightX2V使用说明.txt         # LightX2V usage instructions
+├── outputs/                    # Generated video save directory
+└── models/                     # Model storage directory
+```
+
+**Legacy RTX 50 series environment**: The original bundle instructions provided a separate runtime. Please download from [Quark Cloud](https://pan.quark.cn/s/52b9a8c8f07a), extract and replace the `env/` directory in the software package.
+
+**📥 Model Download**:
+
+You can directly download from the Gradio frontend, with two download sources provided: HuggingFace and ModelScope. You can choose according to your situation, or refer to the [Model Structure Documentation](../getting_started/model_structure.md) to manually download.
+
+
+**📋 Configuration Parameters**
+
+Edit the `lightx2v_config.txt` file and modify the following parameters as needed:
+
+```ini
+
+# Interface language (zh: Chinese, en: English)
+lang=en
+
+# Server port
+port=8032
+
+# GPU device ID (0, 1, 2...)
+gpu=0
+
+# Model path
+model_path=models/
+```
+
+**🚀 Start Service**
+
+Double-click to run the `start_lightx2v.bat` file, the script will:
+
+1. Automatically read configuration file
+2. Verify model paths and file integrity
+3. Start Gradio Web interface
+4. Automatically open browser to access service
+
+
+![Gradio English Interface](../assets/repository/figs/portabl_windows/pic_gradio_en.png)
+
+**⚠️ Important Notes**:
+
+- **Display Issues**: Follow the bundled instructions for the legacy environment. Check the current application repository for its dependency versions.

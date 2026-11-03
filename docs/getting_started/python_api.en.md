@@ -1,6 +1,8 @@
-# Python API
+# Python Pipeline { #python-api }
 
 <p class="lx-page-lead">Create a pipeline in Python, reuse the loaded model and configure acceleration options.</p>
+
+This page loads the model directly inside your Python process. To call a running service from Python, use the [HTTP request example](index.md#send-request).
 
 Install LightX2V using the [full installation guide](installation.md). The examples below run from the repository root; replace model, input and output paths with local paths.
 

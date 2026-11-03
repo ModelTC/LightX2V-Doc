@@ -1,6 +1,6 @@
 # Wan2.2
 
-<p class="lx-page-lead">按任务选择模型，完成首次生成，再调整推理与部署配置。</p>
+<p class="lx-page-lead">按任务选择模型，启动对应服务，通过请求生成视频。</p>
 
 示例脚本位于 [LightX2V 推理仓库](https://github.com/ModelTC/LightX2V)的 `scripts/wan22/` 目录。设置所选脚本中的 `lightx2v_path`、`model_path` 和 `CUDA_VISIBLE_DEVICES`，并从该仓库根目录运行以下命令。
 
@@ -8,11 +8,11 @@
 
 1. [**选择任务**<span>区分 MoE、TI2V、S2V 与 Animate。</span>](#choose-task)
 2. [**准备权重**<span>安装环境，下载对应模型与组件。</span>](#环境与权重)
-3. [**首次生成**<span>从 MoE T2V 示例开始运行。</span>](#first-run)
+3. [**启动服务**<span>发送第一个 MoE T2V 请求。</span>](#first-run)
 
 </nav>
 
-已完成基础生成？继续[调整推理性能](#next-steps)或[接入服务](#服务)。
+已有运行中的服务？前往[请求与结果](#服务)；需要优化时查看[性能配置](#next-steps)。
 
 <a id="choose-task"></a>
 
@@ -20,7 +20,7 @@
 
 MoE 的 T2V 与 I2V 使用各自的 A14B 权重；TI2V 的文生视频、图生视频共用 5B 权重。S2V、Animate 使用各自的模型与输入形式。更换模型时，同时选择对应脚本和 JSON。
 
-| 任务 | 脚本 | 模型权重 |
+| 任务 | 配置参考 | 模型权重 |
 | --- | --- | --- |
 | MoE 文生视频 | [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh) | Wan2.2-T2V-A14B |
 | MoE 图生视频 | [run_wan22_moe_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_i2v.sh) | Wan2.2-I2V-A14B |
@@ -58,8 +58,49 @@ hf download lightx2v/Encoders --include "models_t5_umt5-xxl-enc-fp8.pth" --local
 `model_path` 指向完整基础模型目录。所选 JSON 中的 checkpoint 和 LoRA 路径填写下载后的本地文件路径。
 
 <a id="first-run"></a>
+## 启动服务并发送请求 { #服务 }
 
-## 首次生成：MoE T2V
+先设置服务脚本中的仓库路径、模型路径与 GPU 编号。默认配置使用 `flash_attn3`、关闭 CPU offload，启动前核对[注意力算子](../method_tutorials/attention.md)与[卸载设置](../method_tutorials/offload.md)。
+
+选择一个 MoE T2V 服务入口，默认端口为 8000，单卡与 TP4 共用 `server/post_t2v.py`：
+
+| 卡数 | 启动脚本 |
+| --- | --- |
+| 单卡 | `server/start_server_t2v.sh` |
+| TP4 | `server/start_server_t2v_tp.sh` |
+
+```bash
+# 终端 1：启动服务
+bash scripts/wan22/server/start_server_t2v.sh
+```
+
+等待日志出现 `Application startup complete.`。终端 2 使用同一环境与容器（可通过 `docker exec` 进入），先检查：
+
+```bash
+curl --fail --silent --show-error http://localhost:8000/health
+```
+
+应返回 `{"status":"ok"}`。保持终端 1 运行。
+
+```bash
+# 终端 2：模型加载完成后提交请求
+python scripts/wan22/server/post_t2v.py
+```
+
+视频客户端返回 `task_id`，不会自动等待或下载成品。接着[查询状态并下载结果](../deploy_guides/deploy_service.md#查询下载与取消)，或使用[自动等待的 Python HTTP 客户端](../getting_started/index.md#send-request)，将 `base_url` 改为 `http://localhost:8000`，并按当前模型与任务调整请求字段。
+
+I2V、FLF2V 将单卡服务的 `model_path`、`--task`、`--config_json` 改为对应离线脚本的设置，分别使用 `scripts/wan/server/post_i2v.py`、`post_flf2v.py`。任务在服务启动时确定。TI2V 还需设置 `--model_cls wan2.2`，使用对应权重和共用 JSON。
+
+客户端修改 `url` 和 `message`。图片可传 Base64 或服务端可访问的绝对路径，输出位置通过 `save_result_path` 设置。
+
+### Reuse
+
+MoE T2V 在单卡服务中选择 [wan_moe_t2v_reuse.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_moe_t2v_reuse.json)，在 `server/post_t2v.py` 的 `message` 中添加 `reuse`。MoE I2V 在基础 JSON 中添加 `"enable_reuse": true`、`"reuse_cache_path": "save_results/reuse_cache/wan22_moe_i2v"`，并在普通客户端的 `message` 中添加 `reuse`。不同模型或服务使用独立缓存目录。
+
+首次请求 `reuse=False`，复用输入编码时 `reuse=True`。提示词、帧数、尺寸及 I2V 图片路径和内容保持一致，可修改 seed；更换输入先用 `False`。
+
+<a id="首次生成moe-t2v"></a>
+## 离线命令行 { #offline-inference }
 
 完成环境安装，下载上方 `Wan2.2-T2V-A14B` 权重。打开 [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh)，将 `lightx2v_path`、`model_path` 改为仓库和模型目录的绝对路径，设置 `CUDA_VISIBLE_DEVICES`，按需修改 `--prompt` 与 `--save_result_path`。
 
@@ -78,35 +119,6 @@ bash scripts/wan22/run_wan22_moe_t2v.sh
 MoE 的 T2V、I2V 使用不同权重。TI2V 两种任务共用 [wan_ti2v.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_ti2v.json)，或使用开启 CPU offload、采用 FlashAttention2 的 [wan_ti2v_4090.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_ti2v_4090.json)。
 
 Animate 脚本先预处理驱动视频和参考图片，再执行推理。替换脚本默认使用 [wan_animate_replace_4090.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_animate_replace_4090.json)，需准备量化 DiT/T5/CLIP 权重；原始权重使用 [wan_animate_replace.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_animate_replace.json)。Animate2 直接传参考图片与驱动视频，并在 JSON 中设置组件路径。
-
-## 服务
-
-选择一个 MoE T2V 服务入口，默认端口为 8000，单卡与 TP4 共用 `server/post_t2v.py`：
-
-| 卡数 | 启动脚本 |
-| --- | --- |
-| 单卡 | `server/start_server_t2v.sh` |
-| TP4 | `server/start_server_t2v_tp.sh` |
-
-```bash
-# 终端 1：启动服务
-bash scripts/wan22/server/start_server_t2v.sh
-```
-
-```bash
-# 终端 2：模型加载完成后提交请求
-python scripts/wan22/server/post_t2v.py
-```
-
-I2V、FLF2V 将单卡服务的 `model_path`、`--task`、`--config_json` 改为对应离线脚本的设置，分别使用 `scripts/wan/server/post_i2v.py`、`post_flf2v.py`。任务在服务启动时确定。TI2V 还需设置 `--model_cls wan2.2`，使用对应权重和共用 JSON。
-
-客户端修改 `url` 和 `message`。图片可传 Base64 或服务端可访问的绝对路径，输出位置通过 `save_result_path` 设置。
-
-### Reuse
-
-MoE T2V 在单卡服务中选择 [wan_moe_t2v_reuse.json](https://github.com/ModelTC/LightX2V/blob/main/configs/wan22/wan_moe_t2v_reuse.json)，在 `server/post_t2v.py` 的 `message` 中添加 `reuse`。MoE I2V 在基础 JSON 中添加 `"enable_reuse": true`、`"reuse_cache_path": "save_results/reuse_cache/wan22_moe_i2v"`，并在普通客户端的 `message` 中添加 `reuse`。不同模型或服务使用独立缓存目录。
-
-首次请求 `reuse=False`，复用输入编码时 `reuse=True`。提示词、帧数、尺寸及 I2V 图片路径和内容保持一致，可修改 seed；更换输入先用 `False`。
 
 ## 多卡
 
@@ -187,9 +199,9 @@ I2V 完整权重、LoRA、FP8 使用 CFG2 × SP4 时，在对应单卡 JSON 中�
 
 RainFusion、NPU、Extreme 示例保留各自的算子和通信设置，需使用匹配的硬件与依赖；NPU 脚本通过 `ASCEND_RT_VISIBLE_DEVICES` 选择设备。
 
-## Python API 示例
+## Python Pipeline 示例 { #python-api-示例 }
 
-生成器创建、配置优先级、卸载和多次生成见 [Python API 指南](../getting_started/python_api.md)。
+生成器创建、配置优先级、卸载和多次生成见 [Python Pipeline 指南](../getting_started/python_api.md)。
 安装后，修改所选文件中的路径，从仓库根目录运行。各示例保留各自的模型、采样和注意力设置；
 改用 Shell 入口的 JSON 属于显式切换配置。
 
@@ -216,4 +228,4 @@ MoE 量化推理需要匹配的高噪声、低噪声 DiT 权重；量化 T5 使�
 | 使用量化权重 | [模型量化](../method_tutorials/quantization.md)；MoE 需匹配高噪声与低噪声 DiT 权重 |
 | 使用蒸馏或 LoRA | 本页[蒸馏配置](#蒸馏)、[Animate LoRA](#animate-lora)、[LoRA 命名与组合限制](../deploy_guides/lora_deploy.md) |
 | 使用多张 GPU | 本页[多卡示例](#多卡)、[并行推理指南](../method_tutorials/parallel.md) |
-| 接入应用 | 本页[服务](#服务)、[服务化部署](../deploy_guides/deploy_service.md)、[Python API](../getting_started/python_api.md) |
+| 接入应用 | 本页[服务](#服务)、[服务化部署](../deploy_guides/deploy_service.md)、[Python Pipeline](../getting_started/python_api.md) |

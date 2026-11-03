@@ -1,90 +1,71 @@
 # Windows 本地部署指南
 
-## 📖 概述
+使用当前源码与独立 Python 环境运行服务，再通过 HTTP 请求生成。图形界面使用[独立应用](interfaces.md)。
 
-本文档将详细指导您在Windows环境下完成LightX2V的本地部署配置，包括批处理文件推理、Gradio Web界面推理等多种使用方式。
+## 准备环境与模型
 
-## 🚀 快速开始
+先按[Windows 安装说明](../getting_started/installation.md#windows-environment-setup)配置依赖。本页命令使用 **Windows CMD / Anaconda Prompt**，不是 PowerShell 或 Bash；激活 LightX2V 环境并进入推理仓库根目录后执行。
 
-### 环境要求
+以下示例使用支持 BF16 的 NVIDIA GPU、Wan2.1-T2V-1.3B 原始权重与 CPU 卸载。主机内存和显存仍需容纳模型组件及中间结果，不能仅按“1.3B”估算容量。下载完整模型并复制配置：
 
-#### 硬件要求
-- **GPU**: NVIDIA GPU，建议 8GB+ VRAM
-- **内存**: 建议 16GB+ RAM
-- **存储**: 强烈建议使用 SSD 固态硬盘，机械硬盘会导致模型加载缓慢
-
-## 🎯 使用方式
-
-### 方式一：使用批处理文件推理
-
-参考[快速开始文档](../getting_started/installation.md)安装环境，并使用[批处理文件](https://github.com/ModelTC/LightX2V/tree/main/scripts/win)运行。
-
-### 方式二：使用Gradio Web界面推理
-
-#### 手动配置Gradio
-
-参考[快速开始文档](../getting_started/installation.md)安装环境，参考[Gradio部署指南](deploy_gradio.md)
-
-#### 旧版整合包：一键启动 Gradio
-
-以下保留旧版整合包的下载和使用说明。新独立应用的安装与启动见 [Gradio-Lightx2v](https://github.com/ModelTC/Gradio-Lightx2v)；当前尚未提供对应的新整合包，不能将以下环境直接视为新应用的部署方案。
-
-**📦 下载软件包**
-
-- [夸克网盘](https://pan.quark.cn/s/f44023dcf8c8)
-
-
-**📁 目录结构**
-解压后，确保目录结构如下：
-
-```
-├── env/                        # LightX2V 环境目录
-├── LightX2V/                   # LightX2V 项目目录
-├── start_lightx2v.bat          # 一键启动脚本
-├── lightx2v_config.txt         # 配置文件
-├── LightX2V使用说明.txt         # LightX2V使用说明
-├── outputs/                    # 生成的视频保存目录
-└── models/                     # 模型存放目录
+```bat
+python -m pip install -U huggingface_hub
+hf download Wan-AI/Wan2.1-T2V-1.3B --local-dir models/Wan2.1-T2V-1.3B
+copy configs\wan\wan_t2v.json configs\wan\wan_t2v_windows.json
 ```
 
-**RTX 50系显卡用户注意**：我们提供了专用的运行环境。请从[夸克网盘](https://pan.quark.cn/s/52b9a8c8f07a)下载，解压后替换软件包中的 `env/` 目录即可。
+打开 `configs/wan/wan_t2v_windows.json`，将以下字段合并进去，保留原配置的 50 步、CFG 和其他采样设置。不要用下面的片段覆盖整个文件：
 
-**📥 下载模型**:
-
-可直接从gradio前端下载，提供了两个下载源，huggingface和modelscope，可根据自己情况选择，或参考[模型结构文档](../getting_started/model_structure.md)手动下载
-
-
-**📋 配置参数**
-
-编辑 `lightx2v_config.txt` 文件，根据需要修改以下参数：
-
-```ini
-
-# 界面语言 (zh: 中文, en: 英文)
-lang=zh
-
-# 服务器端口
-port=8032
-
-# GPU设备ID (0, 1, 2...)
-gpu=0
-
-# 模型路径
-model_path=models/
+```json
+{
+  "self_attn_1_type": "torch_sdpa",
+  "cross_attn_1_type": "torch_sdpa",
+  "cpu_offload": true,
+  "offload_granularity": "block",
+  "t5_cpu_offload": true,
+  "vae_cpu_offload": true
+}
 ```
 
-**🚀 启动服务**
+这使用 PyTorch 自带的 SDPA，无需为该示例额外安装 FlashAttention。
 
-双击运行 `start_lightx2v.bat` 文件，脚本将：
+## 启动服务并发送请求
 
-1. 自动读取配置文件
-2. 验证模型路径和文件完整性
-3. 启动 Gradio Web 界面
-4. 自动打开浏览器访问服务
+终端 1 启动服务，保持运行：
 
+```bat
+set CUDA_VISIBLE_DEVICES=0
+python -m lightx2v.server ^
+  --model_cls wan2.1 --task t2v ^
+  --model_path models/Wan2.1-T2V-1.3B ^
+  --config_json configs/wan/wan_t2v_windows.json ^
+  --host 127.0.0.1 --port 8080 --metric_port 8081
+```
 
-![Gradio中文界面](../assets/repository/figs/portabl_windows/pic_gradio_zh.png)
+等待日志出现 `Application startup complete.`。在同一台电脑另开 CMD 终端，检查就绪并提交一次请求：
 
-**⚠️ 重要提示**:
+```bat
+curl.exe --fail http://localhost:8080/health
+curl.exe --fail -X POST http://localhost:8080/v1/tasks/video/ ^
+  -H "Content-Type: application/json" ^
+  -d "{\"prompt\":\"A cat walking on a sunny beach.\",\"seed\":42,\"save_result_path\":\"windows_first_video.mp4\"}"
+```
 
-- **页面显示问题**: 旧版整合包请按随包说明排查。新独立应用使用 Gradio 5.50.0，安装方式见新仓库。
+保存返回的 `task_id`，将下面的 `TASK_ID` 替换为它。先查询状态；只有 `status` 为 `completed` 时才执行下载命令：
+
+```bat
+curl.exe --fail http://localhost:8080/v1/tasks/TASK_ID/status
+curl.exe --fail http://localhost:8080/v1/tasks/TASK_ID/result -o first_video.mp4
+```
+
+结果下载到终端 2 当前目录的 `first_video.mp4`。若状态为 `failed`，查看响应错误与服务日志；任务管理见[服务 API 参考](deploy_service.md)。
+
+## 其他使用方式
+
+- [Python Pipeline](../getting_started/python_api.md)：在 Python 进程中复用模型。
+- [Windows 批处理脚本](https://github.com/ModelTC/LightX2V/tree/main/scripts/win)：运行前修改脚本内仓库与模型路径，同时检查配套配置。`run_wan_t2v.bat` 引用的配置为 4 步，并要求 T5 量化权重，不能直接当作原始权重的 50 步示例。
+- [Gradio 与 ComfyUI](interfaces.md)：分别在应用要求的环境中安装，模型支持范围以集成仓库为准。
+
+<a id="旧版整合包一键启动-gradio"></a>
+
+旧包的下载、配置文件和启动记录见 [Windows 旧整合包](windows_legacy.md)。

@@ -8,22 +8,74 @@ The example scripts are in `scripts/qwen_image_21/` in the [LightX2V inference r
 
 1. [Choose a task and model](#choose-task): text-to-image or image editing, standard or Turbo.
 2. [Prepare the environment](#2-environment-setup) and [weights](#1-model-download) for your GPU and model.
-3. [Generate your first image](#first-run): set paths and output, then run the text-to-image example.
-4. [Tune inference](#next-steps): see RTX 5090 configurations, quantization and parallel inference.
-5. [Start a service](#4-service-deployment-and-api-usage): submit generation or editing requests with the clients.
+3. [Start a service and send a request](#first-run): generate or edit an image and save the response.
+4. [Tune inference](#next-steps): RTX 5090 configurations, quantization, and parallelism.
 
 <a id="choose-task"></a>
 
 ## Choose a task and model
 
-| Model | Task entry points | Default configuration |
+| Model | Offline examples | Default configuration |
 | --- | --- | --- |
 | Qwen-Image-2.1 | [Text-to-image](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_t2i.sh) / [Image editing](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_i2i.sh) | [qwen_image_21.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21.json), 40 steps |
 | Qwen-Image-2.1-Turbo | [Text-to-image](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_turbo_t2i.sh) / [Image editing](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_turbo_i2i.sh) | [qwen_image_21_turbo.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21_turbo.json), 8 steps |
 
-Image editing also requires a reference image in `--image_path`. Turbo uses its matching weights and sampling schedule: switch the model directory, script and JSON together. For quantized and multi-GPU entry points, see the [RTX 5090 examples](#32-rtx-5090-examples).
+Use the [service workflow](#first-run) for the selected model. The table links to offline configuration examples. Image editing requires a reference image: `image_path` in requests, or `--image_path` on the CLI. Turbo uses its matching weights and sampling schedule: switch the model directory, script and JSON together. For quantized and multi-GPU entry points, see the [RTX 5090 examples](#32-rtx-5090-examples).
 
-## 1. Model Download
+## 1. Environment setup { #2-environment-setup }
+
+For an existing environment, check dependencies against the [full installation guide](../getting_started/installation.md). Match both the image and inference config to your GPU:
+
+| GPU | Startup config |
+| --- | --- |
+| H100 / H200 | `qwen_image_21.json` for the standard model, `qwen_image_21_turbo.json` for Turbo; both default to `flash_attn3` |
+| A100 / A800 | Start the standard model with [qwen_image_21_torch.json](https://github.com/ModelTC/LightX2V/blob/main/configs/qwen_image_21/qwen_image_21_torch.json), using SDPA and Torch operators |
+| RTX 5090 | Use the dedicated image below and the [RTX 5090 configs](#32-rtx-5090-examples) |
+
+Do not retain the default `flash_attn3` on A100: it targets Hopper; see the [official requirements](https://github.com/Dao-AILab/flash-attention#flashattention-3-beta-release). Update `--config_json` in the service or offline launcher. Offload settings must still fit the available memory.
+
+For Turbo on A100, retain the Turbo JSON's sampling fields, including `infer_steps`, `sigmas` and `do_time_shift`, and merge in the operator fields below. Do not use the standard model's 40-step Torch config directly:
+
+```json
+{
+  "attn_type": "torch_sdpa",
+  "rope_type": "torch_real_rope",
+  "layer_norm_type": "torch",
+  "modulate_type": "torch",
+  "fused_qk_rms_norm": false,
+  "fused_block_ops": false
+}
+```
+
+Choose the [LightX2V Docker image](https://hub.docker.com/r/lightx2v/lightx2v/tags) for your GPU. Pull the corresponding image in a working directory on the host:
+
+```bash
+# H100 / H200 / A100 (choose the config from the table above)
+docker pull lightx2v/lightx2v:26062001
+
+# RTX 5090
+docker pull lightx2v/lightx2v:26062001-cu130-5090-fix-260921
+```
+
+Start a container using the selected image:
+
+```bash
+docker run --gpus all -it --ipc=host --name lightx2v-qwen \
+  -p 127.0.0.1:8000:8000 -v "$PWD":/workspace -w /workspace \
+  --entrypoint /bin/bash [image_id]
+```
+
+Clone the LightX2V source inside the container:
+
+```bash
+git clone https://github.com/ModelTC/LightX2V.git
+cd LightX2V
+python -m pip install -v -e .
+```
+
+Run the following commands from the LightX2V repository root inside the container. For an existing checkout, enter and install it directly. Open a second terminal in the same environment with `docker exec -it -w /workspace/LightX2V lightx2v-qwen /bin/bash`.
+
+## 2. Download the model { #1-model-download }
 
 Download the official weights from [Qwen/Qwen-Image-2.1](https://huggingface.co/Qwen/Qwen-Image-2.1):
 
@@ -37,39 +89,46 @@ Download the Turbo weights from [Qwen/Qwen-Image-2.1-Turbo](https://huggingface.
 hf download Qwen/Qwen-Image-2.1-Turbo --local-dir Qwen/Qwen-Image-2.1-Turbo
 ```
 
-## 2. Environment Setup
-
-For an existing environment, check dependencies against the [full installation guide](../getting_started/installation.md). General configurations use `flash_attn3`; see the [attention guide](../method_tutorials/attention.md) for backend selection. RTX 5090 uses its corresponding image and dedicated configurations below.
-
-Choose the [LightX2V Docker image](https://hub.docker.com/r/lightx2v/lightx2v/tags) for your GPU. Pull the corresponding image in a working directory on the host:
-
-```bash
-# H100, A100, etc.
-docker pull lightx2v/lightx2v:26062001
-
-# RTX 5090
-docker pull lightx2v/lightx2v:26062001-cu130-5090-fix-260921
-```
-
-Start a container using the selected image:
-
-```bash
-docker run --gpus all -itd --ipc=host --name [container_name] -v [mount_settings] --entrypoint /bin/bash [image_id]
-```
-
-Clone the LightX2V source inside the container:
-
-```bash
-git clone https://github.com/ModelTC/LightX2V.git
-```
-
-Run the following commands from the LightX2V repository root inside the container.
-
-## 3. Offline Inference
-
 <a id="first-run"></a>
+## 3. Start a service and send a request { #4-service-deployment-and-api-usage }
 
-### 3.1 General examples
+Set the repository path, model path, and GPU ID in `server/start_server.sh`, then start the server:
+
+```bash title="Terminal 1 · keep running"
+bash scripts/qwen_image_21/server/start_server.sh
+```
+
+The default port is `8000`. The server supports both text-to-image and image-to-image requests.
+
+Wait for `Application startup complete.`, then check `curl --fail http://localhost:8000/health` from the same container. Keep the server terminal open. This launcher selects the standard model; for Turbo, use its model directory and `configs/qwen_image_21/qwen_image_21_turbo.json` together.
+
+Once the server is ready, open a new terminal in the same container and send requests:
+
+=== "Text to image"
+
+    ```bash title="Terminal 2 · send a request"
+    python scripts/qwen_image_21/server/post_t2i.py
+    ```
+
+=== "Image editing"
+
+    Set `image_path` in the client to your reference image before running.
+
+    ```bash title="Terminal 2 · send a request"
+    python scripts/qwen_image_21/server/post_i2i.py
+    ```
+
+These HTTP clients wait for a PNG response and save it locally: `save_results/qwen_image_21_t2i.png` or `save_results/qwen_image_21_i2i.png`. Edit the prompt and run the client again; the service stays loaded. Unlike asynchronous video requests, this synchronous image route does not require polling a task ID.
+
+Edit `url`, `message`, and `output_path` directly; for image-to-image, also set `image_path`. The scripts already specify `task: "t2i"` and `task: "i2i"`, respectively.
+
+In requests, `size` is `[height, width]`; see the [size rules](#31-general-examples) for resolution details. For automatic image-to-image sizing, remove `size` from `message`.
+
+Set `"resolution": 2048` in `message` to override the startup config for that request; omit it or use `null` to keep the config. The image form endpoint and `/v1/images/generations` and `/v1/images/edits` also accept `resolution`.
+
+## 4. Offline inference { #3-offline-inference }
+
+### General examples { #31-general-examples }
 
 For a first image with the standard model, use [qwen_image_21_t2i.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/qwen_image_21/qwen_image_21_t2i.sh). Prepare the environment and download `Qwen-Image-2.1`, then set `lightx2v_path` (absolute repository path), `model_path` (absolute model directory), and `CUDA_VISIBLE_DEVICES` (GPU ID). Run from the repository root. If you downloaded Turbo weights, use the [Turbo entry points](#qwen-image-21-turbo).
 
@@ -109,7 +168,7 @@ bash scripts/qwen_image_21/qwen_image_21_turbo_i2i.sh
 
 For image-to-image, edit `--image_path` and `--prompt` as needed. The default input is the model's `assets/turbo-boat-input.png`.
 
-### 3.2 RTX 5090 examples
+### RTX 5090 examples { #32-rtx-5090-examples }
 
 The examples use these optimization techniques:
 
@@ -161,32 +220,6 @@ Tests use PyTorch 2.11.0+cu130, 40 steps, seed 42, CFG disabled, and the example
 Latency is the median of three consecutive requests after the first request in the same instance; dual-GPU samples use the slower rank. End-to-end timing includes image saving and excludes model loading and one-time initialization.
 
 Search the runtime log for **`RUN pipeline cost`** to find the pipeline latency in seconds.
-
-## 4. Service Deployment and API Usage
-
-Set the repository path, model path, and GPU ID in `server/start_server.sh`, then start the server:
-
-```bash
-bash scripts/qwen_image_21/server/start_server.sh
-```
-
-The default port is `8000`. The server supports both text-to-image and image-to-image requests.
-
-Once the server is ready, open a new terminal in the same container and send requests:
-
-```bash
-# Text-to-image
-python scripts/qwen_image_21/server/post_t2i.py
-
-# Image-to-image
-python scripts/qwen_image_21/server/post_i2i.py
-```
-
-Edit `url`, `message`, and `output_path` directly; for image-to-image, also set `image_path`. The scripts already specify `task: "t2i"` and `task: "i2i"`, respectively.
-
-Service requests follow the same size rules. For automatic image-to-image sizing, remove `size` from `message`.
-
-Set `"resolution": 2048` in `message` to override the startup config for that request; omit it or use `null` to keep the config. The image form endpoint and `/v1/images/generations` and `/v1/images/edits` also accept `resolution`.
 
 <a id="next-steps"></a>
 
