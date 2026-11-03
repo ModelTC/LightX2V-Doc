@@ -1,6 +1,6 @@
 ---
 title: Welcome to LightX2V
-description: From your first generation to faster image and video inference.
+description: A lightweight, efficient inference framework for image and video generation.
 home: true
 hide:
   - toc
@@ -10,11 +10,11 @@ hide:
 
 <div class="lx-hero-copy" markdown>
 
-# LightX2V Documentation
+# Welcome to LightX2V
 
-<p class="lx-hero-lead">Lighter, faster image and video inference.</p>
+<p class="lx-hero-lead">A lightweight, efficient inference framework for image and video generation.</p>
 
-Turn text and images into visual content. LightX2V brings model execution, inference acceleration and deployment into a lightweight framework, from your first generation to a working application.
+LightX2V supports a range of popular models for image generation, image editing, and video generation. Optimizations such as quantization, distillation, caching, and parallel inference improve generation speed and reduce GPU memory requirements. Python and service APIs simplify model deployment and application integration.
 
 <div class="lx-hero-actions" markdown>
 
@@ -29,89 +29,84 @@ Turn text and images into visual content. LightX2V brings model execution, infer
 
 </div>
 
-<div class="lx-capabilities" markdown>
+<div class="lx-entry-links" markdown>
 
-<div class="lx-capability" markdown>
-
-:material-movie-open-outline:{ .lx-feature-icon }
-
-### Generate images and videos
-
-Find a model for text-to-image, image editing, video or audiovisual generation.
-
-[Browse models →](models/index.md){ .lx-card-action }
-
-</div>
-
-<div class="lx-capability" markdown>
-
-:material-lightning-bolt-outline:{ .lx-feature-icon }
-
-### Combine acceleration methods
-
-Tune inference with quantization, feature caching, attention optimization and step distillation.
-
-[Choose an acceleration approach →](method_tutorials/index.md){ .lx-card-action }
-
-</div>
-
-<div class="lx-capability" markdown>
-
-:material-memory:{ .lx-feature-icon }
-
-### Work with available memory
-
-Use parameter offload, quantization and parallel configurations to fit your hardware.
-
-[See low-resource deployment →](deploy_guides/for_low_resource.md){ .lx-card-action }
-
-</div>
-
-<div class="lx-capability" markdown>
-
-:material-console-network-outline:{ .lx-feature-icon }
-
-### Connect apps and services
-
-Build generation workflows with the Python API, inference services, Gradio or ComfyUI.
-
-[Set up an inference service →](deploy_guides/deploy_service.md){ .lx-card-action }
-
-</div>
+[:material-rocket-launch-outline: **First generation**<span>From setup to your first video</span>](getting_started/index.md)
+[:material-view-grid-outline: **Choose a model**<span>Find examples by task</span>](models/index.md)
+[:material-lightning-bolt-outline: **Accelerate inference**<span>Balance speed, memory, and quality</span>](method_tutorials/index.md)
+[:material-console-network-outline: **Deploy a service**<span>Connect APIs and applications</span>](deploy_guides/deploy_service.md)
 
 </div>
 
 ## Start here
 
-Choose an entry point for your first generation.
+Complete [environment and model setup](getting_started/index.md), then choose how to run inference. Run CLI and Python examples from the LightX2V repository root.
 
-<div class="lx-start-grid" markdown>
+<div class="lx-examples" markdown>
 
-<div class="lx-start-main" markdown>
+=== ":material-console: CLI"
 
-### Generate your first video
+    ### Generate your first video
 
-Prepare the environment, download [Wan2.1-T2V-1.3B](models/wan.md#first-run), and generate a video with the provided script.
+    This example uses Wan2.1-T2V-1.3B. Replace the model path with your local directory and select an [attention backend](method_tutorials/attention.md) compatible with your GPU.
 
-<ol class="lx-steps">
-<li><span>1</span>Set up</li>
-<li><span>2</span>Get weights</li>
-<li><span>3</span>Generate</li>
-</ol>
+    ```bash title="Terminal"
+    python -m lightx2v.infer \
+      --model_cls wan2.1 \
+      --task t2v \
+      --model_path /path/to/Wan2.1-T2V-1.3B \
+      --config_json configs/wan/wan_t2v.json \
+      --prompt "A cat walking on a sunny beach." \
+      --negative_prompt "blurry, low quality" \
+      --seed 42 \
+      --save_result_path save_results/first_video.mp4
+    ```
 
-[Open the quickstart :material-arrow-right:](getting_started/index.md){ .lx-text-link }
+    [Read the generation walkthrough :material-arrow-right:](getting_started/first_generation.md){ .lx-text-link }
 
-</div>
+=== ":material-code-braces: Python"
 
-<div class="lx-start-links" markdown>
+    ### Call inference from your app
 
-[:material-code-braces: **Use the Python API**<br><span>Create a pipeline and reuse it in your application.</span>](getting_started/python_api.md)
+    Create a pipeline, load the model, then call `generate()`. Replace the model path and check that the configured [attention backend](method_tutorials/attention.md) supports your GPU.
 
-[:material-view-grid-outline: **Choose a model by task**<br><span>Find its weights, scripts and configurations.</span>](models/index.md)
+    ```python title="generate.py"
+    from lightx2v import LightX2VPipeline
 
-[:material-monitor: **Use a graphical interface**<br><span>Set up an interactive generation UI with Gradio.</span>](deploy_guides/deploy_gradio.md)
+    pipe = LightX2VPipeline(
+        model_path="/path/to/Wan2.1-T2V-1.3B",
+        model_cls="wan2.1",
+        task="t2v",
+    )
+    pipe.create_generator(config_json="configs/wan/wan_t2v.json")
+    pipe.generate(
+        prompt="A cat walking on a sunny beach.",
+        negative_prompt="blurry, low quality",
+        seed=42,
+        save_result_path="save_results/first_video.mp4",
+    )
+    ```
 
-</div>
+    [Explore the Python API :material-arrow-right:](getting_started/python_api.md){ .lx-text-link }
+
+=== ":material-api: Service API"
+
+    ### Submit a task over HTTP
+
+    Start a Wan2.1 T2V service using the [deployment guide](deploy_guides/deploy_service.md). The response includes a `task_id` for checking progress and retrieving the result.
+
+    ```bash title="Terminal"
+    curl -X POST http://localhost:8000/v1/tasks/video/ \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "prompt": "A cat walking on a sunny beach.",
+        "negative_prompt": "blurry, low quality",
+        "seed": 42,
+        "save_result_path": "first_video.mp4"
+      }'
+    ```
+
+    [Read the service and client guide :material-arrow-right:](deploy_guides/deploy_service.md){ .lx-text-link }
 
 </div>
 

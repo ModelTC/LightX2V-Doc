@@ -1,5 +1,23 @@
 {% extends "base.html" %}
 
+{# Detect rendered math, not dollar signs in code samples. #}
+{% set lx_has_math = page and 'class="arithmatex"' in page.content %}
+
+{% block styles %}
+{{ super() }}
+{% if lx_has_math %}
+<link rel="stylesheet" href="{{ 'assets/vendor/katex/katex.min.css' | url }}">
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% if lx_has_math %}
+<script defer src="{{ 'assets/vendor/katex/katex.min.js' | url }}"></script>
+<script defer src="{{ 'assets/javascripts/math.js' | url }}"></script>
+{% endif %}
+{% endblock %}
+
 {% block site_meta %}
 {# Material 9.8 treats head alternates as separate site roots and fetches a
    sitemap beside each one. Our switch links directly to paired .html pages;

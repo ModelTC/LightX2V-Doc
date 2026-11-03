@@ -1,6 +1,6 @@
 ---
-title: 欢迎使用 LightX2V
-description: 从第一次生成，到更高效的图像与视频推理。
+title: 欢迎来到 LightX2V
+description: 轻量、高效的图像与视频生成推理框架。
 home: true
 hide:
   - toc
@@ -10,11 +10,11 @@ hide:
 
 <div class="lx-hero-copy" markdown>
 
-# LightX2V 文档
+# 欢迎来到 LightX2V
 
-<p class="lx-hero-lead">让图像与视频推理，更轻、更快。</p>
+<p class="lx-hero-lead">轻量、高效的图像与视频生成推理框架。</p>
 
-从文本、图像到视觉内容。LightX2V 将模型运行、推理加速与部署整合到一个轻量级框架中，帮助你从第一次生成走向实际应用。
+LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成等任务。通过量化、蒸馏、缓存与并行推理等优化技术，提升生成速度、降低显存需求，并提供 Python 接口与服务 API，便于模型部署和应用集成。
 
 <div class="lx-hero-actions" markdown>
 
@@ -29,89 +29,84 @@ hide:
 
 </div>
 
-<div class="lx-capabilities" markdown>
+<div class="lx-entry-links" markdown>
 
-<div class="lx-capability" markdown>
-
-:material-movie-open-outline:{ .lx-feature-icon }
-
-### 图像与视频生成
-
-从文生图、图像编辑，到视频与音视频生成，按任务找到合适的模型。
-
-[浏览模型 →](models/index.md){ .lx-card-action }
-
-</div>
-
-<div class="lx-capability" markdown>
-
-:material-lightning-bolt-outline:{ .lx-feature-icon }
-
-### 组合推理加速
-
-结合量化、特征缓存、注意力优化与步数蒸馏，调整推理性能。
-
-[选择加速方案 →](method_tutorials/index.md){ .lx-card-action }
-
-</div>
-
-<div class="lx-capability" markdown>
-
-:material-memory:{ .lx-feature-icon }
-
-### 适配可用显存
-
-通过参数卸载、量化与并行配置，让模型适应你的硬件资源。
-
-[查看低资源部署 →](deploy_guides/for_low_resource.md){ .lx-card-action }
-
-</div>
-
-<div class="lx-capability" markdown>
-
-:material-console-network-outline:{ .lx-feature-icon }
-
-### 接入应用与服务
-
-使用 Python API、推理服务、Gradio 或 ComfyUI 构建生成工作流。
-
-[查看服务部署 →](deploy_guides/deploy_service.md){ .lx-card-action }
-
-</div>
+[:material-rocket-launch-outline: **首次运行**<span>从安装到第一个视频</span>](getting_started/index.md)
+[:material-view-grid-outline: **选择模型**<span>按生成任务查找示例</span>](models/index.md)
+[:material-lightning-bolt-outline: **推理加速**<span>权衡速度、显存与质量</span>](method_tutorials/index.md)
+[:material-console-network-outline: **部署服务**<span>接入 API 与应用</span>](deploy_guides/deploy_service.md)
 
 </div>
 
 ## 从这里开始
 
-选择一个入口，完成你的第一次生成。
+先完成[环境与权重准备](getting_started/index.md)，再选择调用方式。命令行和 Python 示例均在 LightX2V 仓库根目录运行。
 
-<div class="lx-start-grid" markdown>
+<div class="lx-examples" markdown>
 
-<div class="lx-start-main" markdown>
+=== ":material-console: 命令行"
 
-### 运行第一个视频示例
+    ### 生成第一个视频
 
-准备环境，下载 [Wan2.1-T2V-1.3B](models/wan.md#first-run)，并通过现有脚本生成一段视频。
+    以 Wan2.1-T2V-1.3B 为例。将模型路径替换为本地目录，并在配置中选择与 GPU 匹配的[注意力算子](method_tutorials/attention.md)。
 
-<ol class="lx-steps">
-<li><span>1</span>安装环境</li>
-<li><span>2</span>下载模型</li>
-<li><span>3</span>运行生成</li>
-</ol>
+    ```bash title="Terminal"
+    python -m lightx2v.infer \
+      --model_cls wan2.1 \
+      --task t2v \
+      --model_path /path/to/Wan2.1-T2V-1.3B \
+      --config_json configs/wan/wan_t2v.json \
+      --prompt "A cat walking on a sunny beach." \
+      --negative_prompt "blurry, low quality" \
+      --seed 42 \
+      --save_result_path save_results/first_video.mp4
+    ```
 
-[打开快速入门 :material-arrow-right:](getting_started/index.md){ .lx-text-link }
+    [查看完整生成流程 :material-arrow-right:](getting_started/first_generation.md){ .lx-text-link }
 
-</div>
+=== ":material-code-braces: Python"
 
-<div class="lx-start-links" markdown>
+    ### 在应用中调用
 
-[:material-code-braces: **在 Python 中调用**<br><span>创建 Pipeline，在应用中复用模型。</span>](getting_started/python_api.md)
+    创建 Pipeline，加载模型后调用 `generate()`。替换模型路径，并确认配置中的[注意力算子](method_tutorials/attention.md)适用于当前 GPU。
 
-[:material-view-grid-outline: **按任务选择模型**<br><span>找到模型对应的权重、脚本与配置。</span>](models/index.md)
+    ```python title="generate.py"
+    from lightx2v import LightX2VPipeline
 
-[:material-monitor: **使用图形界面**<br><span>通过 Gradio 搭建可交互的生成界面。</span>](deploy_guides/deploy_gradio.md)
+    pipe = LightX2VPipeline(
+        model_path="/path/to/Wan2.1-T2V-1.3B",
+        model_cls="wan2.1",
+        task="t2v",
+    )
+    pipe.create_generator(config_json="configs/wan/wan_t2v.json")
+    pipe.generate(
+        prompt="A cat walking on a sunny beach.",
+        negative_prompt="blurry, low quality",
+        seed=42,
+        save_result_path="save_results/first_video.mp4",
+    )
+    ```
 
-</div>
+    [了解 Python API :material-arrow-right:](getting_started/python_api.md){ .lx-text-link }
+
+=== ":material-api: 服务 API"
+
+    ### 通过 HTTP 提交任务
+
+    先按[服务部署指南](deploy_guides/deploy_service.md)启动 Wan2.1 T2V 服务。请求返回 `task_id`，用于查询进度和获取生成结果。
+
+    ```bash title="Terminal"
+    curl -X POST http://localhost:8000/v1/tasks/video/ \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "prompt": "A cat walking on a sunny beach.",
+        "negative_prompt": "blurry, low quality",
+        "seed": 42,
+        "save_result_path": "first_video.mp4"
+      }'
+    ```
+
+    [查看服务与客户端指南 :material-arrow-right:](deploy_guides/deploy_service.md){ .lx-text-link }
 
 </div>
 
