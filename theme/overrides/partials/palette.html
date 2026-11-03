@@ -1,0 +1,24 @@
+{% set appearance_label = "Appearance" if config.theme.language == "en" else "外观模式" %}
+<div class="md-header__option lx-theme">
+  {# Keep Material's palette engine separate from the visible menu. #}
+  <form data-md-component="palette" hidden aria-hidden="true">
+    {% for option in config.theme.palette %}
+      <input class="md-option" type="radio" name="__palette" id="__palette_{{ loop.index0 }}" tabindex="-1" data-md-color-media="{{ option.media }}" data-md-color-scheme="{{ option.scheme }}" data-md-color-primary="{{ option.primary }}" data-md-color-accent="{{ option.accent }}">
+      <span hidden></span>
+    {% endfor %}
+  </form>
+  <button class="md-header__button md-icon lx-theme-toggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="lx-theme-menu" aria-label="{{ appearance_label }}" title="{{ appearance_label }}" data-label="{{ appearance_label }}">
+    {% for option in config.theme.palette %}
+      <span class="lx-theme-current" data-theme-index="{{ loop.index0 }}" aria-hidden="true">{% include ".icons/" ~ option.toggle.icon ~ ".svg" %}</span>
+    {% endfor %}
+  </button>
+  <div class="lx-theme-menu" id="lx-theme-menu" role="menu" aria-label="{{ appearance_label }}" hidden>
+    {% for option in config.theme.palette %}
+      <button class="lx-theme-choice" type="button" role="menuitemradio" aria-checked="{{ 'true' if option.media == '(prefers-color-scheme)' else 'false' }}" tabindex="-1" data-palette-index="{{ loop.index0 }}">
+        <span class="md-icon" aria-hidden="true">{% include ".icons/" ~ option.toggle.icon ~ ".svg" %}</span>
+        <span class="lx-theme-label">{{ option.toggle.name }}</span>
+        <span class="md-icon lx-theme-check" aria-hidden="true">{% include ".icons/material/check.svg" %}</span>
+      </button>
+    {% endfor %}
+  </div>
+</div>

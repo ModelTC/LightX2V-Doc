@@ -1,0 +1,23 @@
+{# Apply preference before content paints, and migrate the old two-state index. #}
+<script>
+(() => {
+  const inputs = [...document.querySelectorAll('[data-md-component="palette"] input')];
+  if (!inputs.length) return;
+  let saved;
+  try { saved = __md_get("__palette"); } catch (_) {}
+  const defaultInput = inputs.find(input => input.dataset.mdColorMedia === "(prefers-color-scheme)");
+  const selected = inputs.find(input => input.dataset.mdColorMedia === saved?.color?.media) || defaultInput;
+  const media = selected.dataset.mdColorMedia;
+  const resolved = media === "(prefers-color-scheme)"
+    ? inputs.find(input => input.dataset.mdColorMedia === (matchMedia("(prefers-color-scheme: dark)").matches ? "(prefers-color-scheme: dark)" : "(prefers-color-scheme: light)"))
+    : selected;
+  const color = {
+    media,
+    scheme: resolved.dataset.mdColorScheme,
+    primary: resolved.dataset.mdColorPrimary,
+    accent: resolved.dataset.mdColorAccent
+  };
+  __md_set("__palette", { index: inputs.indexOf(selected), color });
+  for (const [key, value] of Object.entries(color)) document.body.setAttribute(`data-md-color-${key}`, value);
+})();
+</script>

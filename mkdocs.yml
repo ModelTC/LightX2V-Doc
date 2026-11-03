@@ -13,26 +13,33 @@ theme:
   name: material
   language: zh
   custom_dir: theme/overrides
-  logo: assets/lightx2v.webp
-  favicon: assets/favicon.svg
+  logo: assets/lightx2v-logo.svg
+  favicon: assets/lightx2v-mark.png
   font: false
   icon:
     repo: fontawesome/brands/github
   palette:
+    - media: "(prefers-color-scheme)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/monitor
+        name: 跟随系统
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: custom
       accent: custom
       toggle:
-        icon: material/weather-night
-        name: 切换到深色模式
+        icon: material/weather-sunny
+        name: 浅色
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: custom
       accent: custom
       toggle:
-        icon: material/weather-sunny
-        name: 切换到浅色模式
+        icon: material/weather-night
+        name: 深色
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -83,6 +90,7 @@ nav:
       - 变分辨率推理: method_tutorials/changing_resolution.md
       - 步数蒸馏: method_tutorials/step_distill.md
   - 部署指南:
+      - 部署总览: deploy_guides/index.md
       - 按资源与延迟选择:
           - 低资源部署: deploy_guides/for_low_resource.md
           - 低延迟部署: deploy_guides/for_low_latency.md
@@ -117,9 +125,11 @@ plugins:
           theme:
             palette:
               - toggle:
-                  name: Switch to dark mode
+                  name: System
               - toggle:
-                  name: Switch to light mode
+                  name: Light
+              - toggle:
+                  name: Dark
           nav_translations:
             概览: Overview
             欢迎使用: Welcome
@@ -151,6 +161,7 @@ plugins:
             变分辨率推理: Variable resolution
             步数蒸馏: Step distillation
             部署指南: Deployment
+            部署总览: Deployment overview
             按资源与延迟选择: Resources and latency
             低资源部署: Low-resource deployment
             低延迟部署: Low-latency deployment
@@ -167,6 +178,8 @@ plugins:
             性能分析: Performance profiling
   - search:
       lang: [zh, en]
+      # Keep technical terms intact for prefix matching (e.g. "cache").
+      pipeline: []
 
 hooks:
   - theme/hooks.py
@@ -180,6 +193,7 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      toc_depth: 3
       slugify: !!python/name:markdown.extensions.toc.slugify_unicode
   - pymdownx.arithmatex:
       generic: true

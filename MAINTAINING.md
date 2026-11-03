@@ -21,6 +21,8 @@
 
 快速入门内容统一放在 `docs/getting_started/`：`index.md` 是安装与首次生成的入口，`installation.md` 是完整安装指南，其余页面分别介绍生成、Python API、模型结构与性能基准。英文文件使用相同文件名加 `.en.md` 后缀。
 
+完整安装指南的三种方式通过 `lx-method-links` 直达对应章节，详细步骤保留在同一页面，便于链接与搜索。`docs/deploy_guides/index.md` 是部署总览，按接入方式和运行需求连接已有指南；新增部署入口时同步维护英文版本与导航。
+
 ### 链接与资源
 
 Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其解析到当前语言的页面。重命名文件或调整标题时，检查导航、交叉引用和已有锚点；模型指南中的 `choose-task`、`first-run`、`next-steps` 被首页和模型目录引用，应保持稳定。
@@ -29,7 +31,7 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 普通插图优先使用 Markdown 图片语法。共享资源放在 `theme/assets/`，构建后使用站点的 `assets/` 路径。使用原始 HTML 图片或视频标签时，分别检查中英文页面的相对路径。
 
-页头 Logo 使用 `theme/assets/lightx2v.webp`，宽 480 像素，以兼顾高清屏与加载速度。更换时按实际显示尺寸准备资源，避免直接使用大尺寸原图。
+页头使用一体式透明标识 `theme/assets/lightx2v-logo.svg`，沿用原图中圆润、直立的字标和图文比例，去掉底部小字。SVG 内嵌优化后的透明位图，无需加载字体；`#dark` 仅调亮字标，`#mark` 供手机菜单单独显示图标。`partials/logo.html` 与 CSS 控制显示尺寸。独立透明图标 `lightx2v-mark.png` 同时用作浏览器标签页图标（favicon），原始品牌图保留在 `lightx2v.webp`。
 
 视频应提供播放控件并按需加载。外部附件和模型资源需要网络访问，站点构建不会验证这些外部资源的可用性。
 
@@ -43,6 +45,8 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 界面文案位于 `theme/i18n.yml`，模板位于 `theme/overrides/`，样式与交互脚本位于 `theme/assets/`。`theme/hooks.py` 负责生成模型目录、加入共享资源和补充语言切换逻辑。
 
+外观菜单提供跟随系统、浅色、深色三种选择，首次访问默认跟随系统，之后保留用户选择。`partials/palette.html` 定制菜单，主题保存和系统变化仍由 Material 处理；`partials/javascripts/palette.html` 在正文显示前应用偏好，并将旧版双模式记录映射到新选项。修改时检查刷新、语言切换、系统主题变化和键盘操作。
+
 中英文首页共用 `theme/overrides/partials/hero-visual.html` 中的 SVG 插画，由构建钩子替换首页的 `<!-- hero-visual -->` 标记。插画与主题颜色联动，不需要额外图片依赖。
 
 首页的命令行、Python 和服务 API 示例使用原生 Markdown 标签页，桌面端纵向排列，窄屏放在代码上方。示例与对应教程同步维护；修改时检查中英文代码一致、标签切换、键盘操作和复制按钮。提示框的图标与侧边线保留语义颜色，标题背景使用统一的浅灰或深色表面。
@@ -55,9 +59,17 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 锚点跳转使用 Material 提供的 `scroll-margin-top` 避让固定页头，不再叠加全局 `scroll-padding-top`，避免跳转位置与右侧目录高亮不一致。
 
+目录展示到三级标题；四级及更深的步骤标题仍保留正文锚点，避免长教程的右侧目录过于拥挤。
+
+标题图标按内容含义选择，目前在完整安装指南与部署总览试用。使用主题已有的 Material SVG，配合 `lx-heading-icon` 和 `aria-hidden="true"`；标题设置 `lx-icon-heading`、原有锚点 ID 和纯文字 `data-toc-label`，让电脑和手机目录保持简洁。普通标题无需统一加图标，提示与警告优先使用带语义图标的原生提示框。
+
 前后篇链接由 `partials/page-navigation.html` 渲染在正文末尾，遵循 `navigation.footer` 和页面的 `hide: [footer]` 配置；`partials/footer.html` 仅保留版权和社区链接。升级主题时检查这两个覆盖模板。
 
 模型筛选通过 URL 参数 `model` 和 `task` 保存状态，应支持刷新、浏览器返回和语言切换。全局搜索使用独立的 `q` 参数，其索引包含中英文内容。
+
+全站搜索保留 Material 的搜索引擎。`partials/search.html` 提供搜索入口与弹层；`reading.js` 补充 Ctrl/⌘ K 快捷键，以及结果的文档位置和语言标记。桌面端使用胶囊入口和居中弹层，手机端沿用全屏搜索。升级主题时核对 `data-md-component`，并检查 `/`、Ctrl/⌘ K 打开、方向键选择、Enter 跳转、清空、Esc 关闭及触屏操作。
+
+搜索配置使用 `pipeline: []` 保留技术术语原词，避免英文词干处理导致 `cache` 等前缀查询漏搜；中英文分词与结果排序仍由主题处理。
 
 模型目录从 `models.yml` 的中英文名称、描述和标签生成同一份搜索文本。分类按钮的数量表示当前关键词在各分类中的匹配数；空结果页可以清除分类而保留关键词。首页任务入口使用 `?task=<分类>#model-catalog` 直达筛选结果，无 JavaScript 时仍可浏览完整模型列表。
 

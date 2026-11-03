@@ -1,20 +1,18 @@
 # Full installation guide { #lightx2v-quick-start-guide }
 
-After setup, follow [Generate your first video](first_generation.md), or use the [Python API](python_api.md).
+<p class="lx-page-lead">Choose an installation method and prepare the environment, images and kernels.</p>
 
-This page covers Linux and Windows setup, container images, and operator dependencies. For a walkthrough from setup to a generated video, start with [Installation and first generation](index.md).
+This page provides full setup instructions for Linux and Windows. For a walkthrough to your first output, start with [Installation and first generation](index.md).
 
-## 📋 Table of Contents
+<div class="lx-method-links" id="table-of-contents" markdown>
 
-- [System Requirements](#system-requirements)
-- [Linux Environment Setup](#linux-environment-setup)
-  - [Docker Environment (Recommended)](#docker-environment-recommended)
-  - [Conda Environment Setup](#conda-environment-setup)
-- [Windows Environment Setup](#windows-environment-setup)
-- [Inference Usage](#inference-usage)
+[:material-docker: **Linux Docker**<span>Recommended: use a prebuilt image to simplify setup.</span>](#docker-environment-recommended){ .lx-method-recommended }
+[:material-console: **Linux Conda**<span>Manage your Python environment and install the kernels you need.</span>](#conda-environment-setup)
+[:material-microsoft-windows: **Windows**<span>Use Conda with matching Windows dependencies.</span>](#windows-environment-setup)
 
-<a id="system-requirements"></a>
-## 🚀 System Requirements
+</div>
+
+## <span class="lx-heading-icon" aria-hidden="true">:material-memory:</span> System Requirements { #system-requirements .lx-icon-heading data-toc-label="System Requirements" }
 
 - **Operating System**: Linux (Ubuntu 18.04+) or Windows 10/11
 - **Python**: 3.10 or higher
@@ -22,13 +20,12 @@ This page covers Linux and Windows setup, container images, and operator depende
 - **Memory**: Enough host RAM for the selected model, including CPU offload buffers
 - **Storage**: At least 50GB available space
 
-<a id="linux-environment-setup"></a>
-## 🐧 Linux Environment Setup
+## <span class="lx-heading-icon" aria-hidden="true">:material-console:</span> Linux Environment Setup { #linux-environment-setup .lx-icon-heading data-toc-label="Linux Environment Setup" }
 
 <a id="docker-environment-recommended"></a>
-### 🐳 Docker Environment (Recommended)
+### Docker Environment (Recommended)
 
-We strongly recommend using the Docker environment, which is the simplest and fastest installation method.
+Prepare the environment with a prebuilt image, then install the checked-out repository inside the container.
 
 #### 1. Pull Image
 
@@ -86,9 +83,9 @@ docker pull registry.cn-hangzhou.aliyuncs.com/yongyang/lightx2v:25101501-cu124
 ```
 
 <a id="conda-environment-setup"></a>
-### 🐍 Conda Environment Setup
+### Conda Environment Setup
 
-If you prefer to set up the environment yourself using Conda, please follow these steps:
+Create a Conda environment, then install the kernels required by your GPU and model configuration.
 
 #### Step 1: Clone Repository
 
@@ -165,11 +162,8 @@ git clone https://github.com/KONAKONA666/q8_kernels.git
 (cd q8_kernels && git submodule update --init --recursive && python setup.py install)
 ```
 
-> 💡 **Note**:
->
-> - You can skip this step if you don't need quantization functionality
-> - Quantized models can be downloaded from [LightX2V HuggingFace](https://huggingface.co/lightx2v)
-> - For more quantization information, please refer to the [Quantization Documentation](../method_tutorials/quantization.md)
+!!! tip "Install quantization kernels as needed"
+    Skip this step if you do not use quantization. Find weights on [LightX2V Hugging Face](https://huggingface.co/lightx2v) and choose modes and kernels using the [quantization guide](../method_tutorials/quantization.md).
 
 #### Step 6: Verify Installation
 
@@ -178,12 +172,11 @@ import lightx2v
 print(f"LightX2V Version: {lightx2v.__version__}")
 ```
 
-<a id="windows-environment-setup"></a>
-## 🪟 Windows Environment Setup
+## <span class="lx-heading-icon" aria-hidden="true">:material-microsoft-windows:</span> Windows Environment Setup { #windows-environment-setup .lx-icon-heading data-toc-label="Windows Environment Setup" }
 
-Windows systems only support Conda environment setup. Please follow these steps:
+The following instructions use Conda to prepare a Windows environment.
 
-### 🐍 Conda Environment Setup
+### Conda Environment Setup
 
 #### Step 1: Check CUDA Version
 
@@ -205,7 +198,8 @@ REM Activate environment
 conda activate lightx2v
 ```
 
-> 💡 **Note**: Python 3.10 or higher is recommended for best compatibility.
+!!! tip "Python version"
+    Python 3.10 or higher is recommended for best compatibility.
 
 #### Step 3: Install PyTorch Framework
 
@@ -266,7 +260,8 @@ REM Install SageAttention (please adjust according to actual filename)
 pip install sageattention-2.1.1+cu126torch2.6.0-cp312-cp312-win_amd64.whl
 ```
 
-> ⚠️ **Note**: SageAttention's CUDA version doesn't need to be strictly aligned, but Python and PyTorch versions must match.
+!!! warning "SageAttention version compatibility"
+    SageAttention's CUDA version doesn't need to be strictly aligned, but Python and PyTorch versions must match.
 
 #### Step 6: Install Quantization Operators (Optional)
 
@@ -303,11 +298,10 @@ popd
 
 For other GPUs, it is recommended to install `q8_kernel==0.5.0`. Please refer to [LTX-Video-Q8-Kernels](https://github.com/Lightricks/LTX-Video-Q8-Kernels).
 
-> 💡 **Note**:
->
-> - It is recommended to use the default Triton kernel for inference
-> - Quantized models can be downloaded from [LightX2V HuggingFace](https://huggingface.co/lightx2v)
-> - For more quantization information, please refer to the [Quantization Documentation](../method_tutorials/quantization.md)
+!!! tip "Quantization and weights"
+    - It is recommended to use the default Triton kernel for inference
+    - Quantized models can be downloaded from [LightX2V HuggingFace](https://huggingface.co/lightx2v)
+    - For more quantization information, please refer to the [Quantization Documentation](../method_tutorials/quantization.md)
 
 #### Step 7: Verify Installation
 
@@ -316,10 +310,9 @@ import lightx2v
 print(f"LightX2V Version: {lightx2v.__version__}")
 ```
 
-<a id="inference-usage"></a>
-## 🎯 Inference Usage
+## <span class="lx-heading-icon" aria-hidden="true">:material-play-circle-outline:</span> Inference Usage { #inference-usage .lx-icon-heading data-toc-label="Inference Usage" }
 
-### 📥 Model Preparation
+### Model Preparation
 
 Before starting inference, you need to download the model files in advance. We recommend:
 
@@ -327,13 +320,13 @@ Before starting inference, you need to download the model files in advance. We r
 - **Storage Location**: It's recommended to store models on SSD disks for better read performance
 - **Available Models**: Including Wan2.1-I2V, Wan2.1-T2V, and other models supporting different resolutions and functionalities
 
-### 📁 Configuration Files and Scripts
+### Configuration Files and Scripts
 
 The configuration files used for inference are available [here](https://github.com/ModelTC/LightX2V/tree/main/configs), and scripts are available [here](https://github.com/ModelTC/LightX2V/tree/main/scripts).
 
 You need to configure the downloaded model path in the run script. In addition to the input arguments in the script, there are also some necessary parameters in the configuration file specified by `--config_json`. You can modify them as needed.
 
-### 🚀 Start Inference
+### Start Inference
 
 #### Linux Environment
 
@@ -382,15 +375,14 @@ pipe.generate(
 )
 ```
 
-> 💡 **More Examples**: For more usage examples including quantization, offloading, caching, and other advanced configurations, please refer to the [Python API guide](python_api.md).
+!!! tip "More examples"
+    For more usage examples including quantization, offloading, caching, and other advanced configurations, please refer to the [Python API guide](python_api.md).
 
-## 📞 Get Help
+## <span class="lx-heading-icon" aria-hidden="true">:material-lifebuoy:</span> Get Help { #get-help .lx-icon-heading data-toc-label="Get Help" }
 
 If you encounter problems during installation or usage, please:
 
 1. Search for related issues in [GitHub Issues](https://github.com/ModelTC/LightX2V/issues)
 2. Submit a new Issue describing your problem
 
----
-
-🎉 **Congratulations!** You have successfully set up the LightX2V environment and can now start enjoying video generation!
+Once the environment is ready, [generate your first video](first_generation.md) or integrate with the [Python API](python_api.md).
