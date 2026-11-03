@@ -38,9 +38,9 @@ LightX2V supports a range of popular models for image generation, image editing,
 
 </div>
 
-## Start here
+## Run and integrate { #start-here }
 
-Complete [environment and model setup](getting_started/index.md), then choose how to run inference. Run CLI and Python examples from the LightX2V repository root.
+Complete [environment and model setup](getting_started/index.md), then choose the CLI, Python, or HTTP API. Run CLI and Python examples from the LightX2V repository root.
 
 <div class="lx-examples" markdown>
 
@@ -110,35 +110,68 @@ Complete [environment and model setup](getting_started/index.md), then choose ho
 
 </div>
 
-## Explore models by task { #explore-the-model-ecosystem }
+<div class="lx-section-heading" markdown>
 
-Start with what you want to create, then find the models and examples for that task.
+## Find models by task { #explore-the-model-ecosystem }
 
-<div class="lx-task-shortcuts" markdown>
-
-[:material-video-outline: **Video and audio**<span>Wan, MiniMax-H3, LTX and more</span>](models/index.md?task=video#model-catalog)
-[:material-image-outline: **Image generation and editing**<span>Qwen-Image, Z-Image, FLUX.2 and more</span>](models/index.md?task=image#model-catalog)
-[:material-auto-fix: **Restoration and upscaling**<span>SeedVR2, SwiftVR, RelayVSR</span>](models/index.md?task=restore#model-catalog)
-[:material-cube-outline: **Interaction and spatial tasks**<span>EdenLive, WorldMirror, WorldPlay</span>](models/index.md?task=world#model-catalog)
+[Browse all models](models/index.md){ .lx-text-link }
 
 </div>
 
-[View the model catalog :material-arrow-right:](models/index.md){ .lx-text-link }
+Choose what you want to create or process, then find a model and its examples.
+
+<div class="lx-task-shortcuts" markdown>
+
+[:material-video-outline: **Video and audio**<span class="lx-task-description">Generate video from text or images, with options for synchronized audio.</span><span class="lx-task-models">Wan, MiniMax-H3, LTX</span>](models/index.md?task=video#model-catalog)
+[:material-image-outline: **Image generation and editing**<span class="lx-task-description">Create images from prompts or edit existing images.</span><span class="lx-task-models">Qwen-Image, Z-Image, FLUX.2</span>](models/index.md?task=image#model-catalog)
+[:material-auto-fix: **Restoration and upscaling**<span class="lx-task-description">Restore images and videos, and improve resolution and detail.</span><span class="lx-task-models">SeedVR2, SwiftVR, RelayVSR</span>](models/index.md?task=restore#model-catalog)
+[:material-cube-outline: **Interaction and spatial tasks**<span class="lx-task-description">Explore interactive video, world models, and 3D reconstruction.</span><span class="lx-task-models">EdenLive, WorldMirror, WorldPlay</span>](models/index.md?task=world#model-catalog)
+
+</div>
+
+<div class="lx-home-bottom" markdown>
+
+<section class="lx-home-updates" markdown>
 
 ## Recent updates
 
 <div class="lx-updates" markdown>
 
-<div markdown><time datetime="2026-10-26">2026.10.26</time><p markdown>[New autoregressive video model entry points](https://github.com/ModelTC/LightX2V/blob/main/README.md)<br><span>Scripts and configurations for TaoMate-H3, StreamRender-H3, Matrix-Game-4 and more.</span></p></div>
-<div markdown><time datetime="2026-10-18">2026.10.18</time><p markdown>[Interactive video generation with EdenLive](https://github.com/ModelTC/LightX2V/blob/main/scripts/edenlive/README.md)<br><span>Control generation with text, a target first frame and proxy recordings.</span></p></div>
-<div markdown><time datetime="2026-10-13">2026.10.13</time><p markdown>[Run LightX2V on a MacBook](https://github.com/ModelTC/LightX2V-Mac-App)<br><span>Generate and edit images locally with a native macOS app.</span></p></div>
+<div markdown>
+
+<time datetime="2026-10-26">2026.10.26</time>
+
+[New autoregressive video model entry points](https://github.com/ModelTC/LightX2V/blob/main/README.md)<br><span>Scripts and configurations for TaoMate-H3, StreamRender-H3, Matrix-Game-4 and more.</span>
+
+</div>
+<div markdown>
+
+<time datetime="2026-10-18">2026.10.18</time>
+
+[Interactive video generation with EdenLive](https://github.com/ModelTC/LightX2V/blob/main/scripts/edenlive/README.md)<br><span>Control generation with text, a target first frame and proxy recordings.</span>
+
+</div>
+<div markdown>
+
+<time datetime="2026-10-13">2026.10.13</time>
+
+[Run LightX2V on a MacBook](https://github.com/ModelTC/LightX2V-Mac-App)<br><span>Generate and edit images locally with a native macOS app.</span>
 
 </div>
 
-<div class="lx-community" markdown>
+</div>
 
-**Help improve LightX2V**
+</section>
 
-[Documentation issues](https://github.com/ModelTC/LightX2V-Doc/issues) · [Inference issues](https://github.com/ModelTC/LightX2V/issues) · [Get model weights](https://huggingface.co/lightx2v) · [Read the technical blog](https://light-ai.top/LightX2V-BLOG/)
+<aside class="lx-resource-links" markdown>
+
+## Resources and feedback
+
+[**Get model weights**<span>Find quantized, distilled, and other model weights.</span>](https://huggingface.co/lightx2v)
+[**Read the technical blog**<span>Explore inference optimizations and engineering notes.</span>](https://light-ai.top/LightX2V-BLOG/)
+[**Report a documentation issue**<span>Flag an error or suggest a clearer explanation.</span>](https://github.com/ModelTC/LightX2V-Doc/issues)
+[**Report an inference issue**<span>Include your environment, configuration, and steps to reproduce.</span>](https://github.com/ModelTC/LightX2V/issues)
+
+</aside>
 
 </div>

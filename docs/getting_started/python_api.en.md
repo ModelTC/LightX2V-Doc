@@ -1,10 +1,12 @@
 # Python API
 
+<p class="lx-page-lead">Create a pipeline in Python, reuse the loaded model and configure acceleration options.</p>
+
 Install LightX2V using the [full installation guide](installation.md). The examples below run from the repository root; replace model, input and output paths with local paths.
 
 ## Create a pipeline and generate
 
-```python
+```python title="Create a Wan2.1 pipeline and generate a video"
 from lightx2v import LightX2VPipeline
 
 pipe = LightX2VPipeline(
@@ -31,7 +33,7 @@ Use the same JSON as the CLI to align startup settings. JSON fields override mat
 
 Alternatively, configure a new generator manually. This is the configuration used by the [Wan2.1 14B Python example](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/inference/wan_t2v.py); it differs from the 1.3B CLI example above:
 
-```python
+```python title="Configure a generator manually: Wan2.1 14B example"
 pipe.create_generator(
     attn_mode="sage_attn2",
     infer_steps=50,

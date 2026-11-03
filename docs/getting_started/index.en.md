@@ -9,6 +9,14 @@ description: Install LightX2V, download Wan2.1 and run your first video generati
 
 This guide uses **Wan2.1-T2V-1.3B**. Run all inference commands from the LightX2V repository root. For other models, see the [model catalog](../models/index.md).
 
+<nav class="lx-guide-path" aria-label="First generation workflow" markdown>
+
+1. [**Set up**<span>Choose Docker or Conda.</span>](#1-prepare-the-environment)
+2. [**Get the model**<span>Download the full Wan2.1 weights.</span>](#download-model)
+3. [**Configure and run**<span>Set paths and generate a video.</span>](#3-configure-generation)
+
+</nav>
+
 ## Before you begin
 
 | Item | Environment used in this guide |
@@ -25,7 +33,7 @@ This guide uses **Wan2.1-T2V-1.3B**. Run all inference commands from the LightX2
 
 Clone the repository on the host, or enter the root of your existing checkout.
 
-```bash
+```bash title="Get the LightX2V repository"
 git clone https://github.com/ModelTC/LightX2V.git
 cd LightX2V
 ```
@@ -34,7 +42,7 @@ cd LightX2V
 
     This example uses the CUDA 13.0 image from the repository installation guide. Install Docker and NVIDIA Container Toolkit first, and check that the host driver supports the image.
 
-    ```bash
+    ```bash title="Host: pull the image and enter the container"
     docker pull lightx2v/lightx2v:26052801-cu130
 
     docker run --gpus all -it --ipc=host --name lightx2v \
@@ -55,7 +63,7 @@ cd LightX2V
 
     Create an environment and install the project from the repository root:
 
-    ```bash
+    ```bash title="Create and install the Conda environment"
     conda create -n lightx2v python=3.11 -y
     conda activate lightx2v
     pip install -v -e .
@@ -73,7 +81,7 @@ cd LightX2V
 
 Use the Hugging Face CLI to download the complete model directory. Replace the path with your local model location.
 
-```bash
+```bash title="Download Wan2.1-T2V-1.3B"
 hf download Wan-AI/Wan2.1-T2V-1.3B \
   --local-dir /path/to/models/Wan2.1-T2V-1.3B
 ```
@@ -111,7 +119,7 @@ Sampling steps, guidance and attention settings are configured in [`configs/wan/
 
 ## 4. Run and inspect the result
 
-```bash
+```bash title="Run video generation"
 bash scripts/wan/run_wan_t2v.sh
 ```
 

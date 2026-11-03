@@ -38,9 +38,9 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 
 </div>
 
-## 从这里开始
+## 运行与集成 { #从这里开始 }
 
-先完成[环境与权重准备](getting_started/index.md)，再选择调用方式。命令行和 Python 示例均在 LightX2V 仓库根目录运行。
+先完成[环境与模型准备](getting_started/index.md)，再选择命令行、Python 或 HTTP API。命令行和 Python 示例均在 LightX2V 仓库根目录运行。
 
 <div class="lx-examples" markdown>
 
@@ -110,35 +110,68 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 
 </div>
 
-## 按任务探索模型 { #探索模型生态 }
+<div class="lx-section-heading" markdown>
 
-从想要生成的内容出发，查看对应模型与运行示例。
+## 按任务找到模型 { #探索模型生态 }
 
-<div class="lx-task-shortcuts" markdown>
-
-[:material-video-outline: **视频与音视频**<span>Wan、MiniMax-H3、LTX 等</span>](models/index.md?task=video#model-catalog)
-[:material-image-outline: **图像生成与编辑**<span>Qwen-Image、Z-Image、FLUX.2 等</span>](models/index.md?task=image#model-catalog)
-[:material-auto-fix: **修复与超分**<span>SeedVR2、SwiftVR、RelayVSR</span>](models/index.md?task=restore#model-catalog)
-[:material-cube-outline: **交互与空间**<span>EdenLive、WorldMirror、WorldPlay</span>](models/index.md?task=world#model-catalog)
+[浏览全部模型](models/index.md){ .lx-text-link }
 
 </div>
 
-[查看模型总览 :material-arrow-right:](models/index.md){ .lx-text-link }
+先确定要生成或处理的内容，再选择对应模型与运行示例。
+
+<div class="lx-task-shortcuts" markdown>
+
+[:material-video-outline: **视频与音视频**<span class="lx-task-description">从文本或图像生成视频，或生成同步音视频。</span><span class="lx-task-models">Wan、MiniMax-H3、LTX</span>](models/index.md?task=video#model-catalog)
+[:material-image-outline: **图像生成与编辑**<span class="lx-task-description">从提示词生成图像，或对已有图像进行编辑。</span><span class="lx-task-models">Qwen-Image、Z-Image、FLUX.2</span>](models/index.md?task=image#model-catalog)
+[:material-auto-fix: **修复与超分**<span class="lx-task-description">修复图像与视频，提升分辨率和细节。</span><span class="lx-task-models">SeedVR2、SwiftVR、RelayVSR</span>](models/index.md?task=restore#model-catalog)
+[:material-cube-outline: **交互与空间**<span class="lx-task-description">探索交互视频、世界模型与三维重建。</span><span class="lx-task-models">EdenLive、WorldMirror、WorldPlay</span>](models/index.md?task=world#model-catalog)
+
+</div>
+
+<div class="lx-home-bottom" markdown>
+
+<section class="lx-home-updates" markdown>
 
 ## 近期更新
 
 <div class="lx-updates" markdown>
 
-<div markdown><time datetime="2026-10-26">2026.10.26</time><p markdown>[新增自回归视频模型运行入口](https://github.com/ModelTC/LightX2V/blob/main/README_zh.md)<br><span>TaoMate-H3、StreamRender-H3、Matrix-Game-4 等模型的脚本与配置。</span></p></div>
-<div markdown><time datetime="2026-10-18">2026.10.18</time><p markdown>[EdenLive 交互视频生成](https://github.com/ModelTC/LightX2V/blob/main/scripts/edenlive/README_zh.md)<br><span>结合文本、首帧和代理录屏控制视频生成。</span></p></div>
-<div markdown><time datetime="2026-10-13">2026.10.13</time><p markdown>[在 MacBook 上运行 LightX2V](https://github.com/ModelTC/LightX2V-Mac-App)<br><span>使用原生 macOS 应用在本地生成与编辑图像。</span></p></div>
+<div markdown>
+
+<time datetime="2026-10-26">2026.10.26</time>
+
+[新增自回归视频模型运行入口](https://github.com/ModelTC/LightX2V/blob/main/README_zh.md)<br><span>TaoMate-H3、StreamRender-H3、Matrix-Game-4 等模型的脚本与配置。</span>
+
+</div>
+<div markdown>
+
+<time datetime="2026-10-18">2026.10.18</time>
+
+[EdenLive 交互视频生成](https://github.com/ModelTC/LightX2V/blob/main/scripts/edenlive/README_zh.md)<br><span>结合文本、首帧和代理录屏控制视频生成。</span>
+
+</div>
+<div markdown>
+
+<time datetime="2026-10-13">2026.10.13</time>
+
+[在 MacBook 上运行 LightX2V](https://github.com/ModelTC/LightX2V-Mac-App)<br><span>使用原生 macOS 应用在本地生成与编辑图像。</span>
 
 </div>
 
-<div class="lx-community" markdown>
+</div>
 
-**一起完善 LightX2V**
+</section>
 
-[文档反馈](https://github.com/ModelTC/LightX2V-Doc/issues) · [推理问题](https://github.com/ModelTC/LightX2V/issues) · [获取模型权重](https://huggingface.co/lightx2v) · [阅读技术博客](https://light-ai.top/LightX2V-BLOG/)
+<aside class="lx-resource-links" markdown>
+
+## 资源与反馈
+
+[**获取模型权重**<span>查找量化、蒸馏与其他模型权重。</span>](https://huggingface.co/lightx2v)
+[**阅读技术博客**<span>了解推理优化方法与工程实践。</span>](https://light-ai.top/LightX2V-BLOG/)
+[**反馈文档问题**<span>报告错误、补充说明或提出建议。</span>](https://github.com/ModelTC/LightX2V-Doc/issues)
+[**反馈推理问题**<span>提供环境、配置和复现步骤。</span>](https://github.com/ModelTC/LightX2V/issues)
+
+</aside>
 
 </div>

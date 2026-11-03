@@ -1,6 +1,16 @@
 # 服务部署
 
+<p class="lx-page-lead">将模型作为 API 服务运行，提交生成任务并获取结果。</p>
+
 LightX2V 通过 FastAPI 提供带异步任务队列的推理服务，启动入口为 `python -m lightx2v.server`。启动时选择的模型和任务决定请求支持哪些字段，详见[新增请求参数](../developer_guides/request_parameters.md)。
+
+<nav class="lx-guide-path" aria-label="异步视频任务流程" markdown>
+
+1. [**启动服务**<span>加载模型，等待服务就绪。</span>](#启动服务)
+2. [**提交任务**<span>发送请求，保存返回的任务 ID。</span>](#提交视频任务)
+3. [**获取结果**<span>查询状态，完成后下载视频。</span>](#查询下载与取消)
+
+</nav>
 
 ## 按模型选择服务入口
 
@@ -16,7 +26,7 @@ LightX2V 通过 FastAPI 提供带异步任务队列的推理服务，启动入�
 
 在仓库根目录下，先修改 `scripts/server/start_server.sh` 中的 `lightx2v_path` 和 `model_path`，再运行：
 
-```bash
+```bash title="终端 1：启动推理服务"
 bash scripts/server/start_server.sh
 ```
 
@@ -26,7 +36,7 @@ bash scripts/server/start_server.sh
 
 服务就绪后，在另一个终端提交请求。以下示例适用于默认 T2V 服务：
 
-```bash
+```bash title="终端 2：提交视频生成请求"
 curl -X POST http://localhost:8000/v1/tasks/video/ \
   -H 'Content-Type: application/json' \
   -d '{"prompt":"Two cats boxing on a stage.","seed":42,"save_result_path":"cat_boxing_seed42.mp4"}'
@@ -40,7 +50,7 @@ curl -X POST http://localhost:8000/v1/tasks/video/ \
 
 将下面的 `TASK_ID` 替换为返回的任务 ID：
 
-```bash
+```bash title="查询任务与队列状态"
 curl http://localhost:8000/v1/tasks/TASK_ID/status
 curl http://localhost:8000/v1/tasks/queue/status
 ```
@@ -53,7 +63,7 @@ python scripts/server/check_status.py
 
 任务状态包括 `pending`、`processing`、`completed`、`failed`、`cancelled`。失败时应检查响应中的错误信息。任务完成且结果已保存为文件后，可下载结果：
 
-```bash
+```bash title="下载已完成的视频"
 curl -f http://localhost:8000/v1/tasks/TASK_ID/result -o output.mp4
 ```
 
@@ -61,7 +71,7 @@ curl -f http://localhost:8000/v1/tasks/TASK_ID/result -o output.mp4
 
 `GET /v1/service/status` 的 `busy` / `idle` 表示执行状态。只要队列还有容量，忙碌的服务也能接受新请求。`GET /v1/tasks/queue/status` 提供 `pending_count`、`active_count`（等待中与执行中之和）、`queue_size`、`queue_available`；队列满时提交请求返回 HTTP 503。
 
-```bash
+```bash title="取消指定任务"
 curl -X DELETE http://localhost:8000/v1/tasks/TASK_ID
 ```
 

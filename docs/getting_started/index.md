@@ -9,6 +9,14 @@ description: 安装 LightX2V，下载 Wan2.1 模型，运行第一个视频生�
 
 本页以 **Wan2.1-T2V-1.3B** 为例。所有推理命令均在 LightX2V 仓库根目录运行。其他模型的入口见[模型总览](../models/index.md)。
 
+<nav class="lx-guide-path" aria-label="首次生成流程" markdown>
+
+1. [**准备环境**<span>选择 Docker 或 Conda。</span>](#1-准备运行环境)
+2. [**下载模型**<span>准备完整的 Wan2.1 权重。</span>](#download-model)
+3. [**配置与运行**<span>设置路径，生成第一个视频。</span>](#3-配置生成参数)
+
+</nav>
+
 ## 开始之前
 
 | 项目 | 本教程使用的环境 |
@@ -25,7 +33,7 @@ description: 安装 LightX2V，下载 Wan2.1 模型，运行第一个视频生�
 
 先在宿主机获取仓库。已有仓库时直接进入其根目录。
 
-```bash
+```bash title="获取 LightX2V 仓库"
 git clone https://github.com/ModelTC/LightX2V.git
 cd LightX2V
 ```
@@ -34,7 +42,7 @@ cd LightX2V
 
     使用仓库安装指南中的 CUDA 13.0 镜像示例。启动前需安装 Docker 和 NVIDIA Container Toolkit，并确认宿主机驱动兼容该镜像。
 
-    ```bash
+    ```bash title="宿主机：拉取镜像并进入容器"
     docker pull lightx2v/lightx2v:26052801-cu130
 
     docker run --gpus all -it --ipc=host --name lightx2v \
@@ -55,7 +63,7 @@ cd LightX2V
 
     创建环境，并在仓库根目录安装依赖与代码：
 
-    ```bash
+    ```bash title="创建并安装 Conda 环境"
     conda create -n lightx2v python=3.11 -y
     conda activate lightx2v
     pip install -v -e .
@@ -73,7 +81,7 @@ cd LightX2V
 
 使用 Hugging Face CLI 下载完整的模型目录。将路径替换为你实际存放模型的位置。
 
-```bash
+```bash title="下载 Wan2.1-T2V-1.3B"
 hf download Wan-AI/Wan2.1-T2V-1.3B \
   --local-dir /path/to/models/Wan2.1-T2V-1.3B
 ```
@@ -111,7 +119,7 @@ pip install -U huggingface_hub
 
 ## 4. 运行并查看结果
 
-```bash
+```bash title="运行视频生成"
 bash scripts/wan/run_wan_t2v.sh
 ```
 

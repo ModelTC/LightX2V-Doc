@@ -1,10 +1,12 @@
 # Python API
 
+<p class="lx-page-lead">在 Python 中创建 Pipeline，复用模型进行生成，并按需配置加速选项。</p>
+
 先按[完整安装指南](installation.md)安装 LightX2V。下列示例从仓库根目录运行，请将模型、输入和输出路径替换为本地路径。
 
 ## 创建 Pipeline 并生成
 
-```python
+```python title="创建 Wan2.1 Pipeline 并生成视频"
 from lightx2v import LightX2VPipeline
 
 pipe = LightX2VPipeline(
@@ -31,7 +33,7 @@ pipe.generate(
 
 也可以手动配置新的 generator。下面是 [Wan2.1 14B Python 示例](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan/inference/wan_t2v.py)采用的设置，与前面的 1.3B CLI 示例不同：
 
-```python
+```python title="手动配置 generator：Wan2.1 14B 示例"
 pipe.create_generator(
     attn_mode="sage_attn2",
     infer_steps=50,

@@ -1,0 +1,19 @@
+{# Keep document navigation within the reading column, separate from site credits. #}
+{% if "navigation.footer" in features and 'footer' not in page.meta.get('hide', []) and not page.meta.home %}
+{% if page.previous_page or page.next_page %}
+<nav class="lx-page-navigation" aria-label="{{ 'Document navigation' if config.theme.language == 'en' else '文章导航' }}">
+  {% if page.previous_page %}
+  <a class="lx-page-navigation-prev" href="{{ page.previous_page.url | url }}">
+    <span class="lx-page-navigation-direction"><span class="twemoji" aria-hidden="true">{% include '.icons/material/arrow-left.svg' %}</span>{{ lang.t('footer.previous') }}</span>
+    <strong>{{ page.previous_page.title }}</strong>
+  </a>
+  {% endif %}
+  {% if page.next_page %}
+  <a class="lx-page-navigation-next" href="{{ page.next_page.url | url }}">
+    <span class="lx-page-navigation-direction">{{ lang.t('footer.next') }}<span class="twemoji" aria-hidden="true">{% include '.icons/material/arrow-right.svg' %}</span></span>
+    <strong>{{ page.next_page.title }}</strong>
+  </a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endif %}

@@ -1,12 +1,14 @@
 # 模型量化技术
 
-## 📖 概述
+<p class="lx-page-lead" id="概述">了解量化模式，准备匹配的权重，再配置模型与计算后端。</p>
 
-LightX2V 支持对 DIT、VAE、T5 和 CLIP 模型进行量化推理，通过降低模型精度来减少显存占用并提升推理速度。
+LightX2V 支持对 DIT、VAE、T5 和 CLIP 模型进行量化推理。下面按模式选择、权重获取和推理配置介绍使用方法；各组件的支持范围以对应小节为准。
 
----
+## 量化模式
 
-## 🔧 量化模式
+<p class="lx-table-hint">左右滑动查看完整的量化模式对照表。</p>
+
+<div class="lx-comparison" role="region" aria-label="量化模式对照表" tabindex="0" markdown>
 
 | 量化模式 | 权重量化 | 激活量化 | 计算内核 | 适用硬件 |
 |--------------|----------|----------|----------|----------|
@@ -21,9 +23,9 @@ LightX2V 支持对 DIT、VAE、T5 和 CLIP 模型进行量化推理，通过降�
 | `int4-g128-marlin` | INT4 分组对称 | FP16 | [Marlin](https://github.com/IST-DASLab/marlin) | H200/H800/A100/A800, RTX 30/40系等 |
 | `fp8-b128-deepgemm` | FP8 分块对称 | FP8 分组对称 | [DeepGemm](https://github.com/deepseek-ai/DeepGEMM) | H100/H200/H800, RTX 40系等|
 
----
+</div>
 
-## 🔧 量化模型获取
+## 量化模型获取
 
 ### 方式一：下载预量化模型
 
@@ -60,9 +62,7 @@ hf download lightx2v/Encoders-Lightx2v \
 
 详细量化工具使用方法请参考：[模型转换文档](https://github.com/ModelTC/lightx2v/tree/main/tools/convert/readme_zh.md)
 
----
-
-## 🚀 量化模型使用
+## 量化模型使用
 
 ### DIT 模型量化
 
@@ -248,9 +248,7 @@ CLIP 量化模式（`clip_quant_scheme`）支持：`int8-vllm`、`fp8-sgl`、`in
 > - **Wan2.1 配置**：参考 [offload 配置文件](https://github.com/ModelTC/LightX2V/tree/main/configs/offload)
 > - **Wan2.2 配置**：参考 [wan22 配置文件](https://github.com/ModelTC/LightX2V/tree/main/configs/wan22) 中以 `4090` 结尾的配置
 
----
-
-## 📚 相关资源
+## 相关资源
 
 ### 配置文件示例
 - [INT8 量化配置](https://github.com/ModelTC/LightX2V/blob/main/configs/quantization/wan_i2v.json)
@@ -268,8 +266,6 @@ CLIP 量化模式（`clip_quant_scheme`）支持：`int8-vllm`、`fp8-sgl`、`in
 - [Wan2.1-LightX2V 量化模型](https://huggingface.co/lightx2v/Wan2.1-Distill-Models)
 - [Wan2.2-LightX2V 量化模型](https://huggingface.co/lightx2v/Wan2.2-Distill-Models)
 - [Encoders 量化模型](https://huggingface.co/lightx2v/Encoders-Lightx2v)
-
----
 
 通过本文档，您应该能够：
 

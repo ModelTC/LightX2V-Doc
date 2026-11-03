@@ -1,6 +1,16 @@
 # Service Deployment
 
+<p class="lx-page-lead">Run a model as an API service, submit generation tasks and retrieve the results.</p>
+
 LightX2V provides a FastAPI service with asynchronous task queues. Start it with `python -m lightx2v.server`. The startup model and task determine which request fields are supported; see [Adding Request Parameters](../developer_guides/request_parameters.md).
+
+<nav class="lx-guide-path" aria-label="Asynchronous video task workflow" markdown>
+
+1. [**Start the service**<span>Load the model and wait until ready.</span>](#start-the-service)
+2. [**Submit a task**<span>Send a request and keep its task ID.</span>](#submit-a-video-task)
+3. [**Get the result**<span>Poll the status, then download.</span>](#poll-download-and-cancel)
+
+</nav>
 
 ## Choose a model-specific service
 
@@ -16,7 +26,7 @@ Prepare the environment and weights in the model guide, complete an offline gene
 
 From the repository root, set `lightx2v_path` and `model_path` in `scripts/server/start_server.sh`, then run:
 
-```bash
+```bash title="Terminal 1: start the inference service"
 bash scripts/server/start_server.sh
 ```
 
@@ -26,7 +36,7 @@ The example loads Wan2.1 T2V with `configs/wan/wan_t2v.json` and listens on port
 
 Once the service is ready, submit a request from another terminal. This example uses the default T2V service:
 
-```bash
+```bash title="Terminal 2: submit a video request"
 curl -X POST http://localhost:8000/v1/tasks/video/ \
   -H 'Content-Type: application/json' \
   -d '{"prompt":"Two cats boxing on a stage.","seed":42,"save_result_path":"cat_boxing_seed42.mp4"}'
@@ -40,7 +50,7 @@ Optional generation fields inherit the startup defaults when omitted or set to `
 
 Replace `TASK_ID` below with the returned ID:
 
-```bash
+```bash title="Check task and queue status"
 curl http://localhost:8000/v1/tasks/TASK_ID/status
 curl http://localhost:8000/v1/tasks/queue/status
 ```
@@ -53,7 +63,7 @@ python scripts/server/check_status.py
 
 Task states are `pending`, `processing`, `completed`, `failed`, and `cancelled`. Inspect the error information if a task fails. After a file-backed task completes, download its result:
 
-```bash
+```bash title="Download the completed video"
 curl -f http://localhost:8000/v1/tasks/TASK_ID/result -o output.mp4
 ```
 
@@ -61,7 +71,7 @@ The result endpoint only serves files under the service's configured output dire
 
 `GET /v1/service/status` reports execution state (`busy` or `idle`). A busy server can still accept requests while queue capacity remains. `GET /v1/tasks/queue/status` exposes `pending_count`, `active_count` (pending + processing), `queue_size`, and `queue_available`. A full queue rejects submissions with HTTP 503.
 
-```bash
+```bash title="Cancel a specific task"
 curl -X DELETE http://localhost:8000/v1/tasks/TASK_ID
 ```
 

@@ -1,14 +1,36 @@
 # Wan2.2
 
+<p class="lx-page-lead">按任务选择模型，完成首次生成，再调整推理与部署配置。</p>
+
 示例脚本位于 [LightX2V 推理仓库](https://github.com/ModelTC/LightX2V)的 `scripts/wan22/` 目录。设置所选脚本中的 `lightx2v_path`、`model_path` 和 `CUDA_VISIBLE_DEVICES`，并从该仓库根目录运行以下命令。
 
-## 使用路径
+<nav class="lx-guide-path" id="使用路径" aria-label="Wan2.2 使用流程" markdown>
 
-1. [选择任务](#choose-task)：区分 MoE、TI2V、S2V 与 Animate。
-2. [准备环境与权重](#环境与权重)：下载与任务匹配的模型和组件。
-3. [首次生成](#first-run)：以 MoE T2V 为例，确认脚本、配置与输出。
-4. [调整推理性能](#next-steps)：选择卸载、量化、蒸馏或并行设置。
-5. [接入推理服务](#服务)：使用所选任务的启动配置和客户端。
+1. [**选择任务**<span>区分 MoE、TI2V、S2V 与 Animate。</span>](#choose-task)
+2. [**准备权重**<span>安装环境，下载对应模型与组件。</span>](#环境与权重)
+3. [**首次生成**<span>从 MoE T2V 示例开始运行。</span>](#first-run)
+
+</nav>
+
+已完成基础生成？继续[调整推理性能](#next-steps)或[接入服务](#服务)。
+
+<a id="choose-task"></a>
+
+## 基础任务
+
+MoE 的 T2V 与 I2V 使用各自的 A14B 权重；TI2V 的文生视频、图生视频共用 5B 权重。S2V、Animate 使用各自的模型与输入形式。更换模型时，同时选择对应脚本和 JSON。
+
+| 任务 | 脚本 | 模型权重 |
+| --- | --- | --- |
+| MoE 文生视频 | [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh) | Wan2.2-T2V-A14B |
+| MoE 图生视频 | [run_wan22_moe_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_i2v.sh) | Wan2.2-I2V-A14B |
+| MoE 首尾帧生视频 | [run_wan22_moe_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_flf2v.sh) | Wan2.2-I2V-A14B |
+| TI2V 文生视频 | [run_wan22_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_t2v.sh) | Wan2.2-TI2V-5B |
+| TI2V 图生视频 | [run_wan22_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_i2v.sh) | Wan2.2-TI2V-5B |
+| 图片与音频驱动视频 | [run_wan22_s2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_s2v.sh) | Wan2.2-S2V-14B |
+| 角色动画 | [run_wan22_animate.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate.sh) | Wan2.2-Animate-14B |
+| 角色替换 | [run_wan22_animate_replace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate_replace.sh) | Wan2.2-Animate-14B 及配套量化权重 |
+| Animate2 | [run_wan22_animate2_distill.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate2_distill.sh) | Wan2.2-Animate-2-14B 蒸馏权重 |
 
 ## 环境与权重
 
@@ -35,27 +57,9 @@ hf download lightx2v/Encoders --include "models_t5_umt5-xxl-enc-fp8.pth" --local
 
 `model_path` 指向完整基础模型目录。所选 JSON 中的 checkpoint 和 LoRA 路径填写下载后的本地文件路径。
 
-<a id="choose-task"></a>
-
-## 基础任务
-
-MoE 的 T2V 与 I2V 使用各自的 A14B 权重；TI2V 的文生视频、图生视频共用 5B 权重。S2V、Animate 使用各自的模型与输入形式。更换模型时，同时选择对应脚本和 JSON。
-
-| 任务 | 脚本 | 模型权重 |
-| --- | --- | --- |
-| MoE 文生视频 | [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh) | Wan2.2-T2V-A14B |
-| MoE 图生视频 | [run_wan22_moe_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_i2v.sh) | Wan2.2-I2V-A14B |
-| MoE 首尾帧生视频 | [run_wan22_moe_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_flf2v.sh) | Wan2.2-I2V-A14B |
-| TI2V 文生视频 | [run_wan22_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_t2v.sh) | Wan2.2-TI2V-5B |
-| TI2V 图生视频 | [run_wan22_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_i2v.sh) | Wan2.2-TI2V-5B |
-| 图片与音频驱动视频 | [run_wan22_s2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_s2v.sh) | Wan2.2-S2V-14B |
-| 角色动画 | [run_wan22_animate.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate.sh) | Wan2.2-Animate-14B |
-| 角色替换 | [run_wan22_animate_replace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate_replace.sh) | Wan2.2-Animate-14B 及配套量化权重 |
-| Animate2 | [run_wan22_animate2_distill.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate2_distill.sh) | Wan2.2-Animate-2-14B 蒸馏权重 |
-
 <a id="first-run"></a>
 
-### 首次生成：MoE T2V
+## 首次生成：MoE T2V
 
 完成环境安装，下载上方 `Wan2.2-T2V-A14B` 权重。打开 [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh)，将 `lightx2v_path`、`model_path` 改为仓库和模型目录的绝对路径，设置 `CUDA_VISIBLE_DEVICES`，按需修改 `--prompt` 与 `--save_result_path`。
 

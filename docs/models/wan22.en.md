@@ -1,14 +1,36 @@
 # Wan2.2
 
+<p class="lx-page-lead">Choose a model for your task, generate a video, then tune inference and deployment.</p>
+
 The example scripts are in `scripts/wan22/` in the [LightX2V inference repository](https://github.com/ModelTC/LightX2V). Set `lightx2v_path`, `model_path`, and `CUDA_VISIBLE_DEVICES` in the selected script, and run the commands below from that repository's root.
 
-## Reading path
+<nav class="lx-guide-path" id="reading-path" aria-label="Wan2.2 workflow" markdown>
 
-1. [Choose a task](#choose-task): distinguish MoE, TI2V, S2V and Animate.
-2. [Prepare the environment and weights](#environment-and-weights): get the matching model and components.
-3. [Generate your first video](#first-run): configure the MoE T2V script and inspect its output.
-4. [Tune inference](#next-steps): choose offload, quantization, distillation or parallel settings.
-5. [Start a service](#server): use the startup configuration and client for your task.
+1. [**Choose a task**<span>Compare MoE, TI2V, S2V and Animate.</span>](#choose-task)
+2. [**Prepare weights**<span>Set up and get the matching model.</span>](#environment-and-weights)
+3. [**Generate a video**<span>Start with the MoE T2V example.</span>](#first-run)
+
+</nav>
+
+Already generating? Continue with [performance tuning](#next-steps) or [service deployment](#server).
+
+<a id="choose-task"></a>
+
+## Basic tasks
+
+MoE T2V and I2V use their respective A14B weights. TI2V text-to-video and image-to-video share the 5B model. S2V and Animate have their own models and input types. When changing models, select the matching script and JSON together.
+
+| Task | Script | Model weights |
+| --- | --- | --- |
+| MoE text-to-video | [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh) | Wan2.2-T2V-A14B |
+| MoE image-to-video | [run_wan22_moe_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_i2v.sh) | Wan2.2-I2V-A14B |
+| MoE first/last-frame-to-video | [run_wan22_moe_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_flf2v.sh) | Wan2.2-I2V-A14B |
+| TI2V text-to-video | [run_wan22_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_t2v.sh) | Wan2.2-TI2V-5B |
+| TI2V image-to-video | [run_wan22_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_i2v.sh) | Wan2.2-TI2V-5B |
+| Image + audio-to-video | [run_wan22_s2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_s2v.sh) | Wan2.2-S2V-14B |
+| Character animation | [run_wan22_animate.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate.sh) | Wan2.2-Animate-14B |
+| Character replacement | [run_wan22_animate_replace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate_replace.sh) | Wan2.2-Animate-14B with matching quantized weights |
+| Animate2 | [run_wan22_animate2_distill.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate2_distill.sh) | Wan2.2-Animate-2-14B distilled weights |
 
 ## Environment and weights
 
@@ -34,27 +56,9 @@ hf download lightx2v/Encoders --include "models_t5_umt5-xxl-enc-fp8.pth" --local
 Keep `model_path` pointed at the complete base model directory. Set the checkpoint
 and LoRA paths in the selected JSON to the downloaded local files.
 
-<a id="choose-task"></a>
-
-## Basic tasks
-
-MoE T2V and I2V use their respective A14B weights. TI2V text-to-video and image-to-video share the 5B model. S2V and Animate have their own models and input types. When changing models, select the matching script and JSON together.
-
-| Task | Script | Model weights |
-| --- | --- | --- |
-| MoE text-to-video | [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh) | Wan2.2-T2V-A14B |
-| MoE image-to-video | [run_wan22_moe_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_i2v.sh) | Wan2.2-I2V-A14B |
-| MoE first/last-frame-to-video | [run_wan22_moe_flf2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_flf2v.sh) | Wan2.2-I2V-A14B |
-| TI2V text-to-video | [run_wan22_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_t2v.sh) | Wan2.2-TI2V-5B |
-| TI2V image-to-video | [run_wan22_i2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_i2v.sh) | Wan2.2-TI2V-5B |
-| Image + audio-to-video | [run_wan22_s2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_s2v.sh) | Wan2.2-S2V-14B |
-| Character animation | [run_wan22_animate.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate.sh) | Wan2.2-Animate-14B |
-| Character replacement | [run_wan22_animate_replace.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate_replace.sh) | Wan2.2-Animate-14B with matching quantized weights |
-| Animate2 | [run_wan22_animate2_distill.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_animate2_distill.sh) | Wan2.2-Animate-2-14B distilled weights |
-
 <a id="first-run"></a>
 
-### First generation: MoE T2V
+## First generation: MoE T2V
 
 Install the environment and download `Wan2.2-T2V-A14B` above. Open [run_wan22_moe_t2v.sh](https://github.com/ModelTC/LightX2V/blob/main/scripts/wan22/run_wan22_moe_t2v.sh), set `lightx2v_path` and `model_path` to absolute repository and model paths, select `CUDA_VISIBLE_DEVICES`, and adjust `--prompt` and `--save_result_path` as needed.
 

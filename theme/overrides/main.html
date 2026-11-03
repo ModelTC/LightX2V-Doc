@@ -48,7 +48,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="lx-page{% if page.meta.home %} lx-home{% endif %}">
+<div class="lx-page{% if page.meta.home %} lx-home{% elif 'toc' not in page.meta.get('hide', []) %} lx-article{% endif %}">
   {% include "partials/breadcrumbs.html" %}
   {% if lx_translation_missing %}
   <div class="admonition note lx-translation-notice" role="note">
@@ -62,5 +62,6 @@
   </div>
   {% endif %}
   {{ super() }}
+  {% include "partials/page-navigation.html" %}
 </div>
 {% endblock %}

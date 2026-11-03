@@ -1,12 +1,14 @@
 # Model Quantization Techniques
 
-## 📖 Overview
+<p class="lx-page-lead" id="overview">Choose a quantization mode, prepare matching weights and configure the model and kernel.</p>
 
-LightX2V supports quantized inference for DIT, VAE, T5, and CLIP models, reducing memory usage and improving inference speed by lowering model precision.
+LightX2V supports quantized inference for DIT, VAE, T5, and CLIP models. This guide covers mode selection, weight preparation and inference configuration; check the corresponding section for each component's supported options.
 
----
+## Quantization Modes
 
-## 🔧 Quantization Modes
+<p class="lx-table-hint">Scroll horizontally to view all quantization modes and hardware requirements.</p>
+
+<div class="lx-comparison" role="region" aria-label="Quantization mode comparison" tabindex="0" markdown>
 
 | Quantization Mode | Weight Quantization | Activation Quantization | Compute Kernel | Supported Hardware |
 |--------------|----------|----------|----------|----------|
@@ -21,9 +23,9 @@ LightX2V supports quantized inference for DIT, VAE, T5, and CLIP models, reducin
 | `int4-g128-marlin` | INT4 group symmetric | FP16 | [Marlin](https://github.com/IST-DASLab/marlin) | H200/H800/A100/A800, RTX 30/40 series, etc. |
 | `fp8-b128-deepgemm` | FP8 block symmetric | FP8 group symmetric | [DeepGemm](https://github.com/deepseek-ai/DeepGEMM) | H100/H200/H800, RTX 40 series, etc.|
 
----
+</div>
 
-## 🔧 Obtaining Quantized Models
+## Obtaining Quantized Models
 
 ### Method 1: Download Pre-Quantized Models
 
@@ -60,9 +62,7 @@ hf download lightx2v/Encoders-Lightx2v \
 
 For detailed quantization tool usage, refer to: [Model Conversion Documentation](https://github.com/ModelTC/lightx2v/tree/main/tools/convert/readme_zh.md)
 
----
-
-## 🚀 Using Quantized Models
+## Using Quantized Models
 
 ### DIT Model Quantization
 
@@ -256,9 +256,7 @@ If memory is insufficient, you can combine parameter offloading to further reduc
 > - **Wan2.1 Configuration**: Refer to [offload config files](https://github.com/ModelTC/LightX2V/tree/main/configs/offload)
 > - **Wan2.2 Configuration**: Refer to [wan22 config files](https://github.com/ModelTC/LightX2V/tree/main/configs/wan22) with `4090` suffix
 
----
-
-## 📚 Related Resources
+## Related Resources
 
 ### Configuration File Examples
 - [INT8 Quantization Config](https://github.com/ModelTC/LightX2V/blob/main/configs/quantization/wan_i2v.json)
@@ -276,8 +274,6 @@ If memory is insufficient, you can combine parameter offloading to further reduc
 - [Wan2.1-LightX2V Quantized Models](https://huggingface.co/lightx2v/Wan2.1-Distill-Models)
 - [Wan2.2-LightX2V Quantized Models](https://huggingface.co/lightx2v/Wan2.2-Distill-Models)
 - [Encoders Quantized Models](https://huggingface.co/lightx2v/Encoders-Lightx2v)
-
----
 
 Through this document, you should be able to:
 
