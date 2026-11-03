@@ -18,8 +18,8 @@ LightX2V supports a range of popular models for image generation, image editing,
 
 <div class="lx-hero-actions" markdown>
 
-[Get started :material-arrow-right:](getting_started/index.md){ .md-button .md-button--primary }
-[Choose a model](models/index.md){ .md-button }
+[Get started](getting_started/index.md){ .md-button .md-button--primary }
+[Browse models](models/index.md){ .lx-hero-link }
 
 </div>
 

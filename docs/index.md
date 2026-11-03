@@ -18,8 +18,8 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 
 <div class="lx-hero-actions" markdown>
 
-[快速开始 :material-arrow-right:](getting_started/index.md){ .md-button .md-button--primary }
-[选择模型](models/index.md){ .md-button }
+[快速开始](getting_started/index.md){ .md-button .md-button--primary }
+[浏览模型](models/index.md){ .lx-hero-link }
 
 </div>
 

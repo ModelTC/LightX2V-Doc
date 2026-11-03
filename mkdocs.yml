@@ -53,7 +53,6 @@ nav:
           - GitHub 仓库: https://github.com/ModelTC/LightX2V
           - 模型权重: https://huggingface.co/lightx2v
           - 技术博客: https://light-ai.top/LightX2V-BLOG/
-          - 论文收藏集: https://lightx2v-papers-zhcn.readthedocs.io/zh-cn/latest/
       - 相关应用:
           - LightX2V Studio: https://x2v.light-ai.top/
           - macOS 应用: https://github.com/ModelTC/LightX2V-Mac-App
@@ -128,7 +127,6 @@ plugins:
             GitHub 仓库: GitHub repository
             模型权重: Model weights
             技术博客: Technical blog
-            论文收藏集: Paper collection (Chinese)
             相关应用: Related applications
             macOS 应用: macOS app
             快速入门: Getting started
