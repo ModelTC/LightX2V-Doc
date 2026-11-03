@@ -2,4 +2,6 @@ KaTeX 0.19.1 (MIT)
 https://github.com/KaTeX/KaTeX
 Source: https://registry.npmjs.org/katex/-/katex-0.19.1.tgz
 Archive SHA-256: 24da5a599eb2fcede2e270b99a6ff48bca816beecc95feeb84e8cccbd1bb34fd
-Included unchanged: dist/katex.min.js, dist/katex.min.css, dist/fonts/* and LICENSE.
+Included unchanged: dist/katex.min.js, dist/fonts/*.woff2 and LICENSE.
+Modified: dist/katex.min.css retains only WOFF2 font sources; WOFF and TTF
+fallback URLs and files are omitted. All other styles are unchanged.

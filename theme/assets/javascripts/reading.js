@@ -150,17 +150,17 @@
       language.textContent = /\/en\//.test(url.pathname) ? "EN" : "中文";
       path.append(trail, language);
       // Material may render table excerpts as bare text nodes as well as tags.
-      const excerpt = document.createElement("div");
-      excerpt.hidden = true;
       [...article.childNodes].forEach(node => {
         if (node.nodeType !== Node.ELEMENT_NODE || !node.matches("h1, h2, .md-search-result__icon")) {
-          excerpt.append(node);
+          node.remove();
         }
       });
-      article.append(excerpt, path);
+      article.append(path);
       article.dataset.lxSearchReady = "";
     });
   };
-  new MutationObserver(enhanceResults).observe(results, { childList: true, subtree: true });
+  // Material appends complete result items, including any collapsed matches.
+  // Observing only the list avoids reacting to our own presentation changes.
+  new MutationObserver(enhanceResults).observe(results, { childList: true });
   enhanceResults();
 })();

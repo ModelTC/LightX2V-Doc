@@ -12,6 +12,9 @@
 
 {% block scripts %}
 {{ super() }}
+{% if page and 'data-model-catalog' in page.content %}
+<script src="{{ 'assets/javascripts/catalog.js' | url }}"></script>
+{% endif %}
 {% if lx_has_math %}
 <script defer src="{{ 'assets/vendor/katex/katex.min.js' | url }}"></script>
 <script defer src="{{ 'assets/javascripts/math.js' | url }}"></script>

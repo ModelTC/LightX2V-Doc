@@ -14,12 +14,6 @@
       </label>
       <kbd class="lx-search-shortcut" aria-hidden="true">Ctrl K</kbd>
       <nav class="md-search__options" aria-label="{{ lang.t('search') }}">
-        {% if "search.share" in features %}
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="{{ lang.t('search.share') }}" aria-label="{{ lang.t('search.share') }}" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
-            {% set icon = config.theme.icon.share or "material/share-variant" %}
-            {% include ".icons/" ~ icon ~ ".svg" %}
-          </a>
-        {% endif %}
         <button type="reset" class="md-search__icon md-icon" title="{{ lang.t('search.reset') }}" aria-label="{{ lang.t('search.reset') }}" tabindex="-1">
           {% set icon = config.theme.icon.close or "material/close" %}
           {% include ".icons/" ~ icon ~ ".svg" %}

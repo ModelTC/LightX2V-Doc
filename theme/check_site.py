@@ -1,6 +1,7 @@
 """Check a built bilingual site offline, using only the Python standard library."""
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -67,6 +68,7 @@ def check_site(site, site_url=None, repository_dir=None, edit_base=None):
         if name != "404.html" and name not in redirects
     }
     repository_paths = set()
+    checked_assets = set()
 
     def fail(message):
         errors.add(message)
@@ -111,6 +113,16 @@ def check_site(site, site_url=None, repository_dir=None, edit_base=None):
             and unquote(parts.fragment) not in pages[relative].ids
         ):
             fail(f"{name}: missing anchor: {href}")
+        if relative.startswith("assets/") and not relative.startswith(
+            ("assets/vendor/", "assets/repository/")
+        ):
+            if (ROOT / "theme" / relative).is_file():
+                fail(f"{name}: theme asset URL must include a content hash: {href}")
+            match = re.fullmatch(r"(.+)\.([0-9a-f]{12})(\.[^/.]+)", relative)
+            if match and relative not in checked_assets and target.is_file():
+                checked_assets.add(relative)
+                if hashlib.sha256(target.read_bytes()).hexdigest()[:12] != match[2]:
+                    fail(f"Theme asset content does not match its filename: {relative}")
 
     for required in ("index.html", "en/index.html", "404.html"):
         if required not in pages:

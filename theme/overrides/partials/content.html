@@ -5,13 +5,11 @@
 {% set heading, closing, body = page.content.partition('</h1>') %}
 {% if closing %}
   {{ heading }}{{ closing }}
-  {% include "partials/mobile-toc.html" %}
-  {{ body }}
 {% else %}
   <h1>{{ page.title | d(config.site_name, true) }}</h1>
-  {% include "partials/mobile-toc.html" %}
-  {{ page.content }}
 {% endif %}
+{% include "partials/mobile-toc.html" %}
+{{ body if closing else page.content }}
 {% include "partials/source-file.html" %}
 {% include "partials/feedback.html" %}
 {% include "partials/comments.html" %}

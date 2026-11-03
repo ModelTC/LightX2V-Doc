@@ -211,7 +211,6 @@ markdown_extensions:
 extra_css:
   - assets/stylesheets/lightx2v.css
 extra_javascript:
-  - assets/javascripts/catalog.js
   - assets/javascripts/reading.js
 
 extra:

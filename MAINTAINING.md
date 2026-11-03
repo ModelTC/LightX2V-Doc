@@ -31,7 +31,7 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 普通插图优先使用 Markdown 图片语法。共享资源放在 `theme/assets/`，构建后使用站点的 `assets/` 路径。使用原始 HTML 图片或视频标签时，分别检查中英文页面的相对路径。
 
-页头使用一体式透明标识 `theme/assets/lightx2v-logo.svg`，沿用原图中圆润、直立的字标和图文比例，去掉底部小字。SVG 内嵌优化后的透明位图，无需加载字体；`#dark` 仅调亮字标，`#mark` 供手机菜单单独显示图标。`partials/logo.html` 与 CSS 控制显示尺寸。独立透明图标 `lightx2v-mark.png` 同时用作浏览器标签页图标（favicon），原始品牌图保留在 `lightx2v.webp`。
+页头使用一体式透明标识 `theme/assets/lightx2v-logo.svg`，沿用原图中圆润、直立的字标和图文比例，去掉底部小字。SVG 内嵌优化后的透明位图，无需加载字体；`#dark` 仅调亮字标，`#mark` 供手机菜单单独显示图标。`partials/logo.html` 与 CSS 控制显示尺寸。独立透明图标 `lightx2v-mark.png` 同时用作浏览器标签页图标（favicon）。
 
 视频应提供播放控件并按需加载。外部附件和模型资源需要网络访问，站点构建不会验证这些外部资源的可用性。
 
@@ -44,6 +44,8 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 - 没有 `page` 的条目链接到 LightX2V 推理仓库；链接目标为目录时设置 `source_kind: tree`。
 
 界面文案位于 `theme/i18n.yml`，模板位于 `theme/overrides/`，样式与交互脚本位于 `theme/assets/`。`theme/hooks.py` 负责生成模型目录、加入共享资源和补充语言切换逻辑。
+
+构建时，自定义样式、脚本和品牌图片会生成带内容哈希的文件名，并自动更新页面引用，避免发布后加载旧缓存。维护时仍使用原文件名，无需手动改版本号；构建检查会验证资源引用和哈希。
 
 外观菜单提供跟随系统、浅色、深色三种选择，首次访问默认跟随系统，之后保留用户选择。`partials/palette.html` 定制菜单，主题保存和系统变化仍由 Material 处理；`partials/javascripts/palette.html` 在正文显示前应用偏好，并将旧版双模式记录映射到新选项。修改时检查刷新、语言切换、系统主题变化和键盘操作。
 
@@ -67,9 +69,13 @@ Markdown 内部链接使用相对路径和 `.md` 后缀，语言插件会将其�
 
 模型筛选通过 URL 参数 `model` 和 `task` 保存状态，应支持刷新、浏览器返回和语言切换。全局搜索使用独立的 `q` 参数，其索引包含中英文内容。
 
+`catalog.js` 仅在模型目录页加载，`reading.js` 提供全站交互；`main.html` 负责按页面内容加载专用脚本。
+
 全站搜索保留 Material 的搜索引擎。`partials/search.html` 提供搜索入口与弹层；`reading.js` 补充 Ctrl/⌘ K 快捷键，以及结果的文档位置和语言标记。桌面端使用胶囊入口和居中弹层，手机端沿用全屏搜索。升级主题时核对 `data-md-component`，并检查 `/`、Ctrl/⌘ K 打开、方向键选择、Enter 跳转、清空、Esc 关闭及触屏操作。
 
 搜索配置使用 `pipeline: []` 保留技术术语原词，避免英文词干处理导致 `cache` 等前缀查询漏搜；中英文分词与结果排序仍由主题处理。
+
+构建钩子按 `search.lang` 保留搜索语言模块及其依赖，省去主题附带的其他语言资源。升级主题时核对搜索 worker 的语言加载逻辑，并验证中英文查询、更多匹配和滚动加载。
 
 模型目录从 `models.yml` 的中英文名称、描述和标签生成同一份搜索文本。分类按钮的数量表示当前关键词在各分类中的匹配数；空结果页可以清除分类而保留关键词。首页任务入口使用 `?task=<分类>#model-catalog` 直达筛选结果，无 JavaScript 时仍可浏览完整模型列表。
 
@@ -131,6 +137,6 @@ Python 依赖固定在 `requirements.txt` 中。升级 MkDocs、Material 或语�
 
 `theme/overrides/main.html` 定制了页面元数据，语言对应关系写入 sitemap；`partials/content.html` 定制了手机端目录的位置。升级主题时，对照上游模板检查这些覆盖文件，保留现有的语言链接行为。
 
-KaTeX 的分发文件、字体、许可证和来源信息位于 `theme/assets/vendor/katex/`。更新这些资源时，同步维护 `NOTICE.txt` 中的版本、来源和校验值，并检查公式与字体加载。
+KaTeX 的分发文件、字体、许可证和来源信息位于 `theme/assets/vendor/katex/`。字体仅保留 WOFF2，CSS 的 `@font-face` 同步去掉 WOFF/TTF 回退项，其余样式保持上游原样。更新时沿用此规则，同步维护 `NOTICE.txt` 中的版本、来源和校验值，并检查公式与字体加载。
 
 `main.html` 根据正文中 Arithmatex 生成的公式标记加载 KaTeX 样式与脚本；无公式的页面不加载这些资源。升级 Markdown 扩展或主题后，检查普通页面的资源请求与中英文公式页的渲染。

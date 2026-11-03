@@ -1,9 +1,10 @@
 """Small presentation extensions for the standalone bilingual documentation."""
 
+import hashlib
 import posixpath
 import re
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -53,14 +54,48 @@ def locale_prefix(locale):
 
 @event_priority(-110)
 def on_files(files, config):
+    # Material ships every search language. Match its worker's runtime imports
+    # so the published site only contains the configured languages and helpers.
+    languages = set(config.plugins["material/search"].config.lang)
+    search_assets = {f"min/lunr.{lang}.min.js" for lang in languages - {"en"}}
+    if len(languages) > 1:
+        search_assets.add("min/lunr.multi.min.js")
+    if search_assets:
+        search_assets.add("min/lunr.stemmer.support.min.js")
+    if "ja" in languages:
+        search_assets.add("tinyseg.js")
+    if languages & {"hi", "th"}:
+        search_assets.add("wordcut.js")
+    prefix = "assets/javascripts/lunr/"
+    for file in list(files):
+        if (
+            file.src_uri.startswith(prefix)
+            and file.src_uri.endswith(".js")
+            and file.src_uri.removeprefix(prefix) not in search_assets
+        ):
+            files.remove(file)
+
     # Shared website assets live outside the document tree. Add them after i18n
     # so both languages use the same files at the site's assets/ URL.
+    versions = {}
     for asset in sorted((HERE / "assets").rglob("*")):
         if asset.is_file():
-            target = "assets/" + asset.relative_to(HERE / "assets").as_posix()
+            relative = asset.relative_to(HERE / "assets")
+            target = "assets/" + relative.as_posix()
             if files.get_file_from_path(target):
                 raise PluginError(f"Document asset shadows a theme asset: {target}")
             files.append(File.generated(config, target, abs_src_path=str(asset)))
+            if relative.parts[0] not in {"vendor", "repository"}:
+                # New markup must not reuse cached CSS, scripts or branding from
+                # an earlier release. Keep source names and old URLs usable.
+                content = asset.read_bytes()
+                digest = hashlib.sha256(content).hexdigest()[:12]
+                versioned = posixpath.splitext(target)[0] + f".{digest}{asset.suffix}"
+                if files.get_file_from_path(versioned):
+                    raise PluginError(f"Versioned asset already exists: {versioned}")
+                files.append(File.generated(config, versioned, content=content))
+                versions[target] = versioned
+    config.extra["_lx_asset_versions"] = versions
 
     # Keep published URLs working without retaining duplicate Markdown pages.
     locale = config.plugins["i18n"].current_language
@@ -90,6 +125,41 @@ def on_files(files, config):
             )
         )
     return files
+
+
+def version_asset_urls(output, config):
+    versions = config.extra.get("_lx_asset_versions", {})
+    site_path = urlsplit(config.site_url or "/").path.rstrip("/") + "/"
+    url_pattern = re.compile(
+        rf"((?:\.\.?/)*|{re.escape(site_path)})(assets/[^?#]+)([?#].*)?"
+    )
+
+    def replace(match):
+        url = url_pattern.fullmatch(match["url"])
+        if not url or url[2] not in versions:
+            return match[0]
+        value = url[1] + versions[url[2]] + (url[3] or "")
+        return match["tag"] + match["quote"] + value + match["quote"]
+
+    # Rewrite resource attributes only; preserve relative paths, SVG view
+    # fragments and query strings without touching document links or examples.
+    return re.sub(
+        r"(?P<tag><(?:link|script|img)\b[^>]*?\b(?:href|src)=)"
+        r"(?P<quote>[\"'])(?P<url>[^\"']+)(?P=quote)",
+        replace,
+        output,
+    )
+
+
+@event_priority(-110)
+def on_post_page(output, page, config):
+    return version_asset_urls(output, config)
+
+
+@event_priority(-110)
+def on_post_template(output, template_name, config):
+    # Error pages use root-relative asset URLs and bypass on_post_page.
+    return version_asset_urls(output, config) if template_name.endswith(".html") else output
 
 
 def on_page_markdown(markdown, page, config, files):
@@ -131,8 +201,9 @@ def on_page_markdown(markdown, page, config, files):
 def on_nav(nav, config, files):
     if config.plugins["i18n"].current_language == "en":
         translated = {
-            f"{REPOSITORY}/blob/main/{zh['source']}": f"{REPOSITORY}/blob/main/{en['source']}"
-            for zh, en in zip(read_models("zh"), read_models("en"))
+            f"{REPOSITORY}/{model.get('source_kind', 'blob')}/main/{model['source']}":
+            f"{REPOSITORY}/{model.get('source_kind', 'blob')}/main/{model['source_en']}"
+            for model in read_models()
         }
 
         def translate_links(items):

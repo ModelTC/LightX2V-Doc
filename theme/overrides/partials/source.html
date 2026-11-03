@@ -1,6 +1,4 @@
-<div class="lx-header-links">
-  <a href="{{ config.repo_url }}" class="lx-github" aria-label="{{ 'LightX2V GitHub repository' if config.theme.language == 'en' else 'LightX2V GitHub 仓库' }}">
-    <span class="md-icon">{% include ".icons/fontawesome/brands/github.svg" %}</span>
-    GitHub
-  </a>
-</div>
+<a href="{{ config.repo_url }}" class="lx-github" aria-label="{{ 'LightX2V GitHub repository' if config.theme.language == 'en' else 'LightX2V GitHub 仓库' }}">
+  <span class="md-icon" aria-hidden="true">{% include ".icons/" ~ config.theme.icon.repo ~ ".svg" %}</span>
+  {{ config.repo_name }}
+</a>

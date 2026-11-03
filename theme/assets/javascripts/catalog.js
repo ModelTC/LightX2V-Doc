@@ -86,7 +86,9 @@
     filter();
     input.focus({ preventScroll: true });
   }));
-  window.addEventListener("pageshow", restore);
+  window.addEventListener("pageshow", event => {
+    if (event.persisted) restore();
+  });
   window.addEventListener("popstate", restore);
   catalog.dataset.enhanced = "true";
   restore();
