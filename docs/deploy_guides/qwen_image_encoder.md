@@ -114,7 +114,7 @@ bash start_encoder_service.sh
 
 *   `text_encoder_type`: 设置为 **"lightllm_service"**。
 *   `service_url`: Text Encoder 服务的地址。
-*   `use_shm`: **强烈推荐开启**。
+*   `use_shm`: 按 Client 和 Server 的部署位置选择。
     *   `true`: 启用共享内存 (Shared Memory) 通信。如果 Client 和 Server 在同一台机器 (即使不同 Docker 容器，需挂载共享内存)，数据传输将通过内存直读，**零拷贝，速度极快**。
     *   `false`: 使用 HTTP 传输 base64 编码数据。适用于跨机部署。
 
@@ -187,4 +187,4 @@ python -m lightx2v.infer \
 
 *   **开发调试**: 默认模式 (HuggingFace) 兼容性最好。
 *   **单机高性能**: 使用 **Kernel Mode**。
-*   **多机/多卡/显存受限**: 使用 **Service Mode**。将 Text Encoder 部署在显存较小的卡上，主卡专注于 DiT 推理，并通过 Shared Memory 实现高效通信。
+*   **多机/多卡/显存受限**: 使用 **Service Mode**。将 Text Encoder 部署在显存较小的卡上，主卡专注于 DiT 推理。同机部署可启用共享内存；跨机部署使用 HTTP 传输，设置 `use_shm: false`。

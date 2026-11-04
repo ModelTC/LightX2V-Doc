@@ -22,8 +22,7 @@ This page provides full setup instructions for Linux and Windows. For a walkthro
 
 ## <span class="lx-heading-icon" aria-hidden="true">:material-console:</span> Linux Environment Setup { #linux-environment-setup .lx-icon-heading data-toc-label="Linux Environment Setup" }
 
-<a id="docker-environment-recommended"></a>
-### Docker Environment (Recommended)
+### Docker Environment (Recommended) { #docker-environment-recommended }
 
 Prepare the environment with a prebuilt image, then install the checked-out repository inside the container.
 
@@ -83,8 +82,7 @@ docker pull registry.cn-hangzhou.aliyuncs.com/yongyang/lightx2v:26011201-cu128
 docker pull registry.cn-hangzhou.aliyuncs.com/yongyang/lightx2v:25101501-cu124
 ```
 
-<a id="conda-environment-setup"></a>
-### Conda Environment Setup
+### Conda Environment Setup { #conda-environment-setup }
 
 Create a Conda environment, then install the kernels required by your GPU and model configuration.
 

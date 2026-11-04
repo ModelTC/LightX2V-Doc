@@ -114,7 +114,7 @@ On the LightX2V side, simply modify the `config_json` to enable Service Mode.
 
 *   `text_encoder_type`: Set to **"lightllm_service"**.
 *   `service_url`: The address of the Text Encoder service.
-*   `use_shm`: **Strongly Recommended**.
+*   `use_shm`: Choose based on the client and server locations.
     *   `true`: Enable Shared Memory communication. If Client and Server are on the same machine (even in different Docker containers, provided shared memory is mounted), data transfer will happen via direct memory reading, **zero-copy, extremely fast**.
     *   `false`: Use HTTP to transfer base64 encoded data. Suitable for cross-machine deployment.
 
@@ -187,4 +187,4 @@ python -m lightx2v.infer \
 
 *   **Development/Debugging**: Default Mode (HuggingFace) for best compatibility.
 *   **High-Performance Single-Node**: Use **Kernel Mode**.
-*   **Multi-Node/Multi-Card/Memory Constrained**: Use **Service Mode**. Deploy the Text Encoder on a card with smaller memory, let the main card focus on DiT inference, and achieve efficient communication via Shared Memory.
+*   **Multi-Node/Multi-Card/Memory Constrained**: Use **Service Mode**. Deploy the Text Encoder on a card with smaller memory so the main card can focus on DiT inference. Use shared memory when both run on the same machine; for cross-machine deployments, use HTTP with `use_shm: false`.

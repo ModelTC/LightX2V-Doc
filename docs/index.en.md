@@ -106,7 +106,7 @@ Complete [environment and model setup](getting_started/index.md#prepare), then s
       }'
     ```
 
-    The response contains a `task_id`. [Wait for completion and download the video :material-arrow-right:](getting_started/index.md#send-request){ .lx-text-link }
+    Keep the returned `task_id` to [check the status and download the video :material-arrow-right:](deploy_guides/deploy_service.md#poll-download-and-cancel){ .lx-text-link }.
 
 === ":material-console: CLI"
 

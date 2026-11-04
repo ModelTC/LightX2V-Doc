@@ -52,7 +52,7 @@ curl -X POST http://localhost:8000/v1/tasks/video/ \
 
 ## 查询、下载与取消
 
-将下面的 `TASK_ID` 替换为返回的任务 ID：
+将下面的 `TASK_ID` 替换为已返回的任务 ID，并使用实际的服务地址。若按首页或快速入门启动服务，将示例中的端口 `8000` 改为 `8080`。
 
 ```bash title="查询任务与队列状态"
 curl http://localhost:8000/v1/tasks/TASK_ID/status

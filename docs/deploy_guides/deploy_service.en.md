@@ -52,7 +52,7 @@ Optional generation fields inherit the startup defaults when omitted or set to `
 
 ## Poll, download, and cancel
 
-Replace `TASK_ID` below with the returned ID:
+Replace `TASK_ID` below with the returned task ID and use your running service's address. If you followed the homepage or quickstart, change port `8000` to `8080` in these examples.
 
 ```bash title="Check task and queue status"
 curl http://localhost:8000/v1/tasks/TASK_ID/status

@@ -106,7 +106,7 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
       }'
     ```
 
-    请求返回 `task_id`。[等待完成并下载视频 :material-arrow-right:](getting_started/index.md#send-request){ .lx-text-link }
+    保留返回的 `task_id`，[查询状态并下载视频 :material-arrow-right:](deploy_guides/deploy_service.md#查询下载与取消){ .lx-text-link }。
 
 === ":material-console: 命令行"
 

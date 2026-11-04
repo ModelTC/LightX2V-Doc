@@ -5,7 +5,7 @@ hide:
   - toc
 ---
 
-# Model catalog
+# Model catalog { #model-overview }
 
 <p class="lx-page-lead">Start with a task, then find a model and a working example.</p>
 
