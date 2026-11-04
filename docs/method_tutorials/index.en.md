@@ -84,4 +84,4 @@ Check each guide and model example for supported configurations and combination 
 2. **Compare the same timing scope.** Separate model loading, the first run and subsequent generations. Also observe peak GPU and host memory. Less denoising computation does not imply a proportional reduction in total latency.
 3. **Inspect the output.** Compare detail, motion consistency and adherence to the prompt before changing another setting.
 
-Once results are reproducible, consult the testing methods in [benchmarks](../getting_started/benchmark.md) or use [performance profiling](torch_profiling.md) to investigate further.
+Once results are reproducible, use [performance profiling](torch_profiling.md) to identify bottlenecks.

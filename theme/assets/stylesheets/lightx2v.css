@@ -262,7 +262,7 @@ a, button, input { -webkit-tap-highlight-color: transparent; }
 .lx-page-navigation-next { grid-column: 2; text-align: right; align-items: flex-end; }
 
 /* Alternative entry points are unnumbered; the whole destination is clickable. */
-.lx-method-links > p { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin: 1.2rem 0 1.5rem; }
+.lx-method-links > p { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; margin: 1.2rem 0 1.5rem; }
 .lx-method-links a { display: grid; align-content: start; gap: .45rem; padding: 1rem; border: 1px solid var(--lx-border); border-radius: .7rem; color: var(--lx-text); background: var(--lx-paper); }
 .lx-method-links a:hover { border-color: var(--lx-accent); background: var(--lx-surface); }
 .lx-method-links .twemoji { color: var(--lx-accent); width: 1.2rem; height: 1.2rem; }

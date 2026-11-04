@@ -2,19 +2,18 @@
 
 <p class="lx-page-lead">Choose an installation method and prepare the environment, images and kernels.</p>
 
-This page provides full setup instructions for Linux and Windows. For a walkthrough to your first output, start with [Start a service and send your first request](index.md).
+This page provides full setup instructions for Linux. For a walkthrough to your first output, start with [Start a service and send your first request](index.md).
 
 <div class="lx-method-links" id="table-of-contents" markdown>
 
 [:material-docker: **Linux Docker**<span>Recommended: use a prebuilt image to simplify setup.</span>](#docker-environment-recommended){ .lx-method-recommended }
 [:material-console: **Linux Conda**<span>Manage your Python environment and install the kernels you need.</span>](#conda-environment-setup)
-[:material-microsoft-windows: **Windows**<span>Use Conda with matching Windows dependencies.</span>](#windows-environment-setup)
 
 </div>
 
 ## <span class="lx-heading-icon" aria-hidden="true">:material-memory:</span> System Requirements { #system-requirements .lx-icon-heading data-toc-label="System Requirements" }
 
-- **Operating System**: Linux (Ubuntu 18.04+) or Windows 10/11
+- **Operating System**: Linux (Ubuntu 18.04+)
 - **Python**: 3.10 or higher
 - **GPU**: NVIDIA GPU with CUDA support; required VRAM depends on the model and configuration
 - **Memory**: Enough host RAM for the selected model, including CPU offload buffers
@@ -171,144 +170,6 @@ import lightx2v
 print(f"LightX2V Version: {lightx2v.__version__}")
 ```
 
-## <span class="lx-heading-icon" aria-hidden="true">:material-microsoft-windows:</span> Windows Environment Setup { #windows-environment-setup .lx-icon-heading data-toc-label="Windows Environment Setup" }
-
-The following instructions use Conda to prepare a Windows environment.
-
-### Conda Environment Setup
-
-#### Step 1: Check CUDA Version
-
-First, confirm your GPU driver and CUDA version:
-
-```bat
-nvidia-smi
-```
-
-The **CUDA Version** shown by `nvidia-smi` is the maximum CUDA version supported by the driver, not necessarily the installed toolkit. Use `nvcc --version` for the local toolkit and `python -c "import torch; print(torch.version.cuda)"` for the CUDA version used by PyTorch. Select compatible packages rather than requiring all three values to be identical. See [NVIDIA's definition](https://docs.nvidia.com/deploy/nvidia-smi/index.html#cuda-umd-version).
-
-#### Step 2: Create Python Environment
-
-```bat
-REM Create new environment (Python 3.12 recommended)
-conda create -n lightx2v python=3.12 -y
-
-REM Activate environment
-conda activate lightx2v
-```
-
-!!! tip "Python version"
-    Python 3.10 or higher is recommended for best compatibility.
-
-#### Step 3: Install PyTorch Framework
-
-**Method 1: Download Official Wheel Package (Recommended)**
-
-1. Visit the [PyTorch Official Download Page](https://download.pytorch.org/whl/torch/)
-2. Select the corresponding version wheel package, paying attention to matching:
-   - **Python Version**: Consistent with your environment
-   - **CUDA Version**: Matches your GPU driver
-   - **Platform**: Select Windows version
-
-**Example (Python 3.12 + PyTorch 2.6 + CUDA 12.4):**
-
-```bat
-REM Download and install PyTorch
-pip install torch-2.6.0+cu124-cp312-cp312-win_amd64.whl
-
-REM Install supporting packages
-pip install torchvision==0.21.0 torchaudio==2.6.0
-```
-
-**Method 2: Direct Installation via pip**
-
-```bat
-REM CUDA 12.4 version example
-pip install torch==2.6.0+cu124 torchvision==0.21.0+cu124 torchaudio==2.6.0+cu124 --index-url https://download.pytorch.org/whl/cu124
-```
-
-#### Step 4: Clone Repository and Install Dependencies
-
-```bat
-REM Clone project code
-git clone https://github.com/ModelTC/LightX2V.git
-cd LightX2V
-
-REM Install Windows-specific dependencies
-pip install -r requirements_win.txt
-pip install -v -e .
-```
-
-#### Step 5: Install Attention Mechanism Operators
-
-**Option A: Flash Attention 2**
-
-```bat
-pip install flash-attn==2.7.2.post1
-```
-
-**Option B: SageAttention 2 (Strongly Recommended)**
-
-**Download Sources:**
-
-- [Windows Special Version 1](https://github.com/woct0rdho/SageAttention/releases)
-- [Windows Special Version 2](https://github.com/sdbds/SageAttention-for-windows/releases)
-
-```bat
-REM Install SageAttention (please adjust according to actual filename)
-pip install sageattention-2.1.1+cu126torch2.6.0-cp312-cp312-win_amd64.whl
-```
-
-!!! warning "SageAttention version compatibility"
-    SageAttention's CUDA version doesn't need to be strictly aligned, but Python and PyTorch versions must match.
-
-#### Step 6: Install Quantization Operators (Optional)
-
-By default, LightX2V uses Triton kernel for quantization inference, which is efficient and requires no additional dependencies. Just ensure that `triton-windows` is installed.
-
-If you need to use other quantization operators, you can install the following options:
-
-**1. Install Windows Version of vLLM**
-
-Download the corresponding wheel package from [vllm-windows releases](https://github.com/SystemPanic/vllm-windows/releases).
-
-**Version Matching Requirements:**
-
-- Python version match
-- PyTorch version match
-- CUDA version match
-
-```bat
-REM Install vLLM (please adjust according to actual filename)
-pip install vllm-0.9.1+cu124-cp312-cp312-win_amd64.whl
-```
-
-**2. Install q8-kernels**
-
-For RTX 40 series GPUs, it is recommended to install `q8_kernel==0.1.0`:
-
-```bat
-git clone https://github.com/KONAKONA666/q8_kernels.git
-pushd q8_kernels
-git submodule update --init --recursive
-python setup.py install
-popd
-```
-
-For other GPUs, it is recommended to install `q8_kernel==0.5.0`. Please refer to [LTX-Video-Q8-Kernels](https://github.com/Lightricks/LTX-Video-Q8-Kernels).
-
-!!! tip "Quantization and weights"
-    - It is recommended to use the default Triton kernel for inference
-    - Quantized models can be downloaded from [LightX2V HuggingFace](https://huggingface.co/lightx2v)
-    - For more quantization information, please refer to the [Quantization Documentation](../method_tutorials/quantization.md)
-
-#### Step 7: Verify Installation
-
-```python
-import lightx2v
-print(f"LightX2V Version: {lightx2v.__version__}")
-```
-
 ## <span class="lx-heading-icon" aria-hidden="true">:material-play-circle-outline:</span> Inference Usage { #inference-usage .lx-icon-heading data-toc-label="Inference Usage" }
 
 ### Model Preparation
@@ -332,13 +193,6 @@ You need to configure the downloaded model path in the run script. In addition t
 ```bash
 # Run after modifying the path in the script
 bash scripts/wan/run_wan_t2v.sh
-```
-
-#### Windows Environment
-
-```bat
-REM Use Windows batch script
-scripts\win\run_wan_t2v.bat
 ```
 
 #### Python Script Launch

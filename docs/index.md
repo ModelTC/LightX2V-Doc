@@ -59,8 +59,8 @@ LightX2V 支持多种主流模型，覆盖图像生成与编辑、视频生成�
 <p class="lx-showcase-error" role="status" hidden>暂时无法加载视频。<a href="https://github.com/user-attachments/assets/7bffe48f-e433-430b-91dc-ac745908ba3a">打开原视频</a></p>
 <figcaption>
 <strong>Wan2.1 · 图像生成视频</strong>
-<span>来自 LightX2V 性能基准的生成示例。</span>
-<a href="getting_started/benchmark.html">查看配置与效果对比</a>
+<span>将静态图像转化为连续的视频画面。</span>
+<a href="models/wan.html#choose-task">查看 Wan2.1 使用指南</a>
 </figcaption>
 </figure>
 

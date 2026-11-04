@@ -30,7 +30,6 @@ Gradio 与 ComfyUI 集成分别维护在独立仓库中，支持的模型和安�
 | 缩短单次生成时间 | [低延迟部署](for_low_latency.md) | 使用匹配的蒸馏权重或评估其他加速方法，同时比较生成效果 |
 | 多张 GPU 协作生成 | [并行推理](../method_tutorials/parallel.md) | 并行配置、进程数与可用 GPU 一致 |
 | 运行多个独立服务 | [多 GPU 与多服务](deploy_service.md#多-gpu-与多服务) | 为各服务分别分配 GPU、API 端口和指标端口 |
-| 在 Windows 上运行 | [Windows 本地部署](deploy_local_windows.md) | 使用 Windows 对应的环境、依赖和启动脚本 |
 
 尚不确定瓶颈时，先阅读[选择加速方案](../method_tutorials/index.md)，区分显存、单次延迟与多请求需求。
 

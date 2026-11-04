@@ -59,8 +59,8 @@ Choose what you want to create or process, then find a model and its examples.
 <p class="lx-showcase-error" role="status" hidden>Video unavailable. <a href="https://github.com/user-attachments/assets/7bffe48f-e433-430b-91dc-ac745908ba3a">Open the source video</a></p>
 <figcaption>
 <strong>Wan2.1 · Image to video</strong>
-<span>A generation example from the LightX2V benchmarks.</span>
-<a href="getting_started/benchmark.html">View configuration and comparisons</a>
+<span>Animate a still image into a video.</span>
+<a href="models/wan.html#choose-task">Explore the Wan2.1 guide</a>
 </figcaption>
 </figure>
 

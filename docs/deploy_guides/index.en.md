@@ -30,7 +30,6 @@ Gradio and ComfyUI integrations are maintained in separate repositories. Check e
 | Reduce generation latency | [Low-latency deployment](for_low_latency.md) | Use matching distilled weights or evaluate other optimizations, and compare output quality |
 | Use multiple GPUs for one generation | [Parallel inference](../method_tutorials/parallel.md) | Match the parallel configuration, process count and available GPUs |
 | Run independent services | [Multiple GPUs and services](deploy_service.md#multiple-gpus-and-multiple-services) | Assign GPUs, API ports and metrics ports to each service |
-| Run on Windows | [Windows deployment](deploy_local_windows.md) | Use the Windows environment, dependencies and startup scripts |
 
 If the bottleneck is unclear, [choose an acceleration approach](../method_tutorials/index.md) first. Distinguish memory constraints, single-request latency and multi-request workloads.
 

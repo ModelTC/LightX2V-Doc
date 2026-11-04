@@ -2,20 +2,19 @@
 
 <p class="lx-page-lead">选择安装方式，准备运行环境、镜像和算子依赖。</p>
 
-本页提供 Linux 与 Windows 的完整安装说明。希望先走通一次生成流程，可从[启动服务与首次请求](index.md)开始。
+本页提供 Linux 的完整安装说明。希望先走通一次生成流程，可从[启动服务与首次请求](index.md)开始。
 
 <div class="lx-method-links" id="目录" markdown>
 
 [:material-docker: **Linux Docker**<span>推荐使用预置镜像，减少环境准备工作。</span>](#docker-environment-recommended){ .lx-method-recommended }
 [:material-console: **Linux Conda**<span>自行管理 Python 环境，按需安装算子。</span>](#conda-environment-setup)
-[:material-microsoft-windows: **Windows**<span>使用 Conda，安装匹配的 Windows 依赖。</span>](#windows-environment-setup)
 
 </div>
 
 <a id="system-requirements"></a>
 ## <span class="lx-heading-icon" aria-hidden="true">:material-memory:</span> 系统要求 { #系统要求 .lx-icon-heading data-toc-label="系统要求" }
 
-- **操作系统**: Linux (Ubuntu 18.04+) 或 Windows 10/11
+- **操作系统**: Linux (Ubuntu 18.04+)
 - **Python**: 3.10 或更高版本
 - **GPU**: 支持 CUDA 的 NVIDIA GPU；显存需求取决于模型与配置
 - **内存**: 需容纳所选模型及 CPU offload 缓冲区
@@ -174,144 +173,6 @@ import lightx2v
 print(f"LightX2V 版本: {lightx2v.__version__}")
 ```
 
-<a id="windows-environment-setup"></a>
-## <span class="lx-heading-icon" aria-hidden="true">:material-microsoft-windows:</span> Windows 系统环境搭建 { #windows-系统环境搭建 .lx-icon-heading data-toc-label="Windows 系统环境搭建" }
-
-以下使用 Conda 准备 Windows 环境。
-
-### Conda 环境搭建
-
-#### 步骤 1: 检查 CUDA 版本
-
-首先确认您的 GPU 驱动和 CUDA 版本：
-
-```bat
-nvidia-smi
-```
-
-`nvidia-smi` 中的 **CUDA Version** 表示驱动支持的最高 CUDA 版本，不一定是本机安装的 Toolkit 版本。用 `nvcc --version` 查看本地 Toolkit，用 `python -c "import torch; print(torch.version.cuda)"` 查看 PyTorch 使用的 CUDA 版本。选择相互兼容的包即可，不要求这三个值完全一致，详见 [NVIDIA 定义](https://docs.nvidia.com/deploy/nvidia-smi/index.html#cuda-umd-version)。
-
-#### 步骤 2: 创建 Python 环境
-
-```bat
-REM 创建新环境（推荐 Python 3.12）
-conda create -n lightx2v python=3.12 -y
-
-REM 激活环境
-conda activate lightx2v
-```
-
-!!! tip "Python 版本"
-    建议使用 Python 3.10 或更高版本以获得最佳兼容性。
-
-#### 步骤 3: 安装 PyTorch 框架
-
-**方法一：下载官方 wheel 包（推荐）**
-
-1. 访问 [PyTorch 官方下载页面](https://download.pytorch.org/whl/torch/)
-2. 选择对应版本的 wheel 包，注意匹配以下参数：
-   - **Python 版本**: 与您的环境一致
-   - **CUDA 版本**: 与您的 GPU 驱动匹配
-   - **平台**: 选择 Windows 版本
-
-**示例（Python 3.12 + PyTorch 2.6 + CUDA 12.4）：**
-
-```bat
-REM 下载并安装 PyTorch
-pip install torch-2.6.0+cu124-cp312-cp312-win_amd64.whl
-
-REM 安装配套包
-pip install torchvision==0.21.0 torchaudio==2.6.0
-```
-
-**方法二：使用 pip 直接安装**
-
-```bat
-REM CUDA 12.4 版本示例
-pip install torch==2.6.0+cu124 torchvision==0.21.0+cu124 torchaudio==2.6.0+cu124 --index-url https://download.pytorch.org/whl/cu124
-```
-
-#### 步骤 4: 克隆项目并安装依赖
-
-```bat
-REM 克隆项目代码
-git clone https://github.com/ModelTC/LightX2V.git
-cd LightX2V
-
-REM 安装 Windows 专用依赖
-pip install -r requirements_win.txt
-pip install -v -e .
-```
-
-#### 步骤 5: 安装注意力机制算子
-
-**选项 A: Flash Attention 2**
-
-```bat
-pip install flash-attn==2.7.2.post1
-```
-
-**选项 B: SageAttention 2（强烈推荐）**
-
-**下载源：**
-
-- [Windows 专用版本 1](https://github.com/woct0rdho/SageAttention/releases)
-- [Windows 专用版本 2](https://github.com/sdbds/SageAttention-for-windows/releases)
-
-```bat
-REM 安装 SageAttention（请根据实际文件名调整）
-pip install sageattention-2.1.1+cu126torch2.6.0-cp312-cp312-win_amd64.whl
-```
-
-!!! warning "SageAttention 版本匹配"
-    SageAttention 的 CUDA 版本可以不严格对齐，但 Python 和 PyTorch 版本必须匹配。
-
-#### 步骤 6 (可选): 安装量化算子
-
-默认使用 Triton kernel 进行量化推理，实现高效且无需安装额外依赖，只需确保已安装 `triton-windows` 即可。
-
-如需使用其他量化算子，可安装以下选项：
-
-**1. 安装 Windows 版 vLLM**
-
-从 [vllm-windows releases](https://github.com/SystemPanic/vllm-windows/releases) 下载对应的 wheel 包。
-
-**版本匹配要求：**
-
-- Python 版本匹配
-- PyTorch 版本匹配
-- CUDA 版本匹配
-
-```bat
-REM 安装 vLLM（请根据实际文件名调整）
-pip install vllm-0.9.1+cu124-cp312-cp312-win_amd64.whl
-```
-
-**2. 安装 q8-kernels**
-
-对于 RTX 40 系显卡，推荐安装 `q8_kernel==0.1.0`：
-
-```bat
-git clone https://github.com/KONAKONA666/q8_kernels.git
-pushd q8_kernels
-git submodule update --init --recursive
-python setup.py install
-popd
-```
-
-对于其他显卡，推荐安装 `q8_kernel==0.5.0`，请参考 [LTX-Video-Q8-Kernels](https://github.com/Lightricks/LTX-Video-Q8-Kernels)。
-
-!!! tip "量化与权重"
-    - 建议使用默认的 Triton kernel 进行推理
-    - 量化模型可以从 [LightX2V HuggingFace](https://huggingface.co/lightx2v) 下载
-    - 更多量化相关信息请参考 [量化文档](../method_tutorials/quantization.md)
-
-#### 步骤 7: 验证安装
-```python
-import lightx2v
-print(f"LightX2V 版本: {lightx2v.__version__}")
-```
-
 <a id="inference-usage"></a>
 ## <span class="lx-heading-icon" aria-hidden="true">:material-play-circle-outline:</span> 推理使用 { #推理使用 .lx-icon-heading data-toc-label="推理使用" }
 
@@ -338,12 +199,6 @@ print(f"LightX2V 版本: {lightx2v.__version__}")
 bash scripts/wan/run_wan_t2v.sh
 ```
 
-#### Windows 环境
-
-```bat
-REM 使用 Windows 批处理脚本
-scripts\win\run_wan_t2v.bat
-```
 #### Python脚本启动
 
 ```python

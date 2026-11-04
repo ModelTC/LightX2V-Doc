@@ -7,12 +7,6 @@ edit_uri: !ENV [LIGHTX2V_DOCS_EDIT_URI, "https://github.com/ModelTC/LightX2V-Doc
 docs_dir: docs
 site_dir: site
 use_directory_urls: false
-# Retain published reference pages without placing them in the navigation.
-not_in_nav: |
-  getting_started/benchmark.md
-  getting_started/benchmark.en.md
-  deploy_guides/windows_legacy.md
-  deploy_guides/windows_legacy.en.md
 copyright: Copyright © 2026 LightX2V Team
 
 theme:
@@ -103,7 +97,6 @@ nav:
       - 接入与运行:
           - LoRA 部署: deploy_guides/lora_deploy.md
           - 图形界面与生态集成: deploy_guides/interfaces.md
-          - Windows 本地部署: deploy_guides/deploy_local_windows.md
       - 进阶部署:
           - 分离式推理: deploy_guides/disagg.md
           - Qwen Image 编码器: deploy_guides/qwen_image_encoder.md
@@ -172,7 +165,6 @@ plugins:
             低延迟部署: Low-latency deployment
             接入与运行: Integration and serving
             LoRA 部署: LoRA deployment
-            Windows 本地部署: Windows deployment
             进阶部署: Advanced deployment
             分离式推理: Disaggregated inference
             Qwen Image 编码器: Qwen Image encoder
